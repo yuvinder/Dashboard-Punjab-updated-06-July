@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Punjab Team Dashboard</title>
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+font-family:'Inter',sans-serif;
+background:#ffffff;
+min-height:100vh;
+padding:35px 18px;
+color:#111827;
+overflow-x:hidden;
+}
+
+.header{
+text-align:center;
+margin-bottom:50px;
+}
+
+.header h1{
+font-size:42px;
+font-weight:800;
+letter-spacing:-1px;
+background:linear-gradient(90deg,#2563eb,#7c3aed,#ec4899);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+}
+
+.header p{
+margin-top:12px;
+font-size:18px;
+color:#64748b;
+font-weight:500;
+}
+
+.grid{
+max-width:1100px;
+margin:auto;
+display:grid;
+grid-template-columns:repeat(5,1fr);
+gap:42px 24px;
+}
+
+.app{
+display:flex;
+flex-direction:column;
+align-items:center;
+text-decoration:none;
+color:#111827;
+transition:.35s ease;
+cursor:pointer;
+}
+
+.app:hover{
+transform:translateY(-6px);
+}
+
+.icon{
+font-size:78px;
+transition:.35s ease;
+filter:drop-shadow(0 14px 24px rgba(0,0,0,.14));
+}
+
+.app:hover .icon{
+transform:translateY(-8px) scale(1.12);
+}
+
+.stock{color:#10b981;}
+.price{color:#2563eb;}
+.tour{color:#f59e0b;}
+.farmer{color:#65a30d;}
+.products{color:#db2777;}
+.news{color:#7c3aed;}
+.sales{color:#0891b2;}
+.accounts{color:#0f766e;}
+.outstanding{color:#dc2626;}
+.misc{color:#9333ea;}
+
+.app span{
+margin-top:16px;
+font-size:17px;
+font-weight:700;
+text-align:center;
+line-height:1.3;
+}
+
+.footer{
+margin-top:65px;
+text-align:center;
+font-size:13px;
+color:#64748b;
+}
+
+.footer span{
+font-weight:700;
+color:#111827;
+}
+
+/* TOUR PAGE */
+
+#tourPage{
+display:none;
+}
+
+.back-btn{
+display:inline-flex;
+align-items:center;
+gap:10px;
+padding:14px 24px;
+border-radius:18px;
+background:#111827;
+color:white;
+font-weight:700;
+cursor:pointer;
+margin-bottom:24px;
+}
+
+.container{
+max-width:720px;
+margin:auto;
+background:#ffffff;
+border-radius:30px;
+padding:28px;
+box-shadow:0 12px 35px rgba(0,0,0,.08);
+}
+
+.title{
+text-align:center;
+font-size:34px;
+font-weight:800;
+}
+
+.subtitle{
+text-align:center;
+margin-top:8px;
+margin-bottom:24px;
+font-size:16px;
+color:#64748b;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+overflow:hidden;
+border-radius:18px;
+}
+
+th{
+background:linear-gradient(135deg,#2563eb,#7c3aed);
+color:white;
+padding:14px 8px;
+font-size:15px;
+}
+
+td{
+padding:14px 8px;
+text-align:center;
+border-bottom:1px solid #e5e7eb;
+font-size:15px;
+}
+
+tr:nth-child(even){
+background:#f8fafc;
+}
+
+.brand{
+font-weight:700;
+}
+
+.points{
+font-weight:700;
+color:#2563eb;
+}
+
+input{
+width:80px;
+padding:10px;
+border-radius:12px;
+border:1px solid #d1d5db;
+text-align:center;
+font-weight:700;
+font-size:15px;
+}
+
+.total-box{
+margin-top:24px;
+padding:28px;
+border-radius:24px;
+background:linear-gradient(135deg,#2563eb,#7c3aed);
+text-align:center;
+color:white;
+}
+
+.total-box h2{
+font-size:18px;
+font-weight:500;
+}
+
+.total-value{
+font-size:46px;
+font-weight:800;
+margin-top:8px;
+}
+
+@media(max-width:900px){
+
+.grid{
+grid-template-columns:repeat(3,1fr);
+}
+
+.icon{
+font-size:66px;
+}
+
+}
+
+@media(max-width:500px){
+
+body{
+padding:24px 14px;
+}
+
+.grid{
+grid-template-columns:repeat(3,1fr);
+gap:30px 16px;
+}
+
+.icon{
+font-size:56px;
+}
+
+.app span{
+font-size:13px;
+}
+
+.header h1{
+font-size:28px;
+}
+
+.header p{
+font-size:15px;
+}
+
+.title{
+font-size:28px;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="homePage">
+
+<div class="header">
+
+<h1>Punjab Team Dashboard</h1>
+
+<p>Professional Smart Access Portal</p>
+
+</div>
+
+<div class="grid">
+
+<a class="app"
+href="https://datastudio.google.com/u/0/reporting/bebbc2ee-f7a8-4342-ae3d-a18411abe362/page/eHYvF"
+target="_blank">
+
+<i class="fa-solid fa-warehouse icon stock"></i>
+<span>Stock Report</span>
+
+</a>
+
+<a class="app"
+href="https://datastudio.google.com/u/0/reporting/18eb2905-ceb9-4459-87d1-1c4dd6fbbf4a/page/kBPyF"
+target="_blank">
+
+<i class="fa-solid fa-indian-rupee-sign icon price"></i>
+<span>Price List</span>
+
+</a>
+
+<div class="app" onclick="openTourPage()">
+
+<i class="fa-solid fa-plane-departure icon tour"></i>
+<span>Tour Calculator</span>
+
+</div>
+
+<a class="app"
+href="https://datastudio.google.com/u/0/reporting/febd6f4d-bd0b-4cc4-b4e2-6c1f0b65227e/page/6wQLF"
+target="_blank">
+
+<i class="fa-solid fa-tractor icon farmer"></i>
+<span>Farmer Dashboard</span>
+
+</a>
+
+<a class="app"
+href="https://drive.google.com/drive/folders/1_ZlApGdobNxDFWmjzAiVKEw_tRTG_Xdr"
+target="_blank">
+
+<i class="fa-solid fa-cubes-stacked icon products"></i>
+<span>Products</span>
+
+</a>
+
+<a class="app"
+href="https://drive.google.com/drive/folders/1tEBbakp8xo9mVssStVOeTrmmDFwJZYpd?usp=drive_link"
+target="_blank">
+
+<i class="fa-solid fa-photo-film icon news"></i>
+<span>News & Video</span>
+
+</a>
+
+<a class="app"
+href="https://datastudio.google.com/u/0/reporting/82cf41fe-2b62-4e9e-8c4f-4e132b16b996/page/QhTyF"
+target="_blank">
+
+<i class="fa-solid fa-chart-line icon sales"></i>
+<span>Sales Dashboard</span>
+
+</a>
+
+<a class="app"
+href="https://drive.google.com/drive/folders/1KFwNQwBrOx1ULmbH5gCbvn96Rere-hDG?usp=drive_link"
+target="_blank">
+
+<i class="fa-solid fa-building-columns icon accounts"></i>
+<span>Account Statements</span>
+
+</a>
+
+<a class="app" href="https://datastudio.google.com/reporting/b132b808-e944-4476-8677-c6ede8414f9c" target="_blank">
+
+<i class="fa-solid fa-file-invoice-dollar icon outstanding"></i>
+<span>Party Wise Outstanding</span>
+
+</a>
+
+
+<a class="app"
+href="https://yuvinder.github.io/OD-dashboard/"
+target="_blank">
+
+<i class="fa-solid fa-scale-balanced icon outstanding"></i>
+<span>OD Check</span>
+
+</a>
+
+
+<a class="app" href="https://drive.google.com/drive/folders/1BWQHp611Wlag-7SsU8PBk2J0qr8kDHjO" target="_blank">
+
+<i class="fa-solid fa-layer-group icon misc"></i>
+<span>Misc</span>
+
+</a>
+
+</div>
+
+<div class="footer">
+Created & Developed by <span>Yuvinder Kumar</span>
+</div>
+
+</div>
+
+<!-- TOUR PAGE -->
+
+<div id="tourPage">
+
+<div class="back-btn" onclick="goHome()">
+<i class="fa-solid fa-arrow-left"></i>
+Back to Dashboard
+</div>
+
+<div class="container">
+
+<div class="title">
+Natco Tour Scheme Calculator
+</div>
+
+<div class="subtitle">
+Professional Incentive Point Calculator
+</div>
+
+<table>
+
+<tr>
+<th>Brand</th>
+<th>Pts</th>
+<th>Qty</th>
+<th>Total</th>
+</tr>
+
+<tbody id="tbl"></tbody>
+
+</table>
+
+<div class="total-box">
+<h2>Grand Total Points</h2>
+<div class="total-value" id="grand">0.00</div>
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+function openTourPage(){
+document.getElementById("homePage").style.display="none";
+document.getElementById("tourPage").style.display="block";
+window.scrollTo(0,0);
+}
+
+function goHome(){
+document.getElementById("tourPage").style.display="none";
+document.getElementById("homePage").style.display="block";
+window.scrollTo(0,0);
+}
+
+const products = [
+
+["ASTOR",9.5],
+["ATMOS",5.5],
+["CYANAT",2.5],
+["GLANZ",2],
+["NATDUO",0.06],
+["NATERRA",0.02],
+["NATGEN",6],
+["NATGEN PRO",3.5],
+["NATLIGO",1],
+["SLAYDEN",1.5],
+["DEXARON",0.5],
+["PAMUK",3],
+["DI-FORCE",1],
+["SPIROVANTA",1],
+["VECTRA",1]
+
+];
+
+let html = "";
+
+products.forEach((p,i)=>{
+
+html += `
+
+<tr>
+
+<td class="brand">${p[0]}</td>
+
+<td class="points">${p[1]}</td>
+
+<td>
+<input type="number"
+id="q${i}"
+placeholder="0"
+oninput="calc()">
+</td>
+
+<td id="t${i}">0</td>
+
+</tr>
+
+`;
+
+});
+
+document.getElementById("tbl").innerHTML = html;
+
+function calc(){
+
+let grand = 0;
+
+products.forEach((p,i)=>{
+
+let qty =
+parseFloat(document.getElementById("q"+i).value) || 0;
+
+let total = qty * p[1];
+
+document.getElementById("t"+i).innerText =
+total.toFixed(2);
+
+grand += total;
+
+});
+
+document.getElementById("grand").innerText =
+grand.toFixed(2);
+
+}
+
+</script>
+
+</body>
+</html>
