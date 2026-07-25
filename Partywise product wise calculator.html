@@ -3,9 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Party Plan Product Wise V5</title>
+<title>Party Plan Product Wise</title>
+<!-- Include html2pdf.js Library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
     body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; background: #eef5ef; }
+    #pdf-content { background: #eef5ef; min-height: 100vh; padding-bottom: 20px; }
     header { background: #167a3a; color: #fff; padding: 16px; font-size: 24px; font-weight: 700; position: sticky; top: 0; z-index: 100; }
     .card { background: #fff; margin: 10px; padding: 14px; border-radius: 14px; box-shadow: 0 2px 8px rgba(0,0,0,.12); }
     .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
@@ -24,6 +27,22 @@
     .footer { position: sticky; bottom: 0; background: #fff; border-top: 4px solid #167a3a; padding: 12px; display: flex; justify-content: space-around; font-weight: bold; z-index: 100; }
     .badge { background: #167a3a; color: #fff; padding: 5px 12px; border-radius: 20px; }
 
+    /* Styling for the Dynamic PDF Tile */
+    #pdfTile {
+        display: none; 
+        text-align: center; 
+        background: #e8f8ec; 
+        border: 2px dashed #167a3a;
+        animation: fadeIn 0.5s ease-in-out;
+    }
+    #pdfTile h3 { margin: 0 0 10px 0; color: #167a3a; }
+    .btn-large { font-size: 18px; padding: 12px 24px; width: 100%; max-width: 300px; margin-top: 10px; }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
     /* Print-Specific Styling */
     @media print {
         body { background: #fff; }
@@ -31,49 +50,55 @@
         .card { box-shadow: none; margin: 0; padding: 0; }
         header { position: static; }
         .footer { position: static; border-top: none; margin-top: 20px; }
-        /* Hide rows with 0 quantity during print to keep the report professional */
         tbody tr:not(.active) { display: none; } 
     }
 </style>
 </head>
 <body>
+<div id="pdf-content">
+    <header>🌱 Party Plan Product Wise</header>
 
-<header>🌱 Party Plan Product Wise</header>
-
-<div class="card">
-    <div class="grid">
-        <div><b>Party Name</b><input id="party" placeholder="Enter Party Name"></div>
-        <div><b>Sales Officer</b><input id="officer" placeholder="Enter Officer Name"></div>
-        <div><b>Date</b><input id="dt" type="date"></div>
+    <div class="card">
+        <div class="grid">
+            <div><b>Party Name</b><input id="party" placeholder="Enter Party Name"></div>
+            <div><b>Month</b><input id="month" type="month"></div>
+            <div><b>Date</b><input id="dt" type="date"></div>
+            <div class="no-print">
+                <b>Saved Entries (Local Phone Storage)</b>
+                <select id="saved" onchange="loadData()">
+                    <option value="">-- Select to Load --</option>
+                </select>
+            </div>
+        </div>
+        <br>
         <div class="no-print">
-            <b>Saved Parties</b>
-            <select id="saved">
-                <option value="">-- Select to Load --</option>
-            </select>
+            <button onclick="saveData()">💾 Save Locally</button>
+            <button onclick="clearAll()">🗑 Clear All</button>
+            <button onclick="window.print()">🖨 Print</button>
         </div>
     </div>
-    <br>
-    <div class="no-print">
-        <button onclick="saveData()">💾 Save</button>
-        <button onclick="loadData()">📂 Load</button>
-        <button onclick="clearAll()">🗑 Clear All</button>
-        <button onclick="window.print()">🖨 Print</button>
+
+    <div class="card">
+        <input id="searchBox" class="no-print" placeholder="🔍 Search Product..." onkeyup="filterProducts()">
+        <table>
+            <thead>
+                <tr><th>Product</th><th>Price</th><th>Qty</th><th>Value</th></tr>
+            </thead>
+            <tbody id="tb"></tbody>
+        </table>
     </div>
-</div>
 
-<div class="card">
-    <input id="searchBox" class="no-print" placeholder="🔍 Search Product..." onkeyup="filterProducts()">
-    <table>
-        <thead>
-            <tr><th>Product</th><th>Price</th><th>Qty</th><th>Value</th></tr>
-        </thead>
-        <tbody id="tb"></tbody>
-    </table>
-</div>
+    <!-- The Dynamic PDF Tile that appears after data entry -->
+    <div class="card no-print" id="pdfTile">
+        <h3>📊 Plan Ready!</h3>
+        <p style="margin: 0; font-size: 14px; color: #555;">Your quantities have been calculated.</p>
+        <button class="btn-large" onclick="saveAsPDF()">📄 Save Plan as PDF</button>
+    </div>
 
-<div class="footer">
-    <div>Total Qty<br><span id="tq" class="badge">0.00</span></div>
-    <div>Total Value<br><span id="tv" class="badge">₹0</span></div>
+    <div class="footer">
+        <div>Total Qty<br><span id="tq" class="badge">0.00</span></div>
+        <div>Total Value<br><span id="tv" class="badge">₹0</span></div>
+    </div>
 </div>
 
 <script>
@@ -88,7 +113,7 @@ const products = [
 ];
 
 const tb = document.getElementById("tb");
-const PREFIX = "PartyPlan_";
+const PREFIX = "PartyPlanEntry_"; 
 
 // Initialize Table
 products.forEach((p, index) => {
@@ -100,11 +125,13 @@ products.forEach((p, index) => {
     </tr>`;
 });
 
-// Set Today's Date
-document.getElementById("dt").value = new Date().toISOString().slice(0,10);
+// Set Today's Date & Current Month
+const now = new Date();
+document.getElementById("dt").value = now.toISOString().slice(0, 10);
+document.getElementById("month").value = now.toISOString().slice(0, 7);
 populateDropdown();
 
-// Calculate Totals
+// Calculate Totals & Trigger PDF Tile
 function calc() {
     let tq = 0, tv = 0;
     document.querySelectorAll("#tb tr").forEach(r => {
@@ -121,6 +148,14 @@ function calc() {
     });
     document.getElementById("tq").innerText = tq.toFixed(2);
     document.getElementById("tv").innerText = "₹" + tv.toLocaleString();
+
+    // Dynamically show the PDF Tile if items are entered
+    const pdfTile = document.getElementById("pdfTile");
+    if (tq > 0) {
+        pdfTile.style.display = "block";
+    } else {
+        pdfTile.style.display = "none";
+    }
 }
 
 // Clear Form
@@ -128,7 +163,7 @@ function clearAll() {
     if (!confirm("Clear all quantities and reset the form?")) return;
     document.querySelectorAll(".qty").forEach(q => q.value = "");
     document.getElementById("party").value = "";
-    calc();
+    calc(); // Recalculates to 0, which also hides the PDF tile
 }
 
 // Search / Filter Function
@@ -141,7 +176,7 @@ function filterProducts() {
     });
 }
 
-// Save Data to Local Storage
+// Save Data to Local Phone Storage
 function saveData() {
     const partyName = document.getElementById("party").value.trim();
     if (!partyName) {
@@ -149,7 +184,7 @@ function saveData() {
         return;
     }
 
-    const officer = document.getElementById("officer").value;
+    const month = document.getElementById("month").value;
     const dt = document.getElementById("dt").value;
     const items = {};
 
@@ -159,26 +194,47 @@ function saveData() {
         }
     });
 
-    const record = { officer, dt, items };
-    localStorage.setItem(PREFIX + partyName, JSON.stringify(record));
+    const id = Date.now();
+    const record = { id, partyName, month, dt, items };
     
-    alert(`Data for ${partyName} saved successfully!`);
+    // Saves directly to device's local storage
+    localStorage.setItem(PREFIX + id, JSON.stringify(record));
+    
+    alert(`Data for ${partyName} saved locally to your device!`);
     populateDropdown();
-    document.getElementById("saved").value = PREFIX + partyName;
+    
+    document.getElementById("saved").value = PREFIX + id;
 }
 
-// Populate Saved Parties Dropdown
+// Populate Saved Entries Dropdown
 function populateDropdown() {
     const select = document.getElementById("saved");
     select.innerHTML = '<option value="">-- Select to Load --</option>';
     
+    let savedEntries = [];
+    
     for (let i = 0; i < localStorage.length; i++) {
         let key = localStorage.key(i);
         if (key.startsWith(PREFIX)) {
-            let partyName = key.replace(PREFIX, "");
-            select.innerHTML += `<option value="${key}">${partyName}</option>`;
+            try {
+                let record = JSON.parse(localStorage.getItem(key));
+                savedEntries.push(record);
+            } catch(e) {
+                console.error("Error parsing saved data", e);
+            }
         }
     }
+
+    savedEntries.sort((a, b) => b.id - a.id);
+
+    savedEntries.forEach(record => {
+        let dateObj = new Date(record.id);
+        let timeString = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        
+        select.innerHTML += `<option value="${PREFIX + record.id}">
+            ${record.partyName} | ${record.dt} (${timeString})
+        </option>`;
+    });
 }
 
 // Load Data from Local Storage
@@ -186,31 +242,80 @@ function loadData() {
     const select = document.getElementById("saved");
     const key = select.value;
     
-    if (!key) {
-        alert("Please select a saved party from the dropdown first.");
-        return;
-    }
+    if (!key) return; // Exit if empty option is selected
 
     const record = JSON.parse(localStorage.getItem(key));
     if (record) {
-        document.getElementById("party").value = key.replace(PREFIX, "");
-        document.getElementById("officer").value = record.officer || "";
-        document.getElementById("dt").value = record.dt || new Date().toISOString().slice(0,10);
+        document.getElementById("party").value = record.partyName || "";
+        document.getElementById("month").value = record.month || new Date().toISOString().slice(0, 7);
+        document.getElementById("dt").value = record.dt || new Date().toISOString().slice(0, 10);
         
-        // Clear current quantities
         document.querySelectorAll(".qty").forEach(q => q.value = "");
         
-        // Apply saved quantities
-        for (const [index, val] of Object.entries(record.items)) {
-            let input = document.getElementById(`qty_${index}`);
-            if (input) input.value = val;
+        if (record.items) {
+            for (const [index, val] of Object.entries(record.items)) {
+                let input = document.getElementById(`qty_${index}`);
+                if (input) input.value = val;
+            }
         }
         
         calc();
-        // Reset search filter visually if applied
         document.getElementById("searchBox").value = "";
         filterProducts();
     }
+}
+
+// Function to Save as PDF (UPDATED FOR BUG FIXES)
+function saveAsPDF() {
+    // 1. Force scroll to top to prevent the massive blank space bug
+    window.scrollTo(0, 0);
+
+    const partyName = document.getElementById("party").value.trim() || "Party";
+    const dt = document.getElementById("dt").value || "Date";
+    const filename = `${partyName}_Plan_${dt}.pdf`;
+
+    // 2. Sync input values so the numbers actually appear in the generated PDF
+    document.querySelectorAll("input").forEach(input => {
+        input.setAttribute("value", input.value);
+    });
+
+    // 3. Temporarily hide UI elements (buttons) and rows with zero quantity
+    const noPrintElements = document.querySelectorAll('.no-print');
+    noPrintElements.forEach(el => el.style.display = 'none');
+
+    const emptyRows = document.querySelectorAll('#tb tr:not(.active)');
+    emptyRows.forEach(el => el.style.display = 'none');
+
+    // 4. Temporarily disable sticky positioning so the footer doesn't overlap data
+    const header = document.querySelector('header');
+    const footer = document.querySelector('.footer');
+    header.style.position = 'static';
+    footer.style.position = 'static';
+
+    // 5. Configure PDF Options
+    const element = document.getElementById('pdf-content');
+    const opt = {
+        margin:       [10, 10, 10, 10], 
+        filename:     filename,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { 
+            scale: 2, 
+            useCORS: true,
+            scrollY: 0 // Double protection against the scroll bug
+        }, 
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    // 6. Generate the PDF
+    html2pdf().set(opt).from(element).save().then(() => {
+        // 7. Restore the web page to normal after downloading
+        noPrintElements.forEach(el => el.style.display = '');
+        emptyRows.forEach(el => el.style.display = '');
+        header.style.position = 'sticky';
+        footer.style.position = 'sticky';
+        
+        calc(); // Ensures the PDF tile maintains its correct visibility state
+    });
 }
 </script>
 </body>
