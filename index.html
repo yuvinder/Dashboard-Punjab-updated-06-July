@@ -36,7 +36,7 @@ min-height: 100vh;
 #priceListPage {
 display: none;
 background: #eef2f5;
-padding: 35px 18px;
+padding: 10px;
 min-height: 100vh;
 }
 
@@ -246,7 +246,7 @@ margin-top:8px;
 }
 
 @media(max-width:500px){
-#homePage, #tourPage, #priceListPage { padding:24px 14px; }
+#homePage, #tourPage { padding:24px 14px; }
 .grid{ grid-template-columns:repeat(3,1fr); gap:30px 16px; }
 .icon{ font-size:56px; }
 .app span{ font-size:13px; }
@@ -356,29 +356,29 @@ margin-top:8px;
 
 
 /* --- PRICE LIST STYLES (Safely Namespaced) --- */
-.pl-container { max-width: 1200px; margin: 0 auto; background: #ffffff; padding: 25px 35px; border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.08); }
-.pl-container h2 { text-align: center; color: #2c3e50; margin-bottom: 25px; font-size: 28px; }
-.pl-search-container { margin-bottom: 20px; }
-#plSearchInput { width: 100%; padding: 14px 20px; font-size: 16px; border: 2px solid #dce1e6; border-radius: 8px; box-sizing: border-box; transition: border-color 0.3s; }
+.pl-container { max-width: 1200px; margin: 0 auto; background: #ffffff; padding: 15px 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+.pl-container h2 { text-align: center; color: #2c3e50; margin-top: 10px; margin-bottom: 15px; font-size: 22px; }
+.pl-search-container { margin-bottom: 15px; }
+#plSearchInput { width: 100%; padding: 12px 15px; font-size: 15px; border: 2px solid #dce1e6; border-radius: 6px; box-sizing: border-box; transition: border-color 0.3s; }
 #plSearchInput:focus { outline: none; border-color: #3498db; }
-.pl-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; background-color: white; }
-.pl-table th, .pl-table td { padding: 15px; text-align: left; border-bottom: 1px solid #e9ecef; vertical-align: top; }
-.pl-table th { background-color: #2c3e50; color: white; position: sticky; top: 0; font-weight: 600; letter-spacing: 0.5px; z-index: 10; }
+.pl-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; background-color: white; }
+.pl-table th, .pl-table td { padding: 10px; text-align: left; border-bottom: 1px solid #e9ecef; vertical-align: middle; }
+.pl-table th { background-color: #2c3e50; color: white; position: sticky; top: 0; font-weight: 600; font-size: 14px; letter-spacing: 0.5px; z-index: 10; }
 .pl-table tr:hover td { background-color: #f8fbfd; }
-.pl-product-name { font-weight: bold; color: #2980b9; font-size: 1.1em; }
+
+/* Product Name & Technical Name Styling */
+.pl-prod-title { font-weight: 700; color: #2980b9; font-size: 1.1em; text-transform: uppercase; }
+.pl-tech-name { font-size: 12px; color: #6c757d; font-weight: 500; margin-top: 4px; line-height: 1.3; }
 
 /* Price List Pack-wise Pricing Styling */
-.pl-pack-container { display: flex; flex-direction: column; gap: 5px; }
-.pl-pack-item { display: flex; justify-content: space-between; align-items: center; background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 5px 12px; border-radius: 6px; font-size: 14px; }
-.pl-pack-qty { color: #475569; font-weight: 500; }
+.pl-pack-container, .pl-slab-container { display: flex; flex-direction: column; gap: 4px; }
+.pl-pack-item, .pl-slab-item { display: flex; justify-content: space-between; align-items: center; padding: 4px 10px; border-radius: 4px; font-size: 13.5px; }
+.pl-pack-item { background-color: #f8fafc; border: 1px solid #e2e8f0; }
+.pl-slab-item { border-left: 4px solid; background-color: #f9f9f9; }
+.pl-pack-qty, .pl-slab-qty { color: #475569; font-weight: 500; }
 .pl-pack-rate { color: #0f172a; font-weight: 600; }
-
-/* Price List Colorful Slab Styling */
-.pl-slab-container { display: flex; flex-direction: column; gap: 5px; }
-.pl-slab-item { display: flex; justify-content: space-between; align-items: center; padding: 5px 12px; border-radius: 6px; font-size: 14px; border-left: 5px solid; background-color: #f9f9f9; }
-.pl-slab-qty { color: #555; font-weight: 500; }
-.pl-slab-rate { font-weight: bold; color: #111; }
-.pl-no-slab { color: #95a5a6; font-style: italic; background-color: #f1f2f6; padding: 6px 12px; border-radius: 6px; display: inline-block; }
+.pl-slab-rate { font-weight: 700; color: #111; }
+.pl-no-slab { color: #95a5a6; font-style: italic; background-color: #f1f2f6; padding: 4px 10px; border-radius: 4px; display: inline-block; font-size: 13.5px; }
 
 /* Color Coding for Slab Tiers */
 .pl-slab-item:nth-child(1) { background-color: #e3f2fd; border-color: #2196f3; } 
@@ -387,7 +387,21 @@ margin-top:8px;
 .pl-slab-item:nth-child(4) { background-color: #fce4ec; border-color: #e91e63; } 
 .pl-slab-item:nth-child(5) { background-color: #f3e5f5; border-color: #9c27b0; } 
 
-.pl-no-results { text-align: center; padding: 30px; color: #7f8c8d; font-size: 18px; display: none; }
+.pl-no-results { text-align: center; padding: 20px; color: #7f8c8d; font-size: 16px; display: none; }
+
+/* Responsive Mobile Styles */
+@media screen and (max-width: 768px) {
+    .pl-table, .pl-table thead, .pl-table tbody, .pl-table th, .pl-table td, .pl-table tr { display: block; }
+    .pl-table thead tr { display: none; }
+    .pl-table tr { margin-bottom: 15px; border: 1px solid #dee2e6; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.04); }
+    .pl-table td { border: none; border-bottom: 1px solid #eee; position: relative; padding: 12px; }
+    .pl-table td:last-child { border-bottom: 0; }
+    .pl-table td::before { content: attr(data-label); display: block; font-size: 12px; text-transform: uppercase; color: #6c757d; font-weight: 700; margin-bottom: 8px; }
+    .pl-table td.pl-product-name { background-color: #2c3e50; text-align: center; }
+    .pl-prod-title { color: #fff !important; font-size: 1.2em; }
+    .pl-tech-name { color: #bdc3c7 !important; }
+    .pl-table td.pl-product-name::before { display: none; }
+}
 </style>
 </head>
 <body>
@@ -486,148 +500,184 @@ margin-top:8px;
         <h2>Product Price List & Slab Discounts</h2>
         
         <div class="pl-search-container">
-            <input type="text" id="plSearchInput" onkeyup="filterPriceTable()" placeholder="🔍 Search for a product name...">
+            <input type="text" id="plSearchInput" onkeyup="filterPriceTable()" placeholder="🔍 Search by product or technical name...">
         </div>
 
         <table id="plPriceTable" class="pl-table">
             <thead>
                 <tr>
-                    <th width="20%">Product</th>
-                    <th width="40%">Pack-wise Net Billing (incl. GST) per kg/L</th>
+                    <th width="25%">Product & Technical Name</th>
+                    <th width="35%">Pack-wise Net Billing (incl. GST)</th>
                     <th width="40%">Slab Discount (/kg or L)</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td class="pl-product-name">CYANAT</td>
-                    <td><div class="pl-pack-container">
+                    <td class="pl-product-name" data-label="Product">
+                        <div class="pl-prod-title">CYANAT</div>
+                        <div class="pl-tech-name">Chlorantranlipirole 10.26% OD</div>
+                    </td>
+                    <td data-label="Pack-wise Net Billing (incl. GST)"><div class="pl-pack-container">
                         <div class="pl-pack-item"><span class="pl-pack-qty">90 ml</span><span class="pl-pack-rate">₹5,522.52</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">180 ml</span><span class="pl-pack-rate">₹5,469.36</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">240 ml</span><span class="pl-pack-rate">₹5,416.20</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">280 ml</span><span class="pl-pack-rate">₹5,363.04</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">360 ml</span><span class="pl-pack-rate">₹5,309.88</span></div>
                     </div></td>
-                    <td><span class="pl-no-slab">No slab</span></td>
+                    <td data-label="Slab Discount"><span class="pl-no-slab">No slab</span></td>
                 </tr>
                 <tr>
-                    <td class="pl-product-name">DI-FORCE</td>
-                    <td><div class="pl-pack-container">
+                    <td class="pl-product-name" data-label="Product">
+                        <div class="pl-prod-title">DI-FORCE</div>
+                        <div class="pl-tech-name">Diafenthiuron 47% + Bifenthrin 9.4% SC</div>
+                    </td>
+                    <td data-label="Pack-wise Net Billing (incl. GST)"><div class="pl-pack-container">
                         <div class="pl-pack-item"><span class="pl-pack-qty">100 ml</span><span class="pl-pack-rate">₹2,631.40</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">250 ml</span><span class="pl-pack-rate">₹2,525.20</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">500 ml</span><span class="pl-pack-rate">₹2,469.74</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">1 L</span><span class="pl-pack-rate">₹2,449.68</span></div>
                     </div></td>
-                    <td><span class="pl-no-slab">No slab</span></td>
+                    <td data-label="Slab Discount"><span class="pl-no-slab">No slab</span></td>
                 </tr>
                 <tr>
-                    <td class="pl-product-name">GLANZ</td>
-                    <td><div class="pl-pack-container">
+                    <td class="pl-product-name" data-label="Product">
+                        <div class="pl-prod-title">GLANZ</div>
+                        <div class="pl-tech-name">Tebuconazole 50% + Trifloxystrobin 25% WG</div>
+                    </td>
+                    <td data-label="Pack-wise Net Billing (incl. GST)"><div class="pl-pack-container">
                         <div class="pl-pack-item"><span class="pl-pack-qty">50 gm</span><span class="pl-pack-rate">₹4,876.70</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">100 gm</span><span class="pl-pack-rate">₹4,829.13</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">250 gm</span><span class="pl-pack-rate">₹4,805.34</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">500 gm</span><span class="pl-pack-rate">₹4,781.55</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">1000 gm</span><span class="pl-pack-rate">₹4,757.76</span></div>
                     </div></td>
-                    <td><span class="pl-no-slab">No slab</span></td>
+                    <td data-label="Slab Discount"><span class="pl-no-slab">No slab</span></td>
                 </tr>
                 <tr>
-                    <td class="pl-product-name">HATRIK</td>
-                    <td><div class="pl-pack-container">
+                    <td class="pl-product-name" data-label="Product">
+                        <div class="pl-prod-title">HATRIK</div>
+                        <div class="pl-tech-name">Tolfenpyrad 15% EC</div>
+                    </td>
+                    <td data-label="Pack-wise Net Billing (incl. GST)"><div class="pl-pack-container">
                         <div class="pl-pack-item"><span class="pl-pack-qty">100 ml</span><span class="pl-pack-rate">₹1,702.06</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">250 ml</span><span class="pl-pack-rate">₹1,685.69</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">500 ml</span><span class="pl-pack-rate">₹1,669.33</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">1000 ml</span><span class="pl-pack-rate">₹1,636.60</span></div>
                     </div></td>
-                    <td><span class="pl-no-slab">No slab</span></td>
+                    <td data-label="Slab Discount"><span class="pl-no-slab">No slab</span></td>
                 </tr>
                 <tr>
-                    <td class="pl-product-name">NATLAM</td>
-                    <td><div class="pl-pack-container">
+                    <td class="pl-product-name" data-label="Product">
+                        <div class="pl-prod-title">NATLAM</div>
+                        <div class="pl-tech-name">Lambda cyhalothrin 4.9% CS</div>
+                    </td>
+                    <td data-label="Pack-wise Net Billing (incl. GST)"><div class="pl-pack-container">
                         <div class="pl-pack-item"><span class="pl-pack-qty">100 ml</span><span class="pl-pack-rate">₹468.79</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">250 ml</span><span class="pl-pack-rate">₹464.28</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">500 ml</span><span class="pl-pack-rate">₹459.78</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">1000 ml</span><span class="pl-pack-rate">₹450.76</span></div>
                     </div></td>
-                    <td><span class="pl-no-slab">No slab</span></td>
+                    <td data-label="Slab Discount"><span class="pl-no-slab">No slab</span></td>
                 </tr>
                 <tr>
-                    <td class="pl-product-name">TOPRASURE</td>
-                    <td><div class="pl-pack-container">
+                    <td class="pl-product-name" data-label="Product">
+                        <div class="pl-prod-title">TOPRASURE</div>
+                        <div class="pl-tech-name">Topramezone 336 g/l SC</div>
+                    </td>
+                    <td data-label="Pack-wise Net Billing (incl. GST)"><div class="pl-pack-container">
                         <div class="pl-pack-item"><span class="pl-pack-qty">15 ml</span><span class="pl-pack-rate">₹23,542.69</span></div>
                     </div></td>
-                    <td><span class="pl-no-slab">No slab</span></td>
+                    <td data-label="Slab Discount"><span class="pl-no-slab">No slab</span></td>
                 </tr>
                 <tr>
-                    <td class="pl-product-name">VECTRA</td>
-                    <td><div class="pl-pack-container">
+                    <td class="pl-product-name" data-label="Product">
+                        <div class="pl-prod-title">VECTRA</div>
+                        <div class="pl-tech-name">Fomesafen 12.5% + Quizalofop Ethyl 4.68% EC</div>
+                    </td>
+                    <td data-label="Pack-wise Net Billing (incl. GST)"><div class="pl-pack-container">
                         <div class="pl-pack-item"><span class="pl-pack-qty">200 ml</span><span class="pl-pack-rate">₹2,183.00</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">400 ml</span><span class="pl-pack-rate">₹2,065.00</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">1000 ml</span><span class="pl-pack-rate">₹1,947.00</span></div>
                     </div></td>
-                    <td><span class="pl-no-slab">No slab</span></td>
+                    <td data-label="Slab Discount"><span class="pl-no-slab">No slab</span></td>
                 </tr>
                 
                 <tr>
-                    <td class="pl-product-name">ASTOR</td>
-                    <td><div class="pl-pack-container">
+                    <td class="pl-product-name" data-label="Product">
+                        <div class="pl-prod-title">ASTOR</div>
+                        <div class="pl-tech-name">Chlorantraniliprole 50% FS</div>
+                    </td>
+                    <td data-label="Pack-wise Net Billing (incl. GST)"><div class="pl-pack-container">
                         <div class="pl-pack-item"><span class="pl-pack-qty">10 ml</span><span class="pl-pack-rate">₹3,040.51</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">50 ml</span><span class="pl-pack-rate">₹16,036.20</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">50 ml</span><span class="pl-pack-rate">₹2,118.13</span></div>
                     </div></td>
-                    <td><div class="pl-slab-container">
+                    <td data-label="Slab Discount"><div class="pl-slab-container">
                         <div class="pl-slab-item"><span class="pl-slab-qty">2-10 L</span><span class="pl-slab-rate">₹450/L</span></div>
                         <div class="pl-slab-item"><span class="pl-slab-qty">11-50 L</span><span class="pl-slab-rate">₹500/L</span></div>
                         <div class="pl-slab-item"><span class="pl-slab-qty">50 L & above</span><span class="pl-slab-rate">₹530/L</span></div>
                     </div></td>
                 </tr>
                 <tr>
-                    <td class="pl-product-name">ATMOS</td>
-                    <td><div class="pl-pack-container">
+                    <td class="pl-product-name" data-label="Product">
+                        <div class="pl-prod-title">ATMOS</div>
+                        <div class="pl-tech-name">Cyantraniliprole 7.3% + Diafenthiuron 36.4% w/w SC</div>
+                    </td>
+                    <td data-label="Pack-wise Net Billing (incl. GST)"><div class="pl-pack-container">
                         <div class="pl-pack-item"><span class="pl-pack-qty">125 ml</span><span class="pl-pack-rate">₹5,317.38</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">250 ml</span><span class="pl-pack-rate">₹5,265.75</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">625 ml</span><span class="pl-pack-rate">₹5,162.50</span></div>
                     </div></td>
-                    <td><div class="pl-slab-container">
+                    <td data-label="Slab Discount"><div class="pl-slab-container">
                         <div class="pl-slab-item"><span class="pl-slab-qty">6-60 L</span><span class="pl-slab-rate">₹260/L</span></div>
                         <div class="pl-slab-item"><span class="pl-slab-qty">61-100 L</span><span class="pl-slab-rate">₹300/L</span></div>
                         <div class="pl-slab-item"><span class="pl-slab-qty">101 L & above</span><span class="pl-slab-rate">₹330/L</span></div>
                     </div></td>
                 </tr>
                 <tr>
-                    <td class="pl-product-name">BOSNAT</td>
-                    <td><div class="pl-pack-container">
+                    <td class="pl-product-name" data-label="Product">
+                        <div class="pl-prod-title">BOSNAT</div>
+                        <div class="pl-tech-name">Pyraclostrobin 12.8% + Boscalid 25.2% WG</div>
+                    </td>
+                    <td data-label="Pack-wise Net Billing (incl. GST)"><div class="pl-pack-container">
                         <div class="pl-pack-item"><span class="pl-pack-qty">120 gm</span><span class="pl-pack-rate">₹5,033.60</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">240 gm</span><span class="pl-pack-rate">₹4,964.78</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">600 gm</span><span class="pl-pack-rate">₹4,876.70</span></div>
                     </div></td>
-                    <td><div class="pl-slab-container">
+                    <td data-label="Slab Discount"><div class="pl-slab-container">
                         <div class="pl-slab-item"><span class="pl-slab-qty">10-50 Kg</span><span class="pl-slab-rate">₹170/kg</span></div>
                         <div class="pl-slab-item"><span class="pl-slab-qty">51-100 Kg</span><span class="pl-slab-rate">₹190/kg</span></div>
                         <div class="pl-slab-item"><span class="pl-slab-qty">101 Kg & above</span><span class="pl-slab-rate">₹220/kg</span></div>
                     </div></td>
                 </tr>
                 <tr>
-                    <td class="pl-product-name">DEXARON</td>
-                    <td><div class="pl-pack-container">
+                    <td class="pl-product-name" data-label="Product">
+                        <div class="pl-prod-title">DEXARON</div>
+                        <div class="pl-tech-name">Novaluron 5.25% + Indoxacarb 4.5% SC</div>
+                    </td>
+                    <td data-label="Pack-wise Net Billing (incl. GST)"><div class="pl-pack-container">
                         <div class="pl-pack-item"><span class="pl-pack-qty">100 ml</span><span class="pl-pack-rate">₹2,537.00</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">350 ml</span><span class="pl-pack-rate">₹2,419.00</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">500 ml</span><span class="pl-pack-rate">₹2,357.64</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">1 L</span><span class="pl-pack-rate">₹2,348.20</span></div>
                     </div></td>
-                    <td><div class="pl-slab-container">
+                    <td data-label="Slab Discount"><div class="pl-slab-container">
                         <div class="pl-slab-item"><span class="pl-slab-qty">10-50 L</span><span class="pl-slab-rate">₹30/L</span></div>
                         <div class="pl-slab-item"><span class="pl-slab-qty">50-100 L</span><span class="pl-slab-rate">₹50/L</span></div>
                         <div class="pl-slab-item"><span class="pl-slab-qty">101 L & above</span><span class="pl-slab-rate">₹70/L</span></div>
                     </div></td>
                 </tr>
                 <tr>
-                    <td class="pl-product-name">GLACPOT</td>
-                    <td><div class="pl-pack-container">
+                    <td class="pl-product-name" data-label="Product">
+                        <div class="pl-prod-title">GLACPOT</div>
+                        <div class="pl-tech-name">Protein Hydrolysates & Amino Acids</div>
+                    </td>
+                    <td data-label="Pack-wise Net Billing (incl. GST)"><div class="pl-pack-container">
                         <div class="pl-pack-item"><span class="pl-pack-qty">250 ml</span><span class="pl-pack-rate">₹773.69</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">500 ml</span><span class="pl-pack-rate">₹737.88</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">1000 ml</span><span class="pl-pack-rate">₹716.38</span></div>
                     </div></td>
-                    <td><div class="pl-slab-container">
+                    <td data-label="Slab Discount"><div class="pl-slab-container">
                         <div class="pl-slab-item"><span class="pl-slab-qty">10-50 L</span><span class="pl-slab-rate">₹40/L</span></div>
                         <div class="pl-slab-item"><span class="pl-slab-qty">51-150 L</span><span class="pl-slab-rate">₹50/L</span></div>
                         <div class="pl-slab-item"><span class="pl-slab-qty">151-300 L</span><span class="pl-slab-rate">₹65/L</span></div>
@@ -636,14 +686,17 @@ margin-top:8px;
                     </div></td>
                 </tr>
                 <tr>
-                    <td class="pl-product-name">NATCORE</td>
-                    <td><div class="pl-pack-container">
+                    <td class="pl-product-name" data-label="Product">
+                        <div class="pl-prod-title">NATCORE</div>
+                        <div class="pl-tech-name">Azoxystrobin 11% + Tebuconazole 18.3% SC</div>
+                    </td>
+                    <td data-label="Pack-wise Net Billing (incl. GST)"><div class="pl-pack-container">
                         <div class="pl-pack-item"><span class="pl-pack-qty">100 ml</span><span class="pl-pack-rate">₹1,371.03</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">250 ml</span><span class="pl-pack-rate">₹1,357.84</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">500 ml</span><span class="pl-pack-rate">₹1,344.66</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">1000 ml</span><span class="pl-pack-rate">₹1,318.30</span></div>
                     </div></td>
-                    <td><div class="pl-slab-container">
+                    <td data-label="Slab Discount"><div class="pl-slab-container">
                         <div class="pl-slab-item"><span class="pl-slab-qty">10-50 L</span><span class="pl-slab-rate">₹30/L</span></div>
                         <div class="pl-slab-item"><span class="pl-slab-qty">51-100 L</span><span class="pl-slab-rate">₹40/L</span></div>
                         <div class="pl-slab-item"><span class="pl-slab-qty">101-300 L</span><span class="pl-slab-rate">₹60/L</span></div>
@@ -651,37 +704,46 @@ margin-top:8px;
                     </div></td>
                 </tr>
                 <tr>
-                    <td class="pl-product-name">NATCRUSH</td>
-                    <td><div class="pl-pack-container">
+                    <td class="pl-product-name" data-label="Product">
+                        <div class="pl-prod-title">NATCRUSH</div>
+                        <div class="pl-tech-name">Delta3Carene 5%, Methyl Euginol 15%</div>
+                    </td>
+                    <td data-label="Pack-wise Net Billing (incl. GST)"><div class="pl-pack-container">
                         <div class="pl-pack-item"><span class="pl-pack-qty">250 gm</span><span class="pl-pack-rate">₹4,248.00</span></div>
                     </div></td>
-                    <td><div class="pl-slab-container">
+                    <td data-label="Slab Discount"><div class="pl-slab-container">
                         <div class="pl-slab-item"><span class="pl-slab-qty">10-50 Kg</span><span class="pl-slab-rate">₹230/kg</span></div>
                         <div class="pl-slab-item"><span class="pl-slab-qty">50-100 Kg</span><span class="pl-slab-rate">₹250/kg</span></div>
                         <div class="pl-slab-item"><span class="pl-slab-qty">101 Kg & above</span><span class="pl-slab-rate">₹270/kg</span></div>
                     </div></td>
                 </tr>
                 <tr>
-                    <td class="pl-product-name">NATDUO</td>
-                    <td><div class="pl-pack-container">
+                    <td class="pl-product-name" data-label="Product">
+                        <div class="pl-prod-title">NATDUO</div>
+                        <div class="pl-tech-name">Chlorantranlipirole (CTPR) 0.5% + Thiamethoxam 1.0% w/w GR</div>
+                    </td>
+                    <td data-label="Pack-wise Net Billing (incl. GST)"><div class="pl-pack-container">
                         <div class="pl-pack-item"><span class="pl-pack-qty">1 Kg</span><span class="pl-pack-rate">₹177.94</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">2.5 Kg</span><span class="pl-pack-rate">₹176.23</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">5 Kg</span><span class="pl-pack-rate">₹171.10</span></div>
                     </div></td>
-                    <td><div class="pl-slab-container">
+                    <td data-label="Slab Discount"><div class="pl-slab-container">
                         <div class="pl-slab-item"><span class="pl-slab-qty">50-2,000 Kg</span><span class="pl-slab-rate">₹16/kg</span></div>
                         <div class="pl-slab-item"><span class="pl-slab-qty">2,001-5,000 Kg</span><span class="pl-slab-rate">₹17/kg</span></div>
                         <div class="pl-slab-item"><span class="pl-slab-qty">5,001 Kg & above</span><span class="pl-slab-rate">₹18/kg</span></div>
                     </div></td>
                 </tr>
                 <tr>
-                    <td class="pl-product-name">NATERRA</td>
-                    <td><div class="pl-pack-container">
+                    <td class="pl-product-name" data-label="Product">
+                        <div class="pl-prod-title">NATERRA</div>
+                        <div class="pl-tech-name">Chlorantranlipirole (CTPR) 0.4% GR</div>
+                    </td>
+                    <td data-label="Pack-wise Net Billing (incl. GST)"><div class="pl-pack-container">
                         <div class="pl-pack-item"><span class="pl-pack-qty">1 Kg</span><span class="pl-pack-rate">₹109.26</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">4 Kg</span><span class="pl-pack-rate">₹106.07</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">7.5 Kg</span><span class="pl-pack-rate">₹105.02</span></div>
                     </div></td>
-                    <td><div class="pl-slab-container">
+                    <td data-label="Slab Discount"><div class="pl-slab-container">
                         <div class="pl-slab-item"><span class="pl-slab-qty">100-3,000 Kg</span><span class="pl-slab-rate">₹3/kg</span></div>
                         <div class="pl-slab-item"><span class="pl-slab-qty">3,001-5,000 Kg</span><span class="pl-slab-rate">₹4/kg</span></div>
                         <div class="pl-slab-item"><span class="pl-slab-qty">5,001-8,000 Kg</span><span class="pl-slab-rate">₹5/kg</span></div>
@@ -689,8 +751,11 @@ margin-top:8px;
                     </div></td>
                 </tr>
                 <tr>
-                    <td class="pl-product-name">NATGEN</td>
-                    <td><div class="pl-pack-container">
+                    <td class="pl-product-name" data-label="Product">
+                        <div class="pl-prod-title">NATGEN</div>
+                        <div class="pl-tech-name">Chlorantranlipirole (CTPR) 18.5% SC</div>
+                    </td>
+                    <td data-label="Pack-wise Net Billing (incl. GST)"><div class="pl-pack-container">
                         <div class="pl-pack-item"><span class="pl-pack-qty">10 ml</span><span class="pl-pack-rate">₹4,521.57</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">30 ml</span><span class="pl-pack-rate">₹4,437.84</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">60 ml</span><span class="pl-pack-rate">₹4,395.97</span></div>
@@ -699,7 +764,7 @@ margin-top:8px;
                         <div class="pl-pack-item"><span class="pl-pack-qty">300 ml</span><span class="pl-pack-rate">₹4,236.25</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">600 ml</span><span class="pl-pack-rate">₹4,186.64</span></div>
                     </div></td>
-                    <td><div class="pl-slab-container">
+                    <td data-label="Slab Discount"><div class="pl-slab-container">
                         <div class="pl-slab-item"><span class="pl-slab-qty">10-50 L</span><span class="pl-slab-rate">₹620/L</span></div>
                         <div class="pl-slab-item"><span class="pl-slab-qty">51-100 L</span><span class="pl-slab-rate">₹640/L</span></div>
                         <div class="pl-slab-item"><span class="pl-slab-qty">101-200 L</span><span class="pl-slab-rate">₹670/L</span></div>
@@ -708,13 +773,16 @@ margin-top:8px;
                     </div></td>
                 </tr>
                 <tr>
-                    <td class="pl-product-name">NATGEN PRO</td>
-                    <td><div class="pl-pack-container">
+                    <td class="pl-product-name" data-label="Product">
+                        <div class="pl-prod-title">NATGEN PRO</div>
+                        <div class="pl-tech-name">Chlorantranlipirole (CTPR) 35% WG</div>
+                    </td>
+                    <td data-label="Pack-wise Net Billing (incl. GST)"><div class="pl-pack-container">
                         <div class="pl-pack-item"><span class="pl-pack-qty">6 g</span><span class="pl-pack-rate">₹13,621.21</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">17 g</span><span class="pl-pack-rate">₹13,235.71</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">34 g</span><span class="pl-pack-rate">₹12,850.20</span></div>
                     </div></td>
-                    <td><div class="pl-slab-container">
+                    <td data-label="Slab Discount"><div class="pl-slab-container">
                         <div class="pl-slab-item"><span class="pl-slab-qty">1-6 Kg</span><span class="pl-slab-rate">₹160/kg</span></div>
                         <div class="pl-slab-item"><span class="pl-slab-qty">6-12 Kg</span><span class="pl-slab-rate">₹180/kg</span></div>
                         <div class="pl-slab-item"><span class="pl-slab-qty">12-20 Kg</span><span class="pl-slab-rate">₹190/kg</span></div>
@@ -722,29 +790,35 @@ margin-top:8px;
                     </div></td>
                 </tr>
                 <tr>
-                    <td class="pl-product-name">NATJEWEL FS</td>
-                    <td><div class="pl-pack-container">
+                    <td class="pl-product-name" data-label="Product">
+                        <div class="pl-prod-title">NATJEWEL FS</div>
+                        <div class="pl-tech-name">Thiamethoxam 30% FS</div>
+                    </td>
+                    <td data-label="Pack-wise Net Billing (incl. GST)"><div class="pl-pack-container">
                         <div class="pl-pack-item"><span class="pl-pack-qty">100 ml</span><span class="pl-pack-rate">₹904.57</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">250 ml</span><span class="pl-pack-rate">₹895.87</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">500 ml</span><span class="pl-pack-rate">₹887.17</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">1000 ml</span><span class="pl-pack-rate">₹869.78</span></div>
                     </div></td>
-                    <td><div class="pl-slab-container">
+                    <td data-label="Slab Discount"><div class="pl-slab-container">
                         <div class="pl-slab-item"><span class="pl-slab-qty">10-50 L</span><span class="pl-slab-rate">₹20/L</span></div>
                         <div class="pl-slab-item"><span class="pl-slab-qty">51-150 L</span><span class="pl-slab-rate">₹30/L</span></div>
                         <div class="pl-slab-item"><span class="pl-slab-qty">150 L & above</span><span class="pl-slab-rate">₹40/L</span></div>
                     </div></td>
                 </tr>
                 <tr>
-                    <td class="pl-product-name">NATLIGO</td>
-                    <td><div class="pl-pack-container">
+                    <td class="pl-product-name" data-label="Product">
+                        <div class="pl-prod-title">NATLIGO</div>
+                        <div class="pl-tech-name">Chlorantranlipirole (CTPR) 9.3% + Lambda Cyhalothrin 4.6% ZC</div>
+                    </td>
+                    <td data-label="Pack-wise Net Billing (incl. GST)"><div class="pl-pack-container">
                         <div class="pl-pack-item"><span class="pl-pack-qty">25 ml</span><span class="pl-pack-rate">₹3,425.54</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">80 ml</span><span class="pl-pack-rate">₹3,365.36</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">200 ml</span><span class="pl-pack-rate">₹3,335.27</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">500 ml</span><span class="pl-pack-rate">₹3,305.18</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">1000 ml</span><span class="pl-pack-rate">₹3,245.00</span></div>
                     </div></td>
-                    <td><div class="pl-slab-container">
+                    <td data-label="Slab Discount"><div class="pl-slab-container">
                         <div class="pl-slab-item"><span class="pl-slab-qty">10-50 L</span><span class="pl-slab-rate">₹130/L</span></div>
                         <div class="pl-slab-item"><span class="pl-slab-qty">51-150 L</span><span class="pl-slab-rate">₹140/L</span></div>
                         <div class="pl-slab-item"><span class="pl-slab-qty">150-300 L</span><span class="pl-slab-rate">₹150/L</span></div>
@@ -753,14 +827,17 @@ margin-top:8px;
                     </div></td>
                 </tr>
                 <tr>
-                    <td class="pl-product-name">NATLIKA</td>
-                    <td><div class="pl-pack-container">
+                    <td class="pl-product-name" data-label="Product">
+                        <div class="pl-prod-title">NATLIKA</div>
+                        <div class="pl-tech-name">Thiamethoxam 12.6% + Lambda Cyhalothrin 9.5% ZC</div>
+                    </td>
+                    <td data-label="Pack-wise Net Billing (incl. GST)"><div class="pl-pack-container">
                         <div class="pl-pack-item"><span class="pl-pack-qty">80 ml</span><span class="pl-pack-rate">₹1,376.68</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">200 ml</span><span class="pl-pack-rate">₹1,364.13</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">500 ml</span><span class="pl-pack-rate">₹1,351.58</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">1000 ml</span><span class="pl-pack-rate">₹1,313.93</span></div>
                     </div></td>
-                    <td><div class="pl-slab-container">
+                    <td data-label="Slab Discount"><div class="pl-slab-container">
                         <div class="pl-slab-item"><span class="pl-slab-qty">10-50 L</span><span class="pl-slab-rate">₹80/L</span></div>
                         <div class="pl-slab-item"><span class="pl-slab-qty">51-150 L</span><span class="pl-slab-rate">₹90/L</span></div>
                         <div class="pl-slab-item"><span class="pl-slab-qty">151-300 L</span><span class="pl-slab-rate">₹100/L</span></div>
@@ -769,29 +846,35 @@ margin-top:8px;
                     </div></td>
                 </tr>
                 <tr>
-                    <td class="pl-product-name">NATNEXT</td>
-                    <td><div class="pl-pack-container">
+                    <td class="pl-product-name" data-label="Product">
+                        <div class="pl-prod-title">NATNEXT</div>
+                        <div class="pl-tech-name">Chlorantranlipirole (CTPR) 4.3% + Abamectin 1.7% SC</div>
+                    </td>
+                    <td data-label="Pack-wise Net Billing (incl. GST)"><div class="pl-pack-container">
                         <div class="pl-pack-item"><span class="pl-pack-qty">20 ml</span><span class="pl-pack-rate">₹3,305.86</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">100 ml</span><span class="pl-pack-rate">₹3,243.49</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">250 ml</span><span class="pl-pack-rate">₹3,212.30</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">500 ml</span><span class="pl-pack-rate">₹3,181.11</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">1000 ml</span><span class="pl-pack-rate">₹3,118.74</span></div>
                     </div></td>
-                    <td><div class="pl-slab-container">
+                    <td data-label="Slab Discount"><div class="pl-slab-container">
                         <div class="pl-slab-item"><span class="pl-slab-qty">6-60 L</span><span class="pl-slab-rate">₹230/L</span></div>
                         <div class="pl-slab-item"><span class="pl-slab-qty">61-90 L</span><span class="pl-slab-rate">₹250/L</span></div>
                         <div class="pl-slab-item"><span class="pl-slab-qty">91 L & above</span><span class="pl-slab-rate">₹290/L</span></div>
                     </div></td>
                 </tr>
                 <tr>
-                    <td class="pl-product-name">NATPEARL</td>
-                    <td><div class="pl-pack-container">
+                    <td class="pl-product-name" data-label="Product">
+                        <div class="pl-prod-title">NATPEARL</div>
+                        <div class="pl-tech-name">Azoxystrobin 18.2% + Difenoconazole 11.45 % SC</div>
+                    </td>
+                    <td data-label="Pack-wise Net Billing (incl. GST)"><div class="pl-pack-container">
                         <div class="pl-pack-item"><span class="pl-pack-qty">100 ml</span><span class="pl-pack-rate">₹1,798.72</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">200 ml</span><span class="pl-pack-rate">₹1,781.57</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">500 ml</span><span class="pl-pack-rate">₹1,762.87</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">1000 ml</span><span class="pl-pack-rate">₹1,723.45</span></div>
                     </div></td>
-                    <td><div class="pl-slab-container">
+                    <td data-label="Slab Discount"><div class="pl-slab-container">
                         <div class="pl-slab-item"><span class="pl-slab-qty">20-50 L</span><span class="pl-slab-rate">₹50/L</span></div>
                         <div class="pl-slab-item"><span class="pl-slab-qty">51-100 L</span><span class="pl-slab-rate">₹60/L</span></div>
                         <div class="pl-slab-item"><span class="pl-slab-qty">101-200 L</span><span class="pl-slab-rate">₹70/L</span></div>
@@ -800,52 +883,64 @@ margin-top:8px;
                     </div></td>
                 </tr>
                 <tr>
-                    <td class="pl-product-name">NATVOL</td>
-                    <td><div class="pl-pack-container">
+                    <td class="pl-product-name" data-label="Product">
+                        <div class="pl-prod-title">NATVOL</div>
+                        <div class="pl-tech-name">Chlorantranlipirole (CTPR) 8.8% + Thiamethoxam 17.5% SC</div>
+                    </td>
+                    <td data-label="Pack-wise Net Billing (incl. GST)"><div class="pl-pack-container">
                         <div class="pl-pack-item"><span class="pl-pack-qty">20 ml</span><span class="pl-pack-rate">₹3,946.34</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">100 ml</span><span class="pl-pack-rate">₹3,871.88</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">200 ml</span><span class="pl-pack-rate">₹3,793.12</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">500 ml</span><span class="pl-pack-rate">₹3,722.96</span></div>
                     </div></td>
-                    <td><div class="pl-slab-container">
+                    <td data-label="Slab Discount"><div class="pl-slab-container">
                         <div class="pl-slab-item"><span class="pl-slab-qty">6-50 L</span><span class="pl-slab-rate">₹140/L</span></div>
                         <div class="pl-slab-item"><span class="pl-slab-qty">51-110 L</span><span class="pl-slab-rate">₹160/L</span></div>
                         <div class="pl-slab-item"><span class="pl-slab-qty">111 L & above</span><span class="pl-slab-rate">₹170/L</span></div>
                     </div></td>
                 </tr>
                 <tr>
-                    <td class="pl-product-name">NATWEEZ</td>
-                    <td><div class="pl-pack-container">
+                    <td class="pl-product-name" data-label="Product">
+                        <div class="pl-prod-title">NATWEEZ</div>
+                        <div class="pl-tech-name">Pyrazosulfuron Ethyl 10% WP</div>
+                    </td>
+                    <td data-label="Pack-wise Net Billing (incl. GST)"><div class="pl-pack-container">
                         <div class="pl-pack-item"><span class="pl-pack-qty">20 gm</span><span class="pl-pack-rate">₹1,270.77</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">80 gm</span><span class="pl-pack-rate">₹1,221.89</span></div>
                     </div></td>
-                    <td><div class="pl-slab-container">
+                    <td data-label="Slab Discount"><div class="pl-slab-container">
                         <div class="pl-slab-item"><span class="pl-slab-qty">5-50 Kg</span><span class="pl-slab-rate">₹80/kg</span></div>
                         <div class="pl-slab-item"><span class="pl-slab-qty">51-100 Kg</span><span class="pl-slab-rate">₹110/kg</span></div>
                         <div class="pl-slab-item"><span class="pl-slab-qty">Above 100 Kg</span><span class="pl-slab-rate">₹115/kg</span></div>
                     </div></td>
                 </tr>
                 <tr>
-                    <td class="pl-product-name">NATZOATE</td>
-                    <td><div class="pl-pack-container">
+                    <td class="pl-product-name" data-label="Product">
+                        <div class="pl-prod-title">NATZOATE</div>
+                        <div class="pl-tech-name">Emamectin Benzoate 5% SG</div>
+                    </td>
+                    <td data-label="Pack-wise Net Billing (incl. GST)"><div class="pl-pack-container">
                         <div class="pl-pack-item"><span class="pl-pack-qty">50 gm</span><span class="pl-pack-rate">₹1,529.28</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">100 gm</span><span class="pl-pack-rate">₹1,516.30</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">250 gm</span><span class="pl-pack-rate">₹1,510.40</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">500 gm</span><span class="pl-pack-rate">₹1,503.32</span></div>
                     </div></td>
-                    <td><div class="pl-slab-container">
+                    <td data-label="Slab Discount"><div class="pl-slab-container">
                         <div class="pl-slab-item"><span class="pl-slab-qty">Flat Rate</span><span class="pl-slab-rate">₹13/kg</span></div>
                     </div></td>
                 </tr>
                 <tr>
-                    <td class="pl-product-name">OMNINAT</td>
-                    <td><div class="pl-pack-container">
+                    <td class="pl-product-name" data-label="Product">
+                        <div class="pl-prod-title">OMNINAT</div>
+                        <div class="pl-tech-name">Bispyribac sodium 10% SC</div>
+                    </td>
+                    <td data-label="Pack-wise Net Billing (incl. GST)"><div class="pl-pack-container">
                         <div class="pl-pack-item"><span class="pl-pack-qty">100 ml</span><span class="pl-pack-rate">₹1,934.70</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">200 ml</span><span class="pl-pack-rate">₹1,804.60</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">500 ml</span><span class="pl-pack-rate">₹1,749.96</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">1000 ml</span><span class="pl-pack-rate">₹1,657.60</span></div>
                     </div></td>
-                    <td><div class="pl-slab-container">
+                    <td data-label="Slab Discount"><div class="pl-slab-container">
                         <div class="pl-slab-item"><span class="pl-slab-qty">10-50 L</span><span class="pl-slab-rate">₹50/L</span></div>
                         <div class="pl-slab-item"><span class="pl-slab-qty">51-100 L</span><span class="pl-slab-rate">₹60/L</span></div>
                         <div class="pl-slab-item"><span class="pl-slab-qty">151-300 L</span><span class="pl-slab-rate">₹75/L</span></div>
@@ -853,56 +948,71 @@ margin-top:8px;
                     </div></td>
                 </tr>
                 <tr>
-                    <td class="pl-product-name">PAMUK</td>
-                    <td><div class="pl-pack-container">
+                    <td class="pl-product-name" data-label="Product">
+                        <div class="pl-prod-title">PAMUK</div>
+                        <div class="pl-tech-name">Cyantraniliprole 10% + Pymetrozine 50% wg</div>
+                    </td>
+                    <td data-label="Pack-wise Net Billing (incl. GST)"><div class="pl-pack-container">
                         <div class="pl-pack-item"><span class="pl-pack-qty">120 gm</span><span class="pl-pack-rate">₹7,292.40</span></div>
                     </div></td>
-                    <td><div class="pl-slab-container">
+                    <td data-label="Slab Discount"><div class="pl-slab-container">
                         <div class="pl-slab-item"><span class="pl-slab-qty">Less than 10 Kg</span><span class="pl-slab-rate">₹270/kg</span></div>
                         <div class="pl-slab-item"><span class="pl-slab-qty">10 Kg & above</span><span class="pl-slab-rate">₹330/kg</span></div>
                     </div></td>
                 </tr>
                 <tr>
-                    <td class="pl-product-name">PRIDONAT</td>
-                    <td><div class="pl-pack-container">
+                    <td class="pl-product-name" data-label="Product">
+                        <div class="pl-prod-title">PRIDONAT</div>
+                        <div class="pl-tech-name">Pyraclostrobin 20% WG</div>
+                    </td>
+                    <td data-label="Pack-wise Net Billing (incl. GST)"><div class="pl-pack-container">
                         <div class="pl-pack-item"><span class="pl-pack-qty">100 gm</span><span class="pl-pack-rate">₹3,550.62</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">200 gm</span><span class="pl-pack-rate">₹3,515.81</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">500 gm</span><span class="pl-pack-rate">₹3,481.00</span></div>
                     </div></td>
-                    <td><div class="pl-slab-container">
+                    <td data-label="Slab Discount"><div class="pl-slab-container">
                         <div class="pl-slab-item"><span class="pl-slab-qty">10-50 Kg</span><span class="pl-slab-rate">₹130/kg</span></div>
                         <div class="pl-slab-item"><span class="pl-slab-qty">51-100 Kg</span><span class="pl-slab-rate">₹150/kg</span></div>
                         <div class="pl-slab-item"><span class="pl-slab-qty">101 Kg & above</span><span class="pl-slab-rate">₹170/kg</span></div>
                     </div></td>
                 </tr>
                 <tr>
-                    <td class="pl-product-name">SLAYDEN</td>
-                    <td><div class="pl-pack-container">
+                    <td class="pl-product-name" data-label="Product">
+                        <div class="pl-prod-title">SLAYDEN</div>
+                        <div class="pl-tech-name">Pinoxaden 5.1% EC</div>
+                    </td>
+                    <td data-label="Pack-wise Net Billing (incl. GST)"><div class="pl-pack-container">
                         <div class="pl-pack-item"><span class="pl-pack-qty">400 ml</span><span class="pl-pack-rate">₹1,996.56</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">2000 ml</span><span class="pl-pack-rate">₹1,976.50</span></div>
                     </div></td>
-                    <td><span class="pl-no-slab">No slab</span></td>
+                    <td data-label="Slab Discount"><span class="pl-no-slab">No slab</span></td>
                 </tr>
                 <tr>
-                    <td class="pl-product-name">SPIROVANTA</td>
-                    <td><div class="pl-pack-container">
+                    <td class="pl-product-name" data-label="Product">
+                        <div class="pl-prod-title">SPIROVANTA</div>
+                        <div class="pl-tech-name">Spiromesifen 22.9% SC</div>
+                    </td>
+                    <td data-label="Pack-wise Net Billing (incl. GST)"><div class="pl-pack-container">
                         <div class="pl-pack-item"><span class="pl-pack-qty">1 L</span><span class="pl-pack-rate">₹3,392.50</span></div>
                     </div></td>
-                    <td><div class="pl-slab-container">
+                    <td data-label="Slab Discount"><div class="pl-slab-container">
                         <div class="pl-slab-item"><span class="pl-slab-qty">10-50 L</span><span class="pl-slab-rate">₹100/L</span></div>
                         <div class="pl-slab-item"><span class="pl-slab-qty">50-100 L</span><span class="pl-slab-rate">₹140/L</span></div>
                         <div class="pl-slab-item"><span class="pl-slab-qty">101 L & above</span><span class="pl-slab-rate">₹180/L</span></div>
                     </div></td>
                 </tr>
                 <tr>
-                    <td class="pl-product-name">VINASAK</td>
-                    <td><div class="pl-pack-container">
+                    <td class="pl-product-name" data-label="Product">
+                        <div class="pl-prod-title">VINASAK</div>
+                        <div class="pl-tech-name">Pymetrozine 50% WG</div>
+                    </td>
+                    <td data-label="Pack-wise Net Billing (incl. GST)"><div class="pl-pack-container">
                         <div class="pl-pack-item"><span class="pl-pack-qty">120 gm</span><span class="pl-pack-rate">₹1,860.82</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">250 gm</span><span class="pl-pack-rate">₹1,868.46</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">500 gm</span><span class="pl-pack-rate">₹1,851.60</span></div>
                         <div class="pl-pack-item"><span class="pl-pack-qty">1 kg</span><span class="pl-pack-rate">₹1,842.39</span></div>
                     </div></td>
-                    <td><div class="pl-slab-container">
+                    <td data-label="Slab Discount"><div class="pl-slab-container">
                         <div class="pl-slab-item"><span class="pl-slab-qty">10-50 Kg</span><span class="pl-slab-rate">₹55/kg</span></div>
                         <div class="pl-slab-item"><span class="pl-slab-qty">51-150 Kg</span><span class="pl-slab-rate">₹65/kg</span></div>
                         <div class="pl-slab-item"><span class="pl-slab-qty">151-300 Kg</span><span class="pl-slab-rate">₹75/kg</span></div>
@@ -910,11 +1020,14 @@ margin-top:8px;
                     </div></td>
                 </tr>
                 <tr>
-                    <td class="pl-product-name">XYMEN</td>
-                    <td><div class="pl-pack-container">
+                    <td class="pl-product-name" data-label="Product">
+                        <div class="pl-prod-title">XYMEN</div>
+                        <div class="pl-tech-name">Pyraxosulfan 85% WG</div>
+                    </td>
+                    <td data-label="Pack-wise Net Billing (incl. GST)"><div class="pl-pack-container">
                         <div class="pl-pack-item"><span class="pl-pack-qty">60 gm</span><span class="pl-pack-rate">₹14,356.67</span></div>
                     </div></td>
-                    <td><span class="pl-no-slab">No slab</span></td>
+                    <td data-label="Slab Discount"><span class="pl-no-slab">No slab</span></td>
                 </tr>
             </tbody>
         </table>
