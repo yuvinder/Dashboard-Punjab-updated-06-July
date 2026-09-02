@@ -33,8 +33,6 @@ background: #f1f5f9;
 min-height: 100vh;
 }
 
-}
-
 /* --- DASHBOARD HEADER --- */
 .header{
 text-align:center;
@@ -59,17 +57,23 @@ font-weight:500;
 
 /* --- DASHBOARD GRID & ORIGINAL ICONS --- */
 .grid{
-max-width:1100px;
-margin:auto;
+width:100%;
+max-width:1450px;
+margin:0 auto;
 display:grid;
-grid-template-columns:repeat(5,1fr);
-gap:42px 24px;
+grid-template-columns:repeat(6,minmax(0,1fr));
+column-gap:24px;
+row-gap:42px;
+align-items:start;
 }
 
 .app{
 display:flex;
 flex-direction:column;
 align-items:center;
+justify-content:flex-start;
+width:100%;
+min-width:0;
 text-decoration:none;
 color:#111827;
 transition:.35s ease;
@@ -234,20 +238,58 @@ font-weight:800;
 margin-top:8px;
 }
 
-/* RESPONSIVE QUERIES FROM ORIGINAL */
-@media(max-width:900px){
-.grid{ grid-template-columns:repeat(3,1fr); }
-.icon{ font-size:66px; }
+/* --- RESPONSIVE DASHBOARD GRID --- */
+/* Large desktop / wide laptop: 6 icons per row */
+@media (min-width:1201px){
+.grid{
+grid-template-columns:repeat(6,minmax(0,1fr));
+column-gap:24px;
+row-gap:42px;
+}
 }
 
-@media(max-width:500px){
-#homePage, #tourPage { padding:24px 14px; }
-.grid{ grid-template-columns:repeat(3,1fr); gap:30px 16px; }
-.icon{ font-size:56px; }
-.app span{ font-size:13px; }
-.header h1{ font-size:28px; }
-.header p{ font-size:15px; }
-.title{ font-size:28px; }
+/* Normal laptop / desktop: 5 icons per row */
+@media (min-width:901px) and (max-width:1200px){
+.grid{
+grid-template-columns:repeat(5,minmax(0,1fr));
+column-gap:20px;
+row-gap:38px;
+}
+.icon{font-size:68px;}
+}
+
+/* Tablet / small laptop: 4 icons per row */
+@media (min-width:601px) and (max-width:900px){
+.grid{
+grid-template-columns:repeat(4,minmax(0,1fr));
+column-gap:18px;
+row-gap:34px;
+}
+.icon{font-size:62px;}
+.app span{font-size:15px;}
+}
+
+/* Mobile: 3 icons per row */
+@media (max-width:600px){
+#homePage, #tourPage{padding:24px 12px;}
+.grid{
+grid-template-columns:repeat(3,minmax(0,1fr));
+column-gap:10px;
+row-gap:30px;
+}
+.icon{font-size:52px;}
+.app span{font-size:13px;margin-top:10px;}
+.header{margin-bottom:35px;}
+.header h1{font-size:28px;}
+.header p{font-size:15px;}
+.title{font-size:28px;}
+}
+
+/* Very small phones: keep 3 icons but reduce size slightly */
+@media (max-width:380px){
+.grid{column-gap:6px;row-gap:26px;}
+.icon{font-size:46px;}
+.app span{font-size:12px;}
 }
 
 
