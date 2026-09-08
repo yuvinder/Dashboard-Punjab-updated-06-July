@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Sales & Inventory Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      
+      --tile-blue-bg: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+      --tile-blue-border: #93c5fd;
+      --tile-blue-text: #1d4ed8;
+
+      --tile-green-bg: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+      --tile-green-border: #6ee7b7;
+      --tile-green-text: #047857;
+
+      --tile-red-bg: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+      --tile-red-border: #fca5a5;
+      --tile-red-text: #b91c1c;
+
+      --border: #e2e8f0;
+      --radius: 16px;
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 10px;
+      line-height: 1.35;
+    }
+
+    .container { max-width: 1280px; margin: 0 auto; }
+
+    .top-header { margin-bottom: 14px; }
+    .title-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .icon-3d-lg {
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.12));
+    }
+    .title-area h1 {
+      margin: 0;
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.02em;
+    }
+    .title-area p { margin: 2px 0 0; color: var(--text-muted); font-size: 0.78rem; }
+
+    /* Filters Bar */
+    .filters-bar {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      margin-bottom: 16px;
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      padding: 10px;
+      border-radius: var(--radius);
+    }
+    @media (min-width: 768px) {
+      .filters-bar { grid-template-columns: 1.2fr 1fr 1fr; }
+      body { padding: 22px; }
+      .title-area h1 { font-size: 1.6rem; }
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .input-icon-3d {
+      position: absolute;
+      left: 12px;
+      width: 18px;
+      height: 18px;
+      pointer-events: none;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+    }
+    .input-control {
+      width: 100%;
+      padding: 9px 12px 9px 38px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 9px;
+      font-size: 0.86rem;
+      background: #ffffff;
+      font-weight: 600;
+      font-family: inherit;
+      color: var(--text);
+      outline: none;
+    }
+    .input-control:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+
+    /* 3 KPI Metric Cards */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    @media (min-width: 640px) {
+      .kpi-grid { grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    }
+    .kpi-card {
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+      border: 1.5px solid transparent;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      overflow: hidden;
+    }
+    .kpi-card.blue { background: var(--tile-blue-bg); border-color: var(--tile-blue-border); }
+    .kpi-card.blue .kpi-label, .kpi-card.blue .kpi-sub { color: #2563eb; }
+    .kpi-card.blue .kpi-val { color: var(--tile-blue-text); }
+
+    .kpi-card.green { background: var(--tile-green-bg); border-color: var(--tile-green-border); }
+    .kpi-card.green .kpi-label, .kpi-card.green .kpi-sub { color: #059669; }
+    .kpi-card.green .kpi-val { color: var(--tile-green-text); }
+
+    .kpi-card.red { background: var(--tile-red-bg); border-color: var(--tile-red-border); }
+    .kpi-card.red .kpi-label, .kpi-card.red .kpi-sub { color: #dc2626; }
+    .kpi-card.red .kpi-val { color: var(--tile-red-text); }
+
+    .kpi-label {
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .kpi-val {
+      font-size: 1.85rem;
+      font-weight: 800;
+      margin: 3px 0 2px;
+      letter-spacing: -0.02em;
+    }
+    .kpi-sub { font-size: 0.72rem; font-weight: 500; }
+    .kpi-icon-3d {
+      width: 46px;
+      height: 46px;
+      object-fit: contain;
+      filter: drop-shadow(0 4px 10px rgba(0,0,0,0.15));
+      flex-shrink: 0;
+    }
+
+    /* Section Headings */
+    .section-title {
+      font-size: 0.88rem;
+      font-weight: 800;
+      color: #1e293b;
+      margin: 18px 0 8px 2px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .section-icon-3d {
+      width: 20px;
+      height: 20px;
+      object-fit: contain;
+    }
+
+    /* Table Container with Horizontal Scroll Guard */
+    .card-box {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin-bottom: 20px;
+    }
+
+    /* Summary Table Specific Styling (Mobile-Fit Optimized) */
+    .summary-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      table-layout: fixed;
+    }
+    .summary-table th {
+      background: #f8fafc;
+      color: #475569;
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      padding: 10px 8px;
+      border-bottom: 2px solid var(--border);
+      text-align: right;
+      white-space: nowrap;
+    }
+    .summary-table th:first-child {
+      text-align: left;
+      width: 34%;
+      padding-left: 12px;
+    }
+    .summary-table th:nth-child(2) { width: 22%; }
+    .summary-table th:nth-child(3) { width: 22%; }
+    .summary-table th:nth-child(4) { width: 22%; padding-right: 12px; }
+
+    .summary-table td {
+      padding: 10px 6px;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.85rem;
+      text-align: right;
+      vertical-align: middle;
+    }
+    .summary-table td:first-child {
+      text-align: left;
+      padding-left: 12px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .summary-table td:last-child {
+      padding-right: 12px;
+    }
+    .summary-table tr:last-child td { border-bottom: none; }
+
+    .badge-pill {
+      display: inline-block;
+      padding: 3px 6px;
+      border-radius: 6px;
+      font-weight: 800;
+      font-size: 0.8rem;
+      white-space: nowrap;
+      min-width: 48px;
+      text-align: center;
+    }
+    .pill-blue { background: #eff6ff; color: #1d4ed8; }
+    .pill-green { background: #ecfdf5; color: #047857; }
+    .pill-red { background: #fef2f2; color: #b91c1c; }
+
+    /* Responsive adjustments for phones under 450px */
+    @media (max-width: 450px) {
+      body { padding: 8px; }
+      .summary-table th {
+        font-size: 0.65rem;
+        padding: 8px 4px;
+      }
+      .summary-table td {
+        padding: 8px 4px;
+        font-size: 0.78rem;
+      }
+      .badge-pill {
+        padding: 2px 4px;
+        font-size: 0.74rem;
+        min-width: 40px;
+      }
+      .th-desktop { display: none; }
+      .th-mobile { display: inline; }
+    }
+    @media (min-width: 451px) {
+      .th-desktop { display: inline; }
+      .th-mobile { display: none; }
+    }
+
+    /* Second Detailed Table */
+    .detailed-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+    .detailed-table th {
+      background: #f8fafc;
+      color: #475569;
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      padding: 10px 14px;
+      border-bottom: 2px solid var(--border);
+      text-align: left;
+    }
+    .detailed-table td {
+      padding: 11px 14px;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.85rem;
+      vertical-align: middle;
+    }
+
+    @media (max-width: 767px) {
+      .detailed-table thead { display: none; }
+      .detailed-table, .detailed-table tbody, .detailed-table tr, .detailed-table td {
+        display: block;
+        width: 100%;
+      }
+      .detailed-table tr {
+        padding: 12px;
+        border-bottom: 1px solid var(--border);
+        background: white;
+      }
+      .m-territory {
+        font-size: 0.7rem;
+        font-weight: 800;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .m-party {
+        font-size: 0.94rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin: 2px 0 4px;
+      }
+      .m-product {
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: #2563eb;
+        margin-bottom: 8px;
+        padding-bottom: 6px;
+        border-bottom: 1px dashed #e2e8f0;
+      }
+      .m-stats-row {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 6px;
+        padding: 0 !important;
+        border: none !important;
+        text-align: center;
+      }
+      .m-stat-box {
+        background: #f8fafc;
+        border-radius: 8px;
+        padding: 5px 3px;
+        border: 1px solid #e2e8f0;
+      }
+      .m-stat-label {
+        font-size: 0.65rem;
+        font-weight: 800;
+        color: #64748b;
+        text-transform: uppercase;
+        margin-bottom: 2px;
+        display: block;
+      }
+      .m-stat-val {
+        font-size: 0.85rem;
+        font-weight: 800;
+        display: block;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="top-header">
+    <div class="title-row">
+      <img class="icon-3d-lg" src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Bar%20chart/3D/bar_chart_3d.png" alt="Analytics">
+      <div class="title-area">
+        <h1>Sales & Inventory Dashboard</h1>
+        <p>Product-Wise & Party-Wise Live Distribution Intelligence</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters Bar with 3D Icons -->
+  <div class="filters-bar">
+    <div class="input-wrapper">
+      <img class="input-icon-3d" src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Magnifying%20glass%20tilted%20left/3D/magnifying_glass_tilted_left_3d.png" alt="Search">
+      <input type="text" id="searchBox" class="input-control" placeholder="Search Product..." oninput="renderDashboard()">
+    </div>
+    
+    <div class="input-wrapper">
+      <img class="input-icon-3d" src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/World%20map/3D/world_map_3d.png" alt="Territory">
+      <select id="territoryFilter" class="input-control" onchange="onTerritoryChange()">
+        <option value="ALL">All Territories</option>
+      </select>
+    </div>
+
+    <div class="input-wrapper">
+      <img class="input-icon-3d" src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Office%20building/3D/office_building_3d.png" alt="Party">
+      <select id="partyFilter" class="input-control" onchange="renderDashboard()">
+        <option value="ALL">All Parties</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- 3 Colored KPI Tiles -->
+  <div class="kpi-grid">
+    <div class="kpi-card blue">
+      <div>
+        <span class="kpi-label">Quantity Billed</span>
+        <div class="kpi-val" id="kpiBilled">0.0</div>
+        <span class="kpi-sub">Invoiced in KG/LTRS</span>
+      </div>
+      <img class="kpi-icon-3d" src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Package/3D/package_3d.png" alt="Billed">
+    </div>
+
+    <div class="kpi-card green">
+      <div>
+        <span class="kpi-label">Quantity Sold</span>
+        <div class="kpi-val" id="kpiSold">0.0</div>
+        <span class="kpi-sub">Calculated sold / dispatched</span>
+      </div>
+      <img class="kpi-icon-3d" src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Shopping%20cart/3D/shopping_cart_3d.png" alt="Sold">
+    </div>
+
+    <div class="kpi-card red">
+      <div>
+        <span class="kpi-label">Quantity Left</span>
+        <div class="kpi-val" id="kpiRemaining">0.0</div>
+        <span class="kpi-sub">Physical distributor stock</span>
+      </div>
+      <img class="kpi-icon-3d" src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Hourglass%20not%20done/3D/hourglass_not_done_3d.png" alt="Left">
+    </div>
+  </div>
+
+  <!-- FIRST TABLE: Product-Wise Summary (Optimized with responsive width) -->
+  <div class="section-title">
+    <img class="section-icon-3d" src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Card%20file%20box/3D/card_file_box_3d.png" alt="Product Summary">
+    Product-Wise Stock Summary
+  </div>
+  <div class="card-box">
+    <table class="summary-table">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th><span class="th-desktop">Total Billed</span><span class="th-mobile">Billed</span></th>
+          <th><span class="th-desktop">Liquidated</span><span class="th-mobile">Liq.</span></th>
+          <th><span class="th-desktop">Total Left</span><span class="th-mobile">Left</span></th>
+        </tr>
+      </thead>
+      <tbody id="productSummaryBody">
+        <tr><td colspan="4" style="text-align:center; padding:16px; color:var(--text-muted);">Loading products...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- SECOND TABLE: Detailed Party-Wise Movement -->
+  <div class="section-title">
+    <img class="section-icon-3d" src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Department%20store/3D/department_store_3d.png" alt="Distributors">
+    Party & Territory Detailed Movement
+  </div>
+  <div class="card-box">
+    <table class="detailed-table">
+      <thead>
+        <tr>
+          <th>Territory</th>
+          <th>Party (Payer Name)</th>
+          <th>Product (Strength)</th>
+          <th>Qty Billed</th>
+          <th>Qty Sold</th>
+          <th>Qty Left</th>
+        </tr>
+      </thead>
+      <tbody id="detailedTableBody">
+        <tr><td colspan="6" style="text-align:center; padding:18px; color:var(--text-muted);">Loading data...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx9JMLkBAi7a_bbVtdOzZ6kbfMIn9EYA45th7cbUzayoE1Sr_k80ytOY2mZTmQdUAPY/exec";
+
+  let rawBilled = [];
+  let rawLogs = [];
+
+  window.onload = async () => {
+    try {
+      const res = await fetch(SCRIPT_URL);
+      const data = await res.json();
+      
+      rawBilled = data.billed || [];
+      rawLogs = data.stockLogs || [];
+
+      populateTerritories();
+      populateParties();
+      renderDashboard();
+    } catch(e) {
+      document.getElementById('detailedTableBody').innerHTML = 
+        `<tr><td colspan="6" style="text-align:center; color:#ef4444; padding:20px;">Failed to load data. Please refresh.</td></tr>`;
+    }
+  };
+
+  function populateTerritories() {
+    const territories = [...new Set(rawBilled.map(b => (b.territory || "Unassigned").trim()))].filter(Boolean).sort();
+    const sel = document.getElementById("territoryFilter");
+    sel.innerHTML = '<option value="ALL">All Territories</option>';
+    territories.forEach(t => {
+      const opt = document.createElement("option");
+      opt.value = t;
+      opt.innerText = t;
+      sel.appendChild(opt);
+    });
+  }
+
+  function onTerritoryChange() {
+    populateParties();
+    renderDashboard();
+  }
+
+  function populateParties() {
+    const selectedTerritory = document.getElementById("territoryFilter").value;
+    const filtered = selectedTerritory === "ALL" 
+      ? rawBilled 
+      : rawBilled.filter(d => (d.territory || "Unassigned").trim() === selectedTerritory);
+
+    const parties = [...new Set(filtered.map(b => b.party))].sort();
+    const sel = document.getElementById("partyFilter");
+    sel.innerHTML = '<option value="ALL">All Parties</option>';
+    parties.forEach(p => {
+      const opt = document.createElement("option");
+      opt.value = p;
+      opt.innerText = p;
+      sel.appendChild(opt);
+    });
+  }
+
+  function getCalculatedData() {
+    const selectedTerritory = document.getElementById('territoryFilter').value;
+    const selectedParty = document.getElementById('partyFilter').value;
+    const search = document.getElementById('searchBox').value.toLowerCase().trim();
+
+    return rawBilled
+      .filter(item => (selectedTerritory === "ALL" || (item.territory || "Unassigned").trim() === selectedTerritory))
+      .filter(item => (selectedParty === "ALL" || item.party === selectedParty))
+      .filter(item => (!search || item.product.toLowerCase().includes(search)))
+      .map(item => {
+        const matchLogs = rawLogs.filter(l => (l.party || "").trim() === item.party && (l.product || "").trim() === item.product);
+        const hasAudit = matchLogs.length > 0;
+        
+        const remaining = hasAudit ? matchLogs[matchLogs.length - 1].quantityLeft : item.billedQty;
+        const sold = Math.max(0, item.billedQty - remaining);
+        
+        return {
+          territory: item.territory || "-",
+          party: item.party,
+          product: item.product,
+          billed: item.billedQty,
+          remaining,
+          sold,
+          hasAudit
+        };
+      });
+  }
+
+  function renderDashboard() {
+    const rows = getCalculatedData();
+    const productSummaryBody = document.getElementById('productSummaryBody');
+    const detailedBody = document.getElementById('detailedTableBody');
+
+    productSummaryBody.innerHTML = "";
+    detailedBody.innerHTML = "";
+
+    let totalB = 0, totalR = 0, totalS = 0;
+
+    const productSummary = {};
+    rows.forEach(r => {
+      totalB += r.billed;
+      totalR += r.remaining;
+      totalS += r.sold;
+
+      if (!productSummary[r.product]) {
+        productSummary[r.product] = { billed: 0, sold: 0, remaining: 0 };
+      }
+      productSummary[r.product].billed += r.billed;
+      productSummary[r.product].sold += r.sold;
+      productSummary[r.product].remaining += r.remaining;
+    });
+
+    const prodNames = Object.keys(productSummary).sort();
+    if (!prodNames.length) {
+      productSummaryBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:15px; color:#94a3b8;">No products found.</td></tr>`;
+    } else {
+      prodNames.forEach(p => {
+        const item = productSummary[p];
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${p}</td>
+          <td><span class="badge-pill pill-blue">${item.billed.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1})}</span></td>
+          <td><span class="badge-pill pill-green">${item.sold.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1})}</span></td>
+          <td><span class="badge-pill pill-red">${item.remaining.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1})}</span></td>
+        `;
+        productSummaryBody.appendChild(tr);
+      });
+    }
+
+    if (!rows.length) {
+      detailedBody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:18px; color:#94a3b8;">No records match your filters.</td></tr>`;
+    } else {
+      rows.forEach(r => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <!-- Desktop Columns -->
+          <td class="desktop-only" style="color:#64748b; font-size:0.8rem; font-weight:700;">${r.territory}</td>
+          <td class="desktop-only"><strong>${r.party}</strong></td>
+          <td class="desktop-only" style="color:#2563eb; font-weight:600;">${r.product}</td>
+          <td class="desktop-only"><span class="badge-pill pill-blue">${r.billed.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1})}</span></td>
+          <td class="desktop-only"><span class="badge-pill pill-green">${r.sold.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1})}</span></td>
+          <td class="desktop-only"><span class="badge-pill pill-red">${r.remaining.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1})}</span></td>
+
+          <!-- Mobile Compact View -->
+          <div class="mobile-card-content" style="display:none;">
+            <div class="m-territory">
+              <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Round%20pushpin/3D/round_pushpin_3d.png" style="width:14px; height:14px;" alt="Pin">
+              ${r.territory}
+            </div>
+            <div class="m-party">${r.party}</div>
+            <div class="m-product">${r.product}</div>
+            <div class="m-stats-row">
+              <div class="m-stat-box" style="border-color:#bfdbfe;">
+                <span class="m-stat-label" style="color:#2563eb;">Billed</span>
+                <span class="m-stat-val" style="color:#1d4ed8;">${r.billed.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1})}</span>
+              </div>
+              <div class="m-stat-box" style="border-color:#bbf7d0;">
+                <span class="m-stat-label" style="color:#059669;">Liquidated</span>
+                <span class="m-stat-val" style="color:#047857;">${r.sold.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1})}</span>
+              </div>
+              <div class="m-stat-box" style="border-color:#fecaca;">
+                <span class="m-stat-label" style="color:#dc2626;">Left</span>
+                <span class="m-stat-val" style="color:#b91c1c;">${r.remaining.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1})}</span>
+              </div>
+            </div>
+          </div>
+        `;
+        detailedBody.appendChild(tr);
+      });
+    }
+
+    document.getElementById('kpiBilled').innerText = totalB.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1});
+    document.getElementById('kpiSold').innerText = totalS.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1});
+    document.getElementById('kpiRemaining').innerText = totalR.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1});
+  }
+</script>
+
+<style>
+  @media (max-width: 767px) {
+    .desktop-only { display: none !important; }
+    .mobile-card-content { display: block !important; }
+  }
+</style>
+
+</body>
+</html>
