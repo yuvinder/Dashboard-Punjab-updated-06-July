@@ -71,12 +71,6 @@ font-weight:500;
 
 /*
   --- RESPONSIVE DASHBOARD GRID (FLUID) ---
-  auto-fit + minmax lets the browser recalculate the column count
-  continuously as width changes, instead of jumping between fixed
-  breakpoints. Combined with minmax(0,1fr) on the tracks and
-  min-width:0 on the items, a column can NEVER be forced wider than
-  the space available, so horizontal overflow is not mathematically
-  possible regardless of screen size.
 */
 .grid{
 width:100%;
@@ -433,6 +427,19 @@ word-break:break-word;
             <i class="fa-solid fa-chart-pie icon sales"></i>
             <span>Liquidation Dashboard</span>
         </a>
+        
+        <!-- NEW Balance stock form -->
+        <a class="app" href="entry%20form.html" target="_blank">
+            <i class="fa-solid fa-file-signature icon farmer"></i>
+            <span>NEW Balance stock form</span>
+        </a>
+
+        <!-- NEW Liquidation dashboard -->
+        <a class="app" href="dashboard.html" target="_blank">
+            <i class="fa-solid fa-chart-column icon sales"></i>
+            <span>NEW Liquidation dashboard</span>
+        </a>
+
         <a class="app" href="https://drive.google.com/drive/folders/1BWQHp611Wlag-7SsU8PBk2J0qr8kDHjO" target="_blank">
             <i class="fa-solid fa-layer-group icon misc"></i>
             <span>Misc</span>
@@ -523,8 +530,6 @@ word-break:break-word;
             <div class="cat-section-count" id="count-insecticide"></div>
         </div>
 
-        <!-- Example product card. Duplicate this block for every product and set data-category to
-             insecticide / fungicide / herbicide / other to match one of the pills above. -->
         <div class="cat-product-card" data-category="insecticide">
             <div class="cat-card-accent accent-insect"></div>
             <div class="cat-card-header">
