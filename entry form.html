@@ -337,10 +337,149 @@
       cursor: pointer;
     }
     .btn-delete-row:hover { background: #dc2626; }
+
+    /* Territory Login */
+    #loginScreen {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: linear-gradient(135deg, #eef2ff 0%, #f8fafc 55%, #e0f2fe 100%);
+    }
+    .login-card {
+      width: 100%;
+      max-width: 420px;
+      background: #fff;
+      border: 1px solid rgba(226,232,240,.95);
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(15,23,42,.14);
+      padding: 28px;
+    }
+    .login-icon {
+      width: 58px;
+      height: 58px;
+      display: block;
+      margin: 0 auto 14px;
+      filter: drop-shadow(0 7px 14px rgba(0,0,0,.12));
+    }
+    .login-card h2 {
+      margin: 0;
+      text-align: center;
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .login-card .login-sub {
+      margin: 6px 0 22px;
+      text-align: center;
+      color: #64748b;
+      font-size: .84rem;
+    }
+    .login-field { margin-bottom: 14px; }
+    .login-field label {
+      text-transform: none;
+      letter-spacing: 0;
+      font-size: .82rem;
+      margin-bottom: 7px;
+      color: #475569;
+    }
+    .login-field select, .login-field input {
+      width: 100%;
+      padding: 13px 14px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 10px;
+      font: 600 .95rem 'Plus Jakarta Sans', sans-serif;
+      outline: none;
+      background: #fff;
+      color: #0f172a;
+    }
+    .login-field select:focus, .login-field input:focus {
+      border-color: #4f46e5;
+      box-shadow: 0 0 0 3px rgba(79,70,229,.12);
+    }
+    .login-btn {
+      width: 100%;
+      border: 0;
+      border-radius: 10px;
+      padding: 14px;
+      color: #fff;
+      background: linear-gradient(135deg,#4f46e5,#3730a3);
+      font: 700 .95rem 'Plus Jakarta Sans',sans-serif;
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(79,70,229,.22);
+    }
+    .login-error {
+      min-height: 20px;
+      margin: 10px 0 0;
+      text-align: center;
+      color: #dc2626;
+      font-size: .78rem;
+      font-weight: 700;
+    }
+    #appContent { display: none; }
+    .logged-territory {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #eef2ff;
+      color: #4338ca;
+      border: 1px solid #c7d2fe;
+      border-radius: 9px;
+      padding: 7px 10px;
+      font-size: .75rem;
+      font-weight: 800;
+    }
+    .logout-btn {
+      border: 0;
+      background: #fee2e2;
+      color: #b91c1c;
+      border-radius: 9px;
+      padding: 8px 11px;
+      font: 700 .75rem 'Plus Jakarta Sans',sans-serif;
+      cursor: pointer;
+    }
+    @media (max-width: 480px) {
+      .login-card { padding: 23px 18px; }
+    }
+
   </style>
 </head>
 <body>
+<div id="loginScreen">
+  <div class="login-card">
+    <img class="login-icon" src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Locked/3D/locked_3d.png" alt="Login">
+    <h2>Territory Login</h2>
+    <p class="login-sub">Login to access parties assigned to your territory</p>
 
+    <div class="login-field">
+      <label for="loginTerritory">Territory</label>
+      <select id="loginTerritory">
+        <option value="">-- Select Territory --</option>
+        <option value="AMRITSAR">Amritsar</option>
+        <option value="SANGRUR">Sangrur</option>
+        <option value="BATHINDA">Bathinda</option>
+        <option value="MOGA">Moga</option>
+        <option value="PATIALA">Patiala</option>
+        <option value="JALANDHAR">Jal</option>
+      </select>
+    </div>
+
+    <div class="login-field">
+      <label for="loginPassword">Password</label>
+      <input id="loginPassword" type="password" autocomplete="current-password"
+             placeholder="Enter territory password"
+             onkeydown="if(event.key==='Enter') territoryLogin()">
+    </div>
+
+    <button class="login-btn" onclick="territoryLogin()">Login</button>
+    <div id="loginError" class="login-error"></div>
+  </div>
+</div>
+
+<div id="appContent">
 <div class="container">
   <div class="card">
     <div class="header-box">
@@ -443,10 +582,101 @@
     </div>
   </div>
 </div>
+</div>
 
 <script>
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx9JMLkBAi7a_bbVtdOzZ6kbfMIn9EYA45th7cbUzayoE1Sr_k80ytOY2mZTmQdUAPY/exec";
   const ADMIN_PASSCODE = "Tanish1504";
+
+  // Territory login credentials. Login controls which territory's parties are visible.
+  const TERRITORY_USERS = {
+    "AMRITSAR":  { label: "Amritsar", password: "Par@123" },
+    "SANGRUR":   { label: "Sangrur",  password: "San@654" },
+    "BATHINDA":  { label: "Bathinda", password: "Abo@987" },
+    "MOGA":      { label: "Moga",     password: "Har@765" },
+    "PATIALA":   { label: "Patiala",  password: "Raj@098" },
+    "JALANDHAR": { label: "Jal",      password: "Vac@123" }
+  };
+  let loggedInTerritory = null;
+
+  function territoryLogin() {
+    const territory = document.getElementById("loginTerritory").value;
+    const password = document.getElementById("loginPassword").value;
+    const error = document.getElementById("loginError");
+
+    if (!territory) {
+      error.innerText = "Please select your territory.";
+      return;
+    }
+
+    if (!TERRITORY_USERS[territory] || password !== TERRITORY_USERS[territory].password) {
+      error.innerText = "Incorrect territory password.";
+      document.getElementById("loginPassword").value = "";
+      document.getElementById("loginPassword").focus();
+      return;
+    }
+
+    loggedInTerritory = territory;
+    sessionStorage.setItem("territoryLogin", territory);
+
+    document.getElementById("loginScreen").style.display = "none";
+    document.getElementById("appContent").style.display = "block";
+
+    const territorySelect = document.getElementById("territorySelect");
+    territorySelect.value = loggedInTerritory;
+    territorySelect.disabled = true;
+
+    const existingActions = document.querySelector(".header-actions");
+    if (existingActions && !document.getElementById("loggedTerritoryBadge")) {
+      existingActions.insertAdjacentHTML("afterbegin",
+        `<span id="loggedTerritoryBadge" class="logged-territory">📍 ${TERRITORY_USERS[loggedInTerritory].label}</span>
+         <button class="logout-btn" onclick="territoryLogout()">Logout</button>`
+      );
+    }
+
+    populateParties();
+    renderPartyProducts();
+    loadData();
+  }
+
+  function territoryLogout() {
+    loggedInTerritory = null;
+    sessionStorage.removeItem("territoryLogin");
+    isAdminUnlocked = false;
+
+    document.getElementById("appContent").style.display = "none";
+    document.getElementById("loginScreen").style.display = "flex";
+    document.getElementById("loginPassword").value = "";
+    document.getElementById("loginTerritory").value = "";
+    document.getElementById("loginError").innerText = "";
+
+    const badge = document.getElementById("loggedTerritoryBadge");
+    if (badge) badge.remove();
+    const logout = document.querySelector(".logout-btn");
+    if (logout) logout.remove();
+  }
+
+  function restoreTerritoryLogin() {
+    const saved = sessionStorage.getItem("territoryLogin");
+    if (saved && TERRITORY_USERS[saved]) {
+      loggedInTerritory = saved;
+      document.getElementById("loginTerritory").value = saved;
+      document.getElementById("loginScreen").style.display = "none";
+      document.getElementById("appContent").style.display = "block";
+
+      const territorySelect = document.getElementById("territorySelect");
+      territorySelect.value = saved;
+      territorySelect.disabled = true;
+
+      const existingActions = document.querySelector(".header-actions");
+      if (existingActions && !document.getElementById("loggedTerritoryBadge")) {
+        existingActions.insertAdjacentHTML("afterbegin",
+          `<span id="loggedTerritoryBadge" class="logged-territory">📍 ${TERRITORY_USERS[saved].label}</span>
+           <button class="logout-btn" onclick="territoryLogout()">Logout</button>`
+        );
+      }
+    }
+  }
 
   // Opening Inventory Dataset (from Excel as on 01-04-2026)
   const OPENING_DATA = [{"t": "AMRITSAR", "p": "Damodar Dass Jai Chand Aggarwal", "k": "DAMODAR DASS JAI CHAND AGGARWAL", "pr": "SLAYDEN", "o": 60.0}, {"t": "AMRITSAR", "p": "Damodar Dass Jai Chand Aggarwal", "k": "DAMODAR DASS JAI CHAND AGGARWAL", "pr": "XYMEN", "o": 3.0}, {"t": "AMRITSAR", "p": "Friends Agro Chemicals (India)", "k": "FRIENDS AGRO CHEMICALS (INDIA)", "pr": "GLANZ", "o": 5.0}, {"t": "AMRITSAR", "p": "Friends Agro Chemicals (India)", "k": "FRIENDS AGRO CHEMICALS (INDIA)", "pr": "NATCORE", "o": 7.0}, {"t": "AMRITSAR", "p": "Friends Agro Chemicals (India)", "k": "FRIENDS AGRO CHEMICALS (INDIA)", "pr": "NATGEN PRO", "o": 3.2}, {"t": "AMRITSAR", "p": "G.H. Kheti Store", "k": "G.H. KHETI STORE", "pr": "OMNINAT", "o": 5.0}, {"t": "AMRITSAR", "p": "Gill Kheti Store", "k": "GILL KHETI STORE", "pr": "GLANZ", "o": 10.0}, {"t": "AMRITSAR", "p": "National Agro Centre", "k": "NATIONAL AGRO CENTRE", "pr": "GLANZ", "o": 10.0}, {"t": "AMRITSAR", "p": "National Agro Centre", "k": "NATIONAL AGRO CENTRE", "pr": "NATGEN", "o": 4.0}, {"t": "AMRITSAR", "p": "National Agro Centre", "k": "NATIONAL AGRO CENTRE", "pr": "NATLIGO", "o": 7.0}, {"t": "AMRITSAR", "p": "National Agro Centre", "k": "NATIONAL AGRO CENTRE", "pr": "NATPEARL", "o": 50.0}, {"t": "AMRITSAR", "p": "National Agro Centre", "k": "NATIONAL AGRO CENTRE", "pr": "SLAYDEN", "o": 18.0}, {"t": "AMRITSAR", "p": "National Agro Centre", "k": "NATIONAL AGRO CENTRE", "pr": "TOPRASURE", "o": 1.2}, {"t": "AMRITSAR", "p": "New Kamboj Kheti Store", "k": "NEW KAMBOJ KHETI STORE", "pr": "GLANZ", "o": 2.0}, {"t": "AMRITSAR", "p": "New Kamboj Kheti Store", "k": "NEW KAMBOJ KHETI STORE", "pr": "NATCORE", "o": 20.0}, {"t": "AMRITSAR", "p": "New Kamboj Kheti Store", "k": "NEW KAMBOJ KHETI STORE", "pr": "NATDUO", "o": 440.0}, {"t": "AMRITSAR", "p": "New Kamboj Kheti Store", "k": "NEW KAMBOJ KHETI STORE", "pr": "NATERRA", "o": 904.0}, {"t": "AMRITSAR", "p": "New Kamboj Kheti Store", "k": "NEW KAMBOJ KHETI STORE", "pr": "NATGEN PRO", "o": 4.0}, {"t": "AMRITSAR", "p": "New Kamboj Kheti Store", "k": "NEW KAMBOJ KHETI STORE", "pr": "NATJEWEL", "o": 30.0}, {"t": "AMRITSAR", "p": "New Kamboj Kheti Store", "k": "NEW KAMBOJ KHETI STORE", "pr": "NATLIGO", "o": 7.0}, {"t": "AMRITSAR", "p": "New Kamboj Kheti Store", "k": "NEW KAMBOJ KHETI STORE", "pr": "SLAYDEN", "o": 18.0}, {"t": "AMRITSAR", "p": "New Kamboj Kheti Store", "k": "NEW KAMBOJ KHETI STORE", "pr": "TOPRASURE", "o": 2.4}, {"t": "AMRITSAR", "p": "Ram Rachhpal Dhawan And Sons", "k": "RAM RACHHPAL DHAWAN AND SONS", "pr": "NATJEWEL", "o": 5.0}, {"t": "AMRITSAR", "p": "Ram Rachhpal Dhawan And Sons", "k": "RAM RACHHPAL DHAWAN AND SONS", "pr": "SLAYDEN", "o": 6.0}, {"t": "AMRITSAR", "p": "Ram Rachhpal Dhawan And Sons", "k": "RAM RACHHPAL DHAWAN AND SONS", "pr": "TOPRASURE", "o": 1.2}, {"t": "AMRITSAR", "p": "S.K. Commission Agent", "k": "S.K. COMMISSION AGENT", "pr": "SLAYDEN", "o": 6.0}, {"t": "AMRITSAR", "p": "Vishnu Khad Store", "k": "VISHNU KHAD STORE", "pr": "NATDUO", "o": 200.0}, {"t": "AMRITSAR", "p": "Vishnu Khad Store", "k": "VISHNU KHAD STORE", "pr": "NATERRA", "o": 440.0}, {"t": "BATHINDA", "p": "Janta Kheti Centre", "k": "JANTA KHETI CENTRE", "pr": "NATCORE", "o": 40.0}, {"t": "BATHINDA", "p": "Janta Kheti Centre", "k": "JANTA KHETI CENTRE", "pr": "NATPEARL", "o": 20.0}, {"t": "BATHINDA", "p": "Lekh Raj Kukkar And Sons", "k": "LEKH RAJ KUKKAR AND SONS", "pr": "GLANZ", "o": 24.0}, {"t": "BATHINDA", "p": "New Shere Punjab Pesticides", "k": "NEW SHERE PUNJAB PESTICIDES", "pr": "GLANZ", "o": 20.0}, {"t": "BATHINDA", "p": "New Shere Punjab Pesticides", "k": "NEW SHERE PUNJAB PESTICIDES", "pr": "NATCORE", "o": 20.0}, {"t": "BATHINDA", "p": "New Shere Punjab Pesticides", "k": "NEW SHERE PUNJAB PESTICIDES", "pr": "NATGEN", "o": 12.0}, {"t": "BATHINDA", "p": "New Shere Punjab Pesticides", "k": "NEW SHERE PUNJAB PESTICIDES", "pr": "NATLIGO", "o": 30.0}, {"t": "BATHINDA", "p": "New Shere Punjab Pesticides", "k": "NEW SHERE PUNJAB PESTICIDES", "pr": "NATZOATE", "o": 15.0}, {"t": "BATHINDA", "p": "Raj Agro Chemicals", "k": "RAJ AGRO CHEMICALS", "pr": "NATCORE", "o": 90.0}, {"t": "BATHINDA", "p": "Rakesh Kumar And Co.", "k": "RAKESH KUMAR AND CO.", "pr": "GLANZ", "o": 40.0}, {"t": "BATHINDA", "p": "Rakesh Kumar And Co.", "k": "RAKESH KUMAR AND CO.", "pr": "NATERRA", "o": 450.0}, {"t": "BATHINDA", "p": "Rakesh Kumar And Co.", "k": "RAKESH KUMAR AND CO.", "pr": "NATJEWEL", "o": 60.0}, {"t": "BATHINDA", "p": "Rakesh Kumar And Co.", "k": "RAKESH KUMAR AND CO.", "pr": "NATZOATE", "o": 10.0}, {"t": "BATHINDA", "p": "Shakti Pesticides", "k": "SHAKTI PESTICIDES", "pr": "TOPRASURE", "o": 4.0}, {"t": "BATHINDA", "p": "Surinder Singh And Co", "k": "SURINDER SINGH AND CO", "pr": "GLANZ", "o": 20.0}, {"t": "BATHINDA", "p": "Surinder Singh And Co", "k": "SURINDER SINGH AND CO", "pr": "NATZOATE", "o": 10.0}, {"t": "BATHINDA", "p": "Sushil Trading Co", "k": "SUSHIL TRADING CO", "pr": "NATZOATE", "o": 20.0}, {"t": "BATHINDA", "p": "Zamidara Pesticide", "k": "ZAMIDARA PESTICIDE", "pr": "GLANZ", "o": 20.0}, {"t": "BATHINDA", "p": "Zimidara Agro Traders", "k": "ZIMIDARA AGRO TRADERS", "pr": "GLANZ", "o": 20.0}, {"t": "BATHINDA", "p": "Zimidara Agro Traders", "k": "ZIMIDARA AGRO TRADERS", "pr": "NATCORE", "o": 100.0}, {"t": "BATHINDA", "p": "Zimidara Agro Traders", "k": "ZIMIDARA AGRO TRADERS", "pr": "NATERRA", "o": 1700.0}, {"t": "BATHINDA", "p": "Zimidara Agro Traders", "k": "ZIMIDARA AGRO TRADERS", "pr": "NATJEWEL", "o": 70.0}, {"t": "BATHINDA", "p": "Zimidara Agro Traders", "k": "ZIMIDARA AGRO TRADERS", "pr": "NATZOATE", "o": 35.0}, {"t": "JALANDHAR", "p": "Goyal Traders", "k": "GOYAL TRADERS", "pr": "SLAYDEN", "o": 5.0}, {"t": "JALANDHAR", "p": "Hazara Agro Centre", "k": "HAZARA AGRO CENTRE", "pr": "NATZOATE", "o": 20.0}, {"t": "JALANDHAR", "p": "Hazara Agro Centre", "k": "HAZARA AGRO CENTRE", "pr": "TOPRASURE", "o": 1.4}, {"t": "JALANDHAR", "p": "Khalsa Traders", "k": "KHALSA TRADERS", "pr": "NATCORE", "o": 20.0}, {"t": "JALANDHAR", "p": "Khalsa Traders", "k": "KHALSA TRADERS", "pr": "NATZOATE", "o": 20.0}, {"t": "JALANDHAR", "p": "Khalsa Traders", "k": "KHALSA TRADERS", "pr": "TOPRASURE", "o": 10.0}, {"t": "JALANDHAR", "p": "Kheti Suvidha Kender", "k": "KHETI SUVIDHA KENDER", "pr": "GLANZ", "o": 2.0}, {"t": "JALANDHAR", "p": "Kisan Seed Company", "k": "KISAN SEED COMPANY", "pr": "NATGEN", "o": 6.0}, {"t": "JALANDHAR", "p": "Kisan Seed Company", "k": "KISAN SEED COMPANY", "pr": "SLAYDEN", "o": 8.0}, {"t": "JALANDHAR", "p": "Minhas Pesticides & Seed Store", "k": "MINHAS PESTICIDES & SEED STORE", "pr": "GLANZ", "o": 5.0}, {"t": "JALANDHAR", "p": "Pandtan Di Hatti", "k": "PANDTAN DI HATTI", "pr": "SLAYDEN", "o": 3.0}, {"t": "JALANDHAR", "p": "Punjab Seed Store", "k": "PUNJAB SEED STORE", "pr": "NATERRA", "o": 600.0}, {"t": "JALANDHAR", "p": "Saini Brothers", "k": "SAINI BROTHERS", "pr": "GLANZ", "o": 4.0}, {"t": "JALANDHAR", "p": "Saini Brothers", "k": "SAINI BROTHERS", "pr": "NATGEN", "o": 18.0}, {"t": "MOGA", "p": "Aggarwal Khad Store", "k": "AGGARWAL KHAD STORE", "pr": "GLANZ", "o": 4.0}, {"t": "MOGA", "p": "Batra Pestcides & Fertilizer", "k": "BATRA PESTCIDES & FERTILIZER", "pr": "ASTOR", "o": 0.5}, {"t": "MOGA", "p": "Batra Pestcides & Fertilizer", "k": "BATRA PESTCIDES & FERTILIZER", "pr": "NATCORE", "o": 35.0}, {"t": "MOGA", "p": "Batra Pestcides & Fertilizer", "k": "BATRA PESTCIDES & FERTILIZER", "pr": "NATPEARL", "o": 5.0}, {"t": "MOGA", "p": "Batra Pestcides & Fertilizer", "k": "BATRA PESTCIDES & FERTILIZER", "pr": "TOPRASURE", "o": 6.3}, {"t": "MOGA", "p": "Bhushan & Sons", "k": "BHUSHAN & SONS", "pr": "TOPRASURE", "o": 1.2}, {"t": "MOGA", "p": "Brar Seed And Fertilizer", "k": "BRAR SEED AND FERTILIZER", "pr": "ATMOS", "o": 20.0}, {"t": "MOGA", "p": "Gill Spray Store", "k": "GILL SPRAY STORE", "pr": "GLANZ", "o": 16.0}, {"t": "MOGA", "p": "Gill Spray Store", "k": "GILL SPRAY STORE", "pr": "NATCORE", "o": 40.0}, {"t": "MOGA", "p": "Gill Spray Store", "k": "GILL SPRAY STORE", "pr": "NATLAM", "o": 16.0}, {"t": "MOGA", "p": "Gill Spray Store", "k": "GILL SPRAY STORE", "pr": "NATPEARL", "o": 25.0}, {"t": "MOGA", "p": "Gill Spray Store", "k": "GILL SPRAY STORE", "pr": "NATZOATE", "o": 8.0}, {"t": "MOGA", "p": "Goyal Spray Company", "k": "GOYAL SPRAY COMPANY", "pr": "NATLIGO", "o": 20.0}, {"t": "MOGA", "p": "Grover Pesticide", "k": "GROVER PESTICIDE", "pr": "NATZOATE", "o": 18.0}, {"t": "MOGA", "p": "Hari Om Khad Agency", "k": "HARI OM KHAD AGENCY", "pr": "NATGEN PRO", "o": 0.68}, {"t": "MOGA", "p": "Hari Om Khad Agency", "k": "HARI OM KHAD AGENCY", "pr": "SLAYDEN", "o": 16.0}, {"t": "MOGA", "p": "Kamal Kheti Store", "k": "KAMAL KHETI STORE", "pr": "GLANZ", "o": 41.5}, {"t": "MOGA", "p": "Kamal Kheti Store", "k": "KAMAL KHETI STORE", "pr": "NATGEN PRO", "o": 3.4}, {"t": "MOGA", "p": "Kamal Kheti Store", "k": "KAMAL KHETI STORE", "pr": "TOPRASURE", "o": 0.51}, {"t": "MOGA", "p": "Kissan Agro Centre", "k": "KISSAN AGRO CENTRE", "pr": "GLANZ", "o": 5.0}, {"t": "MOGA", "p": "Kissan Agro Centre", "k": "KISSAN AGRO CENTRE", "pr": "NATGEN", "o": 12.0}, {"t": "MOGA", "p": "Kissan Agro Centre", "k": "KISSAN AGRO CENTRE", "pr": "NATGEN PRO", "o": 3.4}, {"t": "MOGA", "p": "Kissan Agro Centre", "k": "KISSAN AGRO CENTRE", "pr": "TOPRASURE", "o": 6.0}, {"t": "MOGA", "p": "Kissan Agro Centre", "k": "KISSAN AGRO CENTRE", "pr": "XYMEN", "o": 1.5}, {"t": "MOGA", "p": "Mittal Brothers", "k": "MITTAL BROTHERS", "pr": "GLANZ", "o": 3.0}, {"t": "MOGA", "p": "Mittal Brothers", "k": "MITTAL BROTHERS", "pr": "NATGEN PRO", "o": 0.85}, {"t": "MOGA", "p": "Mittal Brothers", "k": "MITTAL BROTHERS", "pr": "NATPEARL", "o": 6.0}, {"t": "MOGA", "p": "Modern Kheti Sewa Centre", "k": "MODERN KHETI SEWA CENTRE", "pr": "NATCORE", "o": 60.0}, {"t": "MOGA", "p": "Modern Kheti Sewa Centre", "k": "MODERN KHETI SEWA CENTRE", "pr": "NATJEWEL", "o": 17.0}, {"t": "MOGA", "p": "Modern Kheti Sewa Centre", "k": "MODERN KHETI SEWA CENTRE", "pr": "NATPEARL", "o": 50.0}, {"t": "MOGA", "p": "Modern Kheti Sewa Centre", "k": "MODERN KHETI SEWA CENTRE", "pr": "NATZOATE", "o": 32.0}, {"t": "MOGA", "p": "Nand Lal Pesticides And Fertilizer", "k": "NAND LAL PESTICIDES AND FERTILIZER", "pr": "NATGEN", "o": 9.0}, {"t": "MOGA", "p": "Nand Lal Pesticides And Fertilizer", "k": "NAND LAL PESTICIDES AND FERTILIZER", "pr": "NATPEARL", "o": 11.0}, {"t": "MOGA", "p": "Nand Lal Pesticides And Fertilizer", "k": "NAND LAL PESTICIDES AND FERTILIZER", "pr": "NATZOATE", "o": 12.0}, {"t": "MOGA", "p": "National Seed Depot", "k": "NATIONAL SEED DEPOT", "pr": "NATLIGO", "o": 14.0}, {"t": "MOGA", "p": "National Seed Depot", "k": "NATIONAL SEED DEPOT", "pr": "NATPEARL", "o": 6.0}, {"t": "MOGA", "p": "National Seed Depot", "k": "NATIONAL SEED DEPOT", "pr": "NATZOATE", "o": 30.0}, {"t": "MOGA", "p": "National Seed Depot", "k": "NATIONAL SEED DEPOT", "pr": "TOPRASURE", "o": 0.39}, {"t": "MOGA", "p": "Pest Control Service", "k": "PEST CONTROL SERVICE", "pr": "GLANZ", "o": 6.0}, {"t": "MOGA", "p": "Pest Control Service", "k": "PEST CONTROL SERVICE", "pr": "NATJEWEL", "o": 10.0}, {"t": "PATIALA", "p": "Guru Nanak Pesticides", "k": "GURU NANAK PESTICIDES", "pr": "NATGEN", "o": 2.0}, {"t": "PATIALA", "p": "Kisan Seed Store", "k": "KISAN SEED STORE", "pr": "NATERRA", "o": 240.0}, {"t": "PATIALA", "p": "Kisan Seed Store", "k": "KISAN SEED STORE", "pr": "OMNINAT", "o": 2.0}, {"t": "PATIALA", "p": "Kissan Kheti Centre", "k": "KISSAN KHETI CENTRE", "pr": "NATGEN PRO", "o": 13.6}, {"t": "PATIALA", "p": "Kissan Kheti Centre", "k": "KISSAN KHETI CENTRE", "pr": "NATJEWEL", "o": 10.0}, {"t": "PATIALA", "p": "Kissan Kheti Centre", "k": "KISSAN KHETI CENTRE", "pr": "NATLAM", "o": 30.0}, {"t": "PATIALA", "p": "Kissan Kheti Centre", "k": "KISSAN KHETI CENTRE", "pr": "NATLIGO", "o": 50.0}, {"t": "PATIALA", "p": "Kissan Kheti Centre", "k": "KISSAN KHETI CENTRE", "pr": "NATPEARL", "o": 5.0}, {"t": "PATIALA", "p": "New Zimidara Khad Store", "k": "NEW ZIMIDARA KHAD STORE", "pr": "GLANZ", "o": 4.0}, {"t": "PATIALA", "p": "Zimidara Khad Store", "k": "ZIMIDARA KHAD STORE", "pr": "GLANZ", "o": 15.0}, {"t": "PATIALA", "p": "Yameen Seed & Pesticide Store", "k": "YAMEEN SEED & PESTICIDE STORE", "pr": "ATMOS", "o": 10.0}, {"t": "PATIALA", "p": "Yameen Seed & Pesticide Store", "k": "YAMEEN SEED & PESTICIDE STORE", "pr": "CYANAT", "o": 6.0}, {"t": "PATIALA", "p": "Yameen Seed & Pesticide Store", "k": "YAMEEN SEED & PESTICIDE STORE", "pr": "GLANZ", "o": 8.0}, {"t": "PATIALA", "p": "Yameen Seed & Pesticide Store", "k": "YAMEEN SEED & PESTICIDE STORE", "pr": "HATRIK", "o": 10.0}, {"t": "PATIALA", "p": "Yameen Seed & Pesticide Store", "k": "YAMEEN SEED & PESTICIDE STORE", "pr": "TOPRASURE", "o": 0.6}, {"t": "SANGRUR", "p": "Budh Ram & Sons", "k": "BUDH RAM & SONS", "pr": "SLAYDEN", "o": 10.0}, {"t": "SANGRUR", "p": "Jagdambey Pesticides", "k": "JAGDAMBEY PESTICIDES", "pr": "NATERRA", "o": 552.0}, {"t": "SANGRUR", "p": "Jagdambey Pesticides", "k": "JAGDAMBEY PESTICIDES", "pr": "SLAYDEN", "o": 12.0}, {"t": "SANGRUR", "p": "Jagdambey Pesticides", "k": "JAGDAMBEY PESTICIDES", "pr": "XYMEN", "o": 1.0}, {"t": "SANGRUR", "p": "Malwa Beej Store", "k": "MALWA BEEJ STORE", "pr": "NATJEWEL", "o": 20.0}, {"t": "SANGRUR", "p": "Malwa Beej Store", "k": "MALWA BEEJ STORE", "pr": "NATLIGO", "o": 6.0}, {"t": "SANGRUR", "p": "Malwa Beej Store", "k": "MALWA BEEJ STORE", "pr": "NATPEARL", "o": 4.0}, {"t": "SANGRUR", "p": "Malwa Beej Store", "k": "MALWA BEEJ STORE", "pr": "OMNINAT", "o": 3.0}, {"t": "SANGRUR", "p": "Mukesh Kumar Bansal & Co.", "k": "MUKESH KUMAR BANSAL & CO.", "pr": "NATGEN", "o": 6.0}, {"t": "SANGRUR", "p": "Mukesh Kumar Bansal & Co.", "k": "MUKESH KUMAR BANSAL & CO.", "pr": "NATGEN PRO", "o": 1.0}, {"t": "SANGRUR", "p": "Mukesh Kumar Bansal & Co.", "k": "MUKESH KUMAR BANSAL & CO.", "pr": "OMNINAT", "o": 2.0}, {"t": "SANGRUR", "p": "Mukesh Kumar Bansal & Co.", "k": "MUKESH KUMAR BANSAL & CO.", "pr": "SLAYDEN", "o": 4.0}, {"t": "SANGRUR", "p": "Navbharat Agro Agencies", "k": "NAVBHARAT AGRO AGENCIES", "pr": "GLANZ", "o": 3.0}, {"t": "SANGRUR", "p": "Navbharat Agro Agencies", "k": "NAVBHARAT AGRO AGENCIES", "pr": "NATGEN", "o": 1.0}, {"t": "SANGRUR", "p": "Navbharat Agro Agencies", "k": "NAVBHARAT AGRO AGENCIES", "pr": "NATLIGO", "o": 6.0}, {"t": "SANGRUR", "p": "New Kissan Sewa Centre", "k": "NEW KISSAN SEWA CENTRE", "pr": "GLANZ", "o": 6.0}, {"t": "SANGRUR", "p": "New Kissan Sewa Centre", "k": "NEW KISSAN SEWA CENTRE", "pr": "NATPEARL", "o": 4.0}, {"t": "SANGRUR", "p": "Om Parkash Ramesh Kumar", "k": "OM PARKASH RAMESH KUMAR", "pr": "GLANZ", "o": 8.0}, {"t": "SANGRUR", "p": "Om Parkash Ramesh Kumar", "k": "OM PARKASH RAMESH KUMAR", "pr": "NATLIGO", "o": 85.0}, {"t": "SANGRUR", "p": "Om Parkash Ramesh Kumar", "k": "OM PARKASH RAMESH KUMAR", "pr": "NATPEARL", "o": 11.0}, {"t": "SANGRUR", "p": "Om Parkash Ramesh Kumar", "k": "OM PARKASH RAMESH KUMAR", "pr": "NATWEEZ", "o": 24.0}, {"t": "SANGRUR", "p": "Sarao Pesticides", "k": "SARAO PESTICIDES", "pr": "GLANZ", "o": 9.0}, {"t": "SANGRUR", "p": "Sarao Pesticides", "k": "SARAO PESTICIDES", "pr": "SLAYDEN", "o": 2.0}, {"t": "SANGRUR", "p": "Sarao Pesticides", "k": "SARAO PESTICIDES", "pr": "XYMEN", "o": 2.0}, {"t": "SANGRUR", "p": "Zimidara Pesticides", "k": "ZIMIDARA PESTICIDES", "pr": "GLANZ", "o": 18.0}, {"t": "SANGRUR", "p": "Zimidara Pesticides", "k": "ZIMIDARA PESTICIDES", "pr": "NATCORE", "o": 24.0}, {"t": "SANGRUR", "p": "Zimidara Pesticides", "k": "ZIMIDARA PESTICIDES", "pr": "NATGEN PRO", "o": 3.0}, {"t": "SANGRUR", "p": "Zimidara Pesticides", "k": "ZIMIDARA PESTICIDES", "pr": "NATPEARL", "o": 7.0}, {"t": "SANGRUR", "p": "Zimidara Pesticides", "k": "ZIMIDARA PESTICIDES", "pr": "XYMEN", "o": 0.5}];
@@ -565,13 +795,10 @@
   }
 
   function populateTerritories() {
-    const territories = [...new Set([
-      ...unifiedRecords.map(b => (b.territory || "Unassigned").trim()),
-      ...MASTER_PARTIES.map(mp => (mp.t || "Unassigned").trim())
-    ])].filter(Boolean).sort();
+    if (!loggedInTerritory) return;
+    const territories = [loggedInTerritory];
 
     const sel = document.getElementById("territorySelect");
-    sel.innerHTML = '<option value="ALL">All Territories</option>';
     territories.forEach(t => {
       const opt = document.createElement("option");
       opt.value = t;
@@ -586,7 +813,8 @@
   }
 
   function populateParties() {
-    const selectedTerritory = document.getElementById("territorySelect").value;
+    if (!loggedInTerritory) return;
+    const selectedTerritory = loggedInTerritory;
     const partyMap = {};
 
     unifiedRecords.forEach(r => {
@@ -663,6 +891,22 @@
   function renderPartyProducts() {
     const party = document.getElementById("partySelect").value;
     const stockSection = document.getElementById("stockSection");
+
+    // Never render a party outside the logged-in territory.
+    if (party && loggedInTerritory) {
+      const allowed = unifiedRecords.some(r =>
+        normalizeKey(r.party) === normalizeKey(party) &&
+        normalizeKey(r.territory || "Unassigned") === normalizeKey(loggedInTerritory)
+      ) || MASTER_PARTIES.some(mp =>
+        normalizeKey(mp.p) === normalizeKey(party) &&
+        normalizeKey(mp.t || "Unassigned") === normalizeKey(loggedInTerritory)
+      );
+      if (!allowed) {
+        document.getElementById("partySelect").value = "";
+        stockSection.style.display = "none";
+        return;
+      }
+    }
     const tbody = document.getElementById("tableBody");
     tbody.innerHTML = "";
 
@@ -794,6 +1038,25 @@
 
   async function submitStock() {
     const party = document.getElementById("partySelect").value;
+
+    if (!loggedInTerritory) {
+      alert("Please login with your territory first.");
+      return;
+    }
+
+    const partyAllowed = MASTER_PARTIES.some(mp =>
+      normalizeKey(mp.p) === normalizeKey(party) &&
+      normalizeKey(mp.t || "Unassigned") === normalizeKey(loggedInTerritory)
+    ) || unifiedRecords.some(r =>
+      normalizeKey(r.party) === normalizeKey(party) &&
+      normalizeKey(r.territory || "Unassigned") === normalizeKey(loggedInTerritory)
+    );
+
+    if (!party || !partyAllowed) {
+      alert("This party is not available for your territory.");
+      return;
+    }
+
     const inputs = document.querySelectorAll(".new-stock-input");
     const payload = [];
     let hasError = false;
@@ -850,7 +1113,12 @@
     }
   }
 
-  window.onload = loadData;
+  window.onload = () => {
+    restoreTerritoryLogin();
+    if (loggedInTerritory) {
+      loadData();
+    }
+  };
 </script>
 </body>
 </html>
