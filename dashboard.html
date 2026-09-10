@@ -355,6 +355,120 @@
         display: block;
       }
     }
+
+    /* Compact grouped party/product rows */
+    .detailed-table td.desktop-only:nth-child(3) { width: 100%; }
+    @media (min-width: 768px) {
+      .detailed-table { table-layout: auto; }
+      .detailed-table th:first-child { width: 12%; }
+      .detailed-table th:nth-child(2) { width: 28%; }
+      .detailed-table th:nth-child(3) { width: 60%; }
+    }
+    @media (max-width: 767px) {
+      .detailed-table tr { padding: 8px 10px; }
+      .detailed-table .m-product { margin-bottom: 4px; padding-bottom: 4px; }
+    }
+
+    /* Compact second table: headings appear once, values stay on one line */
+    .movement-header,
+    .movement-row {
+      display: grid;
+      grid-template-columns: minmax(68px, 0.65fr) 84px 84px 84px;
+      align-items: center;
+      gap: 6px;
+      text-align: center;
+    }
+
+    .movement-header {
+      font-size: 0.68rem;
+      font-weight: 800;
+      color: #475569;
+    }
+
+    .movement-product-head {
+      text-align: left;
+    }
+
+    .movement-row {
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+
+    .movement-product {
+      text-align: left;
+      color: #2563eb;
+      font-weight: 800;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .movement-number {
+      font-weight: 800;
+      padding: 3px 4px;
+      border-radius: 6px;
+      background: #f8fafc;
+    }
+
+    .grouped-party {
+      font-weight: 800 !important;
+      color: #0f172a;
+    }
+
+    .grouped-territory {
+      font-weight: 800 !important;
+    }
+
+    @media (max-width: 767px) {
+      .mobile-movement-header,
+      .mobile-movement-row {
+        display: grid;
+        grid-template-columns: minmax(66px, 0.65fr) 62px 62px 62px;
+        gap: 4px;
+        align-items: center;
+      }
+
+      .mobile-movement-header {
+        margin-top: 5px;
+        padding: 3px 0;
+        font-size: 0.57rem;
+        font-weight: 800;
+        color: #64748b;
+        text-align: center;
+      }
+
+      .mobile-movement-header span:first-child {
+        text-align: left;
+      }
+
+      .mobile-movement-row {
+        padding: 4px 0;
+        font-size: 0.72rem;
+        font-weight: 800;
+        text-align: center;
+      }
+
+      .mobile-product {
+        text-align: left;
+        color: #2563eb;
+        font-weight: 800;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .mobile-movement-row strong { font-size: 0.84rem;
+        font-weight: 800;
+      }
+
+      .m-party {
+        font-weight: 800 !important;
+      }
+
+      .m-territory {
+        font-weight: 800 !important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -454,10 +568,14 @@
         <tr>
           <th>Territory</th>
           <th>Party (Payer Name)</th>
-          <th>Product (Strength)</th>
-          <th>Qty Billed (Sale+Opening)</th>
-          <th>Qty Sold</th>
-          <th>Qty Left</th>
+          <th>
+            <div class="movement-header">
+              <span class="movement-product-head">PRODUCT</span>
+              <span>STOCK</span>
+              <span>LIQ.</span>
+              <span>INVENTORY</span>
+            </div>
+          </th>
         </tr>
       </thead>
       <tbody id="detailedTableBody">
@@ -478,15 +596,22 @@
   let rawLogs = [];
   let unifiedRecords = [];
 
-  function normalizeKey(str) {
-    return (str || "").trim().toUpperCase().replace(/\s+/g, " ");
-  }
+  function normalizeKey(s) {
+      return String(s || "")
+        .trim()
+        .toLowerCase()
+        .replace(/\band\b/g, "&")
+        .replace(/\s*&\s*/g, " & ")
+        .replace(/\s+/g, " ");
+    }
 
-  function formatDigit(n) {
-    if (n === undefined || n === null || isNaN(n)) return "0";
-    const num = Number(n);
-    return num % 1 === 0 ? num.toString() : num.toFixed(1).replace(/\.0$/, "");
-  }
+  function formatDigit(num) {
+      const n = Number(num) || 0;
+      return n.toLocaleString(undefined, {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2
+      });
+    }
 
   function buildUnifiedRecords() {
     const unifiedMap = {};
@@ -692,8 +817,8 @@
         tr.innerHTML = `
           <td>${item.displayName}</td>
           <td><span class="badge-pill pill-blue">${billedStr}</span></td>
-          <td><span class="badge-pill pill-green">${item.sold.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1})}</span></td>
-          <td><span class="badge-pill pill-red">${item.remaining.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1})}</span></td>
+          <td><span class="badge-pill pill-green">${formatDigit(item.sold)}</span></td>
+          <td><span class="badge-pill pill-red">${formatDigit(item.remaining)}</span></td>
         `;
         productSummaryBody.appendChild(tr);
       });
@@ -701,53 +826,87 @@
 
     // Render Second Table: Detailed Rows
     if (!rows.length) {
-      detailedBody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:18px; color:#94a3b8;">No records match your filters.</td></tr>`;
+      detailedBody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:18px; color:#94a3b8;">No records match your filters.</td></tr>`;
     } else {
-      rows.forEach(r => {
-        const billedStr = `${formatDigit(r.billing)}+${formatDigit(r.opening)}`;
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <!-- Desktop Columns -->
-          <td class="desktop-only" style="color:#64748b; font-size:0.8rem; font-weight:700;">${r.territory}</td>
-          <td class="desktop-only"><strong>${r.party}</strong></td>
-          <td class="desktop-only" style="color:#2563eb; font-weight:600;">${r.product}</td>
-          <td class="desktop-only"><span class="badge-pill pill-blue">${billedStr}</span></td>
-          <td class="desktop-only"><span class="badge-pill pill-green">${r.sold.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1})}</span></td>
-          <td class="desktop-only"><span class="badge-pill pill-red">${r.remaining.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1})}</span></td>
+      // Group all products under one party
+      const partyGroups = {};
 
-          <!-- Mobile Compact View -->
-          <div class="mobile-card-content" style="display:none;">
-            <div class="m-territory">
-              <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Round%20pushpin/3D/round_pushpin_3d.png" style="width:14px; height:14px;" alt="Pin">
-              ${r.territory}
+      rows.forEach(r => {
+        const partyKey = normalizeKey(r.party);
+
+        if (!partyGroups[partyKey]) {
+          partyGroups[partyKey] = {
+            party: r.party,
+            territory: r.territory,
+            rows: []
+          };
+        }
+
+        partyGroups[partyKey].rows.push(r);
+      });
+
+      Object.values(partyGroups).forEach(group => {
+        group.rows.forEach((r, index) => {
+          const billedStr = `${formatDigit(r.billing)}+${formatDigit(r.opening)}`;
+          const soldStr = formatDigit(r.sold);
+          const remainingStr = formatDigit(r.remaining);
+          const tr = document.createElement('tr');
+
+          const territoryCell = index === 0
+            ? group.territory
+            : `<span style="visibility:hidden;">${group.territory}</span>`;
+
+          const partyCell = index === 0
+            ? `<strong>${group.party}</strong>`
+            : `<span style="visibility:hidden;">${group.party}</span>`;
+
+          tr.innerHTML = `
+            <!-- Compact Desktop View -->
+            <td class="desktop-only grouped-territory">${territoryCell}</td>
+            <td class="desktop-only grouped-party">${partyCell}</td>
+            <td class="desktop-only movement-cell">
+              <div class="movement-row">
+                <span class="movement-product">${r.product}</span>
+                <span class="movement-number">${billedStr}</span>
+                <span class="movement-number">${soldStr}</span>
+                <span class="movement-number">${remainingStr}</span>
+              </div>
+            </td>
+
+            <!-- Mobile Compact View -->
+            <div class="mobile-card-content" style="display:none;">
+              ${index === 0 ? `
+                <div class="m-territory">
+                  <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Round%20pushpin/3D/round_pushpin_3d.png" style="width:14px; height:14px;" alt="Pin">
+                  ${group.territory}
+                </div>
+                <div class="m-party">${group.party}</div>
+                <div class="mobile-movement-header">
+                  <span>PRODUCT</span>
+                  <span>STOCK</span>
+                  <span>LIQ.</span>
+                  <span>INVENTORY</span>
+                </div>
+              ` : ''}
+              <div class="mobile-movement-row">
+                <span class="mobile-product">${r.product}</span>
+                <strong>${billedStr}</strong>
+                <strong>${soldStr}</strong>
+                <strong>${remainingStr}</strong>
+              </div>
             </div>
-            <div class="m-party">${r.party}</div>
-            <div class="m-product">${r.product}</div>
-            <div class="m-stats-row">
-              <div class="m-stat-box" style="border-color:#bfdbfe;">
-                <span class="m-stat-label" style="color:#2563eb;">Billed</span>
-                <span class="m-stat-val" style="color:#1d4ed8;">${billedStr}</span>
-              </div>
-              <div class="m-stat-box" style="border-color:#bbf7d0;">
-                <span class="m-stat-label" style="color:#059669;">Liquidated</span>
-                <span class="m-stat-val" style="color:#047857;">${r.sold.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1})}</span>
-              </div>
-              <div class="m-stat-box" style="border-color:#fecaca;">
-                <span class="m-stat-label" style="color:#dc2626;">Left</span>
-                <span class="m-stat-val" style="color:#b91c1c;">${r.remaining.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1})}</span>
-              </div>
-            </div>
-          </div>
-        `;
-        detailedBody.appendChild(tr);
+          `;
+
+          detailedBody.appendChild(tr);
+        });
       });
     }
 
     // Update 3 KPI Tiles
     document.getElementById('kpiBilled').innerText = `${formatDigit(totalBillingSum)}+${formatDigit(totalOpeningSum)}`;
-    document.getElementById('kpiBilledSub').innerText = `Total available stock: ${totalAvailableSum.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1})}`;
-    document.getElementById('kpiSold').innerText = totalSS.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1});
-    document.getElementById('kpiRemaining').innerText = totalRS.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1});
+    document.getElementById('kpiBilledSub').innerText = `Total available stock: ${formatDigit(totalAvailableSum)}`;
+    document.getElementById('kpiSold').innerText = formatDigit(totalSS);
+    document.getElementById('kpiRemaining').innerText = formatDigit(totalRS);
   }
 </script>
 
