@@ -870,24 +870,6 @@
     return Number(last.quantityLeft) || 0;
   }
 
-  function validateInputCeiling(input, maxAllowed) {
-    const val = Number(input.value);
-    const warn = input.parentElement.querySelector(".limit-warning");
-
-    if (!isAdminUnlocked && input.value !== "" && val > maxAllowed) {
-      input.classList.add("input-error");
-      if (warn) {
-        warn.innerText = `Max allowed: ${maxAllowed} (Admin needed to increase)`;
-        warn.style.display = "block";
-      }
-    } else {
-      input.classList.remove("input-error");
-      if (warn) {
-        warn.style.display = "none";
-      }
-    }
-  }
-
   function renderPartyProducts() {
     const party = document.getElementById("partySelect").value;
     const stockSection = document.getElementById("stockSection");
@@ -951,8 +933,8 @@
 
     partyItems.forEach(item => {
       const totalAvailable = (item.billing || 0) + (item.opening || 0);
-      const maxAllowed = getLastStockNumeric(party, item.product, totalAvailable);
-      const displayStock = maxAllowed.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 2});
+      const lastRecordedStock = getLastStockNumeric(party, item.product, totalAvailable);
+      const displayStock = lastRecordedStock.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 2});
       const billedStr = `${formatDigit(item.billing)}+${formatDigit(item.opening)}`;
 
       const tr = document.createElement("tr");
@@ -963,13 +945,9 @@
         <td class="m-val" data-label="New Stock">
           <div class="input-cell">
             <input type="number" step="any" min="0" 
-                   ${!isAdminUnlocked ? `max="${maxAllowed}"` : ''} 
                    class="new-stock-input" 
                    data-product="${item.product}" 
-                   data-max="${maxAllowed}"
-                   placeholder="≤ ${maxAllowed}"
-                   oninput="validateInputCeiling(this, ${maxAllowed})">
-            <span class="limit-warning"></span>
+                   placeholder="Enter stock quantity">
           </div>
         </td>
       `;
@@ -1065,17 +1043,13 @@
       const val = inp.value.trim();
       if (val !== "") {
         const numVal = Number(val);
-        const maxLimit = Number(inp.dataset.max);
 
-        if (!isAdminUnlocked && numVal > maxLimit) {
+        if (!Number.isFinite(numVal) || numVal < 0) {
           hasError = true;
           inp.classList.add("input-error");
-          const warn = inp.parentElement.querySelector(".limit-warning");
-          if (warn) {
-            warn.innerText = `Cannot exceed last stock (${maxLimit})`;
-            warn.style.display = "block";
-          }
+          alert("Please enter a valid quantity (0 or more)." );
         } else {
+          inp.classList.remove("input-error");
           payload.push({
             party: party,
             product: inp.dataset.product,
@@ -1086,7 +1060,6 @@
     });
 
     if (hasError) {
-      alert("Submission blocked! You cannot enter stock higher than the previous count. Only an admin can increase stock.");
       return;
     }
 
