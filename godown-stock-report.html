@@ -254,6 +254,41 @@
 
     tr:nth-child(even) { background-color: var(--row-alt); }
 
+    /* Expiry Badges & Status Indicators */
+    .exp-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .exp-danger {
+      background-color: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid #fecaca;
+    }
+
+    .exp-warning {
+      background-color: #fef3c7;
+      color: #b45309;
+      border: 1px solid #fde68a;
+    }
+
+    .exp-good {
+      background-color: #d1fae5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+    }
+
+    .exp-neutral {
+      background-color: #f1f5f9;
+      color: #475569;
+    }
+
     /* Mobile Adaptive Cards */
     .mobile-cards-view {
       display: none;
@@ -415,7 +450,7 @@
         <label for="brandFilter"><i class="fa-solid fa-box-archive"></i> Filter by Product Name</label>
         <div class="select-wrapper">
           <i class="fa-solid fa-magnifying-glass"></i>
-          <select id="brandFilter">
+          <select id="brandFilter" onchange="render()">
             <option value="ALL">All Products</option>
           </select>
         </div>
@@ -425,7 +460,7 @@
         <label for="nexFilter"><i class="fa-regular fa-clock"></i> Filter by Days to Expire (NEX)</label>
         <div class="select-wrapper">
           <i class="fa-solid fa-hourglass-half"></i>
-          <select id="nexFilter">
+          <select id="nexFilter" onchange="render()">
             <option value="ALL">All Durations</option>
             <option value="Expired">Expired (≤ 0 days)</option>
             <option value="0–60 days">0–60 days</option>
@@ -470,8 +505,8 @@
       </div>
     </div>
 
-    <!-- In Transit Stock Card -->
-    <div class="card" id="transitCard" style="display: none;">
+    <!-- In Transit Stock Card (Hidden by default) -->
+    <div class="card" id="transitCard" style="display: none !important;">
       <div class="card-header transit-header">
         <div class="header-left">
           <i class="fa-solid fa-truck-fast"></i>
@@ -502,15 +537,14 @@
     const SHEET_ID = "15IIuOlziFvGqPGb75GhIfpKdoq7GaeYyqcGDIvmnYY4";
     let rawData = [];
 
-    // Extracts base product brand name (e.g. "NATGEN 100ML x 20" -> "NATGEN")
+    // Robust base product extractor (matches NATGEN even if written as 'NATGEN PRO 100ML' or 'NATGEN-1L')
     function extractBaseProductName(description) {
       if (!description || typeof description !== "string") return "";
-      const cleaned = description.trim();
-      const tokens = cleaned.split(/\s+/);
-      return tokens[0].toUpperCase();
+      const cleaned = description.trim().replace(/^[^a-zA-Z0-9]+/, '');
+      const tokens = cleaned.split(/[\s\-_/]+/);
+      return tokens[0] ? tokens[0].toUpperCase() : "";
     }
 
-    // JSONP callback for Google Visualization API
     function handleData(response) {
       if (!response || !response.table) {
         showError("Could not load table data. Please check sheet sharing permissions.");
@@ -537,8 +571,12 @@
         const item = {};
         row.c.forEach((cell, i) => {
           const key = headers[i];
-          if (key) {
-            item[key] = cell ? (cell.f !== undefined ? cell.f : cell.v) : "";
+          if (key && cell) {
+            item[key] = cell.v !== undefined && cell.v !== null ? cell.v : cell.f;
+            item[key + "_formatted"] = cell.f || cell.v || "";
+          } else if (key) {
+            item[key] = "";
+            item[key + "_formatted"] = "";
           }
         });
         return item;
@@ -555,40 +593,61 @@
       document.getElementById("stockTableBody").innerHTML = errHtml;
       document.getElementById("stockMobileCards").innerHTML = errMobile;
       document.getElementById("stockCount").innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> Error`;
-      document.getElementById("transitCard").style.display = "none";
+      document.getElementById("transitCard").style.setProperty("display", "none", "important");
     }
 
     function findValueByHeader(item, keyword) {
-      const target = keyword.toLowerCase().replace(/\s+/g, "");
+      const target = keyword.toLowerCase().replace(/[^a-z0-9]/g, "");
       for (const key of Object.keys(item)) {
-        if (key.toLowerCase().replace(/\s+/g, "").includes(target)) {
+        const cleanKey = key.toLowerCase().replace(/[^a-z0-9]/g, "");
+        if (cleanKey === target || cleanKey.includes(target)) {
           return item[key];
         }
       }
       return "";
     }
 
-    function parseCustomDate(dateStr) {
-      if (!dateStr) return null;
-      if (typeof dateStr === "string" && dateStr.startsWith("Date(")) {
-        const parts = dateStr.match(/\d+/g);
-        if (parts) return new Date(parts[0], parts[1], parts[2]);
+    function parseCustomDate(dateVal) {
+      if (!dateVal) return null;
+
+      if (dateVal instanceof Date) {
+        return isNaN(dateVal.getTime()) ? null : dateVal;
       }
-      const parsed = new Date(dateStr);
+
+      if (typeof dateVal === "string" && dateVal.startsWith("Date(")) {
+        const parts = dateVal.match(/\d+/g);
+        if (parts && parts.length >= 3) {
+          return new Date(Number(parts[0]), Number(parts[1]), Number(parts[2]));
+        }
+      }
+
+      const str = String(dateVal).trim();
+
+      const dmyMatch = str.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})/);
+      if (dmyMatch) {
+        const day = parseInt(dmyMatch[1], 10);
+        const month = parseInt(dmyMatch[2], 10) - 1;
+        const year = parseInt(dmyMatch[3], 10);
+        return new Date(year, month, day);
+      }
+
+      const parsed = new Date(str);
       return isNaN(parsed.getTime()) ? null : parsed;
     }
 
-    function calculateNEXLabel(dateObj) {
-      if (!dateObj) return "N/A";
-
+    function getDaysDiff(dateObj) {
+      if (!dateObj) return null;
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       
-      const target = new Date(dateObj);
-      target.setHours(0, 0, 0, 0);
+      const expiry = new Date(dateObj);
+      expiry.setHours(0, 0, 0, 0);
 
-      const diffDays = Math.ceil((target - today) / (1000 * 60 * 60 * 24));
+      return Math.round((expiry - today) / (1000 * 60 * 60 * 24));
+    }
 
+    function calculateNEXLabel(diffDays) {
+      if (diffDays === null) return "N/A";
       if (diffDays <= 0) return "Expired";
       if (diffDays <= 60) return "0–60 days";
       if (diffDays <= 120) return "61–120 days";
@@ -596,7 +655,22 @@
       return "181+ days";
     }
 
-    // Populate dropdown with unique base names only (no package details)
+    function getExpiryBadgeHTML(displayDate, diffDays) {
+      if (diffDays === null || !displayDate || displayDate === "-") {
+        return `<span class="exp-badge exp-neutral"><i class="fa-regular fa-calendar"></i> ${displayDate || "-"}</span>`;
+      }
+
+      if (diffDays <= 0) {
+        return `<span class="exp-badge exp-danger" title="Expired (${diffDays}d)"><i class="fa-solid fa-triangle-exclamation"></i> ${displayDate} (Expired)</span>`;
+      } else if (diffDays <= 60) {
+        return `<span class="exp-badge exp-danger" title="Critical Short Expiry: ${diffDays} days left"><i class="fa-solid fa-triangle-exclamation"></i> ${displayDate} (${diffDays}d)</span>`;
+      } else if (diffDays <= 180) {
+        return `<span class="exp-badge exp-warning" title="Short Expiry: ${diffDays} days left"><i class="fa-solid fa-circle-exclamation"></i> ${displayDate} (${diffDays}d)</span>`;
+      } else {
+        return `<span class="exp-badge exp-good" title="Good Stock: ${diffDays} days left"><i class="fa-solid fa-circle-check"></i> ${displayDate}</span>`;
+      }
+    }
+
     function populateBrandFilter(data) {
       const brandSelect = document.getElementById("brandFilter");
       const baseBrands = new Set();
@@ -609,6 +683,7 @@
         }
       });
 
+      brandSelect.innerHTML = '<option value="ALL">All Products</option>';
       Array.from(baseBrands).sort().forEach(brand => {
         const opt = document.createElement("option");
         opt.value = brand;
@@ -618,8 +693,11 @@
     }
 
     function render() {
-      const selectedBrand = document.getElementById("brandFilter").value;
-      const selectedNEX = document.getElementById("nexFilter").value;
+      const brandFilterEl = document.getElementById("brandFilter");
+      const nexFilterEl = document.getElementById("nexFilter");
+
+      const selectedBrand = brandFilterEl ? brandFilterEl.value.trim().toUpperCase() : "ALL";
+      const selectedNEX = nexFilterEl ? nexFilterEl.value : "ALL";
 
       const stockTbody = document.getElementById("stockTableBody");
       const stockMobileCards = document.getElementById("stockMobileCards");
@@ -633,16 +711,19 @@
       transitMobileCards.innerHTML = "";
 
       let stockCount = 0;
-      let transitCount = 0;
       const transitMap = new Map();
 
       rawData.forEach(item => {
         const prod = findValueByHeader(item, "MATERIAL DESCRIPTION") || findValueByHeader(item, "MATERIAL") || "-";
         const brandName = extractBaseProductName(prod);
         const batch = findValueByHeader(item, "BATCH") || "-";
+        
         const rawExpiry = findValueByHeader(item, "EXPIRY DATE") || findValueByHeader(item, "EXPDATE");
+        const rawDisplayExpiry = findValueByHeader(item, "EXPIRY DATE_formatted") || findValueByHeader(item, "EXPDATE_formatted") || rawExpiry;
+        
         const expDate = parseCustomDate(rawExpiry);
-        const nexLabel = calculateNEXLabel(expDate);
+        const diffDays = getDaysDiff(expDate);
+        const nexLabel = calculateNEXLabel(diffDays);
 
         const casesRaw = findValueByHeader(item, "Un.Res.Qty");
         const cases = parseFloat(String(casesRaw).replace(/,/g, "")) || 0;
@@ -650,25 +731,23 @@
         const transitRaw = findValueByHeader(item, "In transit Stock");
         const transit = parseFloat(String(transitRaw).replace(/,/g, "")) || 0;
 
-        // Base brand matching: matches all pack sizes of the chosen brand
         const matchesBrand = (selectedBrand === "ALL" || brandName === selectedBrand);
         const matchesNEX = (selectedNEX === "ALL" || nexLabel === selectedNEX);
 
-        // Stock Position Matches
+        // Stock Position Rows
         if (matchesBrand && matchesNEX && cases > 0) {
           stockCount++;
+          const badgeHTML = getExpiryBadgeHTML(rawDisplayExpiry, diffDays);
 
-          // Desktop Table Row
           const tr = document.createElement("tr");
           tr.innerHTML = `
             <td><strong>${prod}</strong></td>
             <td><span class="batch-tag"><i class="fa-solid fa-barcode fa-xs"></i> ${batch}</span></td>
-            <td>${rawExpiry || "-"}</td>
+            <td>${badgeHTML}</td>
             <td style="text-align: right; font-weight: 700;">${cases.toLocaleString()}</td>
           `;
           stockTbody.appendChild(tr);
 
-          // Mobile Card
           const cardDiv = document.createElement("div");
           cardDiv.className = "stock-item-card";
           cardDiv.innerHTML = `
@@ -678,23 +757,23 @@
             </div>
             <div class="mobile-card-bottom">
               <span class="batch-tag"><i class="fa-solid fa-barcode fa-xs"></i> ${batch}</span>
-              <span><i class="fa-regular fa-calendar fa-xs"></i> Exp: <strong>${rawExpiry || "-"}</strong></span>
+              <span>Exp: ${badgeHTML}</span>
             </div>
           `;
           stockMobileCards.appendChild(cardDiv);
         }
 
-        // Tally in-transit items matching the brand
+        // Tally strictly matching In-Transit rows for the chosen brand
         if (matchesBrand && transit > 0) {
           transitMap.set(prod, (transitMap.get(prod) || 0) + transit);
         }
       });
 
-      // Render In-Transit Items
+      // Render In Transit Rows ONLY if matching items exist
+      let transitItemsCount = 0;
       transitMap.forEach((qty, prodName) => {
-        transitCount++;
+        transitItemsCount++;
 
-        // Desktop Row
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td><strong>${prodName}</strong></td>
@@ -702,7 +781,6 @@
         `;
         transitTbody.appendChild(tr);
 
-        // Mobile Card
         const mDiv = document.createElement("div");
         mDiv.className = "transit-item-card";
         mDiv.innerHTML = `
@@ -712,22 +790,20 @@
         transitMobileCards.appendChild(mDiv);
       });
 
-      // Update counters
       document.getElementById("stockCount").innerHTML = `<i class="fa-solid fa-layer-group"></i> ${stockCount} Batches`;
-      document.getElementById("transitCount").innerHTML = `<i class="fa-solid fa-truck"></i> ${transitCount} Items`;
+      document.getElementById("transitCount").innerHTML = `<i class="fa-solid fa-truck"></i> ${transitItemsCount} Items`;
 
-      // Handle empty states
       if (stockCount === 0) {
         const emptyMsg = `<div class="empty-state"><i class="fa-regular fa-folder-open"></i>No matching godown stock found</div>`;
         stockTbody.innerHTML = `<tr><td colspan="4" class="empty-state"><i class="fa-regular fa-folder-open"></i>No matching godown stock found</td></tr>`;
         stockMobileCards.innerHTML = emptyMsg;
       }
 
-      // Hide or show transit card dynamically
-      if (transitCount > 0) {
-        transitCard.style.display = "block";
+      // Strictly control In-Transit visibility: Hide completely if 0 matching items
+      if (transitItemsCount > 0) {
+        transitCard.style.setProperty("display", "block", "important");
       } else {
-        transitCard.style.display = "none";
+        transitCard.style.setProperty("display", "none", "important");
       }
     }
 
@@ -736,9 +812,6 @@
     script.src = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=responseHandler:handleData`;
     script.onerror = () => showError("Unable to connect to Google Sheets. Verify permissions are set to 'Anyone with the link can view'.");
     document.body.appendChild(script);
-
-    document.getElementById("brandFilter").addEventListener("change", render);
-    document.getElementById("nexFilter").addEventListener("change", render);
   </script>
 </body>
 </html>
