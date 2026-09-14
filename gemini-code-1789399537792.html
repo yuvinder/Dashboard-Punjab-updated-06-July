@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Natco Crop Health - Ludhiana Godown Stock</title>
+  <!-- Google Fonts & Font Awesome Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    :root {
+      --bg: #f1f5f9;
+      --card-bg: #ffffff;
+      --brand-gradient: linear-gradient(135deg, #064e3b 0%, #047857 60%, #10b981 100%);
+      --header-stock: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+      --header-transit: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%);
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --row-alt: #f8fafc;
+      --badge-bg: rgba(255, 255, 255, 0.22);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      padding: 12px 10px;
+      display: flex;
+      justify-content: center;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1100px;
+    }
+
+    /* Brand Headline Card */
+    .brand-header {
+      background: var(--brand-gradient);
+      color: #ffffff;
+      padding: 18px 16px;
+      border-radius: 14px;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 20px -4px rgba(6, 78, 59, 0.25);
+      position: relative;
+      overflow: hidden;
+      animation: fadeInDown 0.5s ease;
+    }
+
+    .brand-subtitle {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #a7f3d0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+
+    .brand-title {
+      font-size: 19px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      line-height: 1.25;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-meta {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #d1fae5;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .brand-meta span {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .pulse-dot {
+      width: 7px;
+      height: 7px;
+      background-color: #34d399;
+      border-radius: 50%;
+      box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.7);
+      animation: pulse 1.8s infinite;
+    }
+
+    /* Filter Controls */
+    .filter-panel {
+      background: var(--card-bg);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+      border: 1px solid var(--border);
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .filter-group label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .select-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .select-wrapper i.fa-solid {
+      position: absolute;
+      left: 12px;
+      color: #94a3b8;
+      pointer-events: none;
+      font-size: 14px;
+    }
+
+    .filter-group select {
+      width: 100%;
+      font-size: 16px;
+      padding: 10px 14px 10px 36px;
+      border: 1.5px solid var(--border);
+      border-radius: 9px;
+      background-color: #f8fafc;
+      color: var(--text-main);
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      transition: border-color 0.2s;
+    }
+
+    .select-wrapper::after {
+      content: '\f078';
+      font-family: 'Font Awesome 6 Free';
+      font-weight: 900;
+      font-size: 11px;
+      color: #94a3b8;
+      position: absolute;
+      right: 14px;
+      pointer-events: none;
+    }
+
+    .filter-group select:focus {
+      background-color: #ffffff;
+      border-color: #10b981;
+    }
+
+    /* Container Cards */
+    .card {
+      background: var(--card-bg);
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+      border: 1px solid var(--border);
+    }
+
+    .card-header {
+      padding: 12px 16px;
+      font-size: 15px;
+      font-weight: 700;
+      color: #ffffff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-header.stock-header { background: var(--header-stock); }
+    .card-header.transit-header { background: var(--header-transit); }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .badge-count {
+      font-size: 11px;
+      font-weight: 600;
+      background: var(--badge-bg);
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+
+    /* Desktop View */
+    .desktop-table-view {
+      display: block;
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f8fafc;
+      padding: 11px 16px;
+      font-weight: 700;
+      color: var(--text-muted);
+      border-bottom: 2px solid var(--border);
+      white-space: nowrap;
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.5px;
+    }
+
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    tr:nth-child(even) { background-color: var(--row-alt); }
+
+    /* Mobile Adaptive Cards */
+    .mobile-cards-view {
+      display: none;
+      padding: 10px;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .stock-item-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-left: 4px solid #f59e0b;
+      border-radius: 10px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+      animation: fadeIn 0.3s ease;
+    }
+
+    .transit-item-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-left: 4px solid #3b82f6;
+      border-radius: 10px;
+      padding: 12px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+    }
+
+    .mobile-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .mobile-prod-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #0f172a;
+      line-height: 1.3;
+    }
+
+    .mobile-card-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 6px;
+      border-top: 1px dashed var(--border);
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .cases-badge {
+      background: #fef3c7;
+      color: #92400e;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-weight: 800;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .transit-badge {
+      background: #dbeafe;
+      color: #1e40af;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-weight: 800;
+      font-size: 13px;
+    }
+
+    .batch-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 7px;
+      background-color: #f1f5f9;
+      color: #334155;
+      font-size: 11.5px;
+      font-weight: 600;
+      border-radius: 5px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 30px 14px;
+      color: var(--text-muted);
+      font-style: italic;
+      font-size: 13px;
+    }
+
+    .empty-state i {
+      font-size: 24px;
+      color: #cbd5e1;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    @media (max-width: 768px) {
+      .desktop-table-view { display: none; }
+      .mobile-cards-view { display: flex; }
+      .filter-panel { padding: 12px; }
+      .brand-title { font-size: 17px; }
+      .card-header { font-size: 14px; }
+    }
+
+    @media (min-width: 769px) {
+      .filter-panel {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        padding: 16px 20px;
+      }
+      .filter-group select { font-size: 14px; }
+    }
+
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.7); }
+      70% { box-shadow: 0 0 0 6px rgba(52, 211, 153, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header -->
+    <div class="brand-header">
+      <div class="brand-subtitle">
+        <i class="fa-solid fa-seedling"></i> Agro Solutions & Logistics
+      </div>
+      <div class="brand-title">
+        <i class="fa-solid fa-warehouse"></i> Natco Crop Health - Ludhiana godown stock
+      </div>
+      <div class="brand-meta">
+        <span><i class="fa-solid fa-location-dot"></i> Ludhiana Central</span>
+        <span>•</span>
+        <span><div class="pulse-dot"></div> Live Data Sync</span>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-panel">
+      <div class="filter-group">
+        <label for="brandFilter"><i class="fa-solid fa-box-archive"></i> Filter by Product Name</label>
+        <div class="select-wrapper">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <select id="brandFilter">
+            <option value="ALL">All Products</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <label for="nexFilter"><i class="fa-regular fa-clock"></i> Filter by Days to Expire (NEX)</label>
+        <div class="select-wrapper">
+          <i class="fa-solid fa-hourglass-half"></i>
+          <select id="nexFilter">
+            <option value="ALL">All Durations</option>
+            <option value="Expired">Expired (≤ 0 days)</option>
+            <option value="0–60 days">0–60 days</option>
+            <option value="61–120 days">61–120 days</option>
+            <option value="121–180 days">121–180 days</option>
+            <option value="181+ days">181+ days</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stock Position Card -->
+    <div class="card" id="stockCard">
+      <div class="card-header stock-header">
+        <div class="header-left">
+          <i class="fa-solid fa-boxes-stacked"></i>
+          <span>Stock Position</span>
+        </div>
+        <span id="stockCount" class="badge-count"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</span>
+      </div>
+
+      <!-- Desktop View -->
+      <div class="desktop-table-view">
+        <table>
+          <thead>
+            <tr>
+              <th>Product Description</th>
+              <th>Batch</th>
+              <th>Expiry Date</th>
+              <th style="text-align: right;">Cases</th>
+            </tr>
+          </thead>
+          <tbody id="stockTableBody">
+            <tr><td colspan="4" class="empty-state">Loading godown stock records...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Mobile Native Card View -->
+      <div class="mobile-cards-view" id="stockMobileCards">
+        <div class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i>Loading records...</div>
+      </div>
+    </div>
+
+    <!-- In Transit Stock Card -->
+    <div class="card" id="transitCard" style="display: none;">
+      <div class="card-header transit-header">
+        <div class="header-left">
+          <i class="fa-solid fa-truck-fast"></i>
+          <span>In Transit Stock</span>
+        </div>
+        <span id="transitCount" class="badge-count">0 Items</span>
+      </div>
+
+      <!-- Desktop Transit Table -->
+      <div class="desktop-table-view">
+        <table>
+          <thead>
+            <tr>
+              <th>Product Description</th>
+              <th style="text-align: right;">In Transit Cases</th>
+            </tr>
+          </thead>
+          <tbody id="transitTableBody"></tbody>
+        </table>
+      </div>
+
+      <!-- Mobile Transit Cards -->
+      <div class="mobile-cards-view" id="transitMobileCards"></div>
+    </div>
+  </div>
+
+  <script>
+    const SHEET_ID = "15IIuOlziFvGqPGb75GhIfpKdoq7GaeYyqcGDIvmnYY4";
+    let rawData = [];
+
+    // Extracts base product brand name (e.g. "NATGEN 100ML x 20" -> "NATGEN")
+    function extractBaseProductName(description) {
+      if (!description || typeof description !== "string") return "";
+      const cleaned = description.trim();
+      const tokens = cleaned.split(/\s+/);
+      return tokens[0].toUpperCase();
+    }
+
+    // JSONP callback for Google Visualization API
+    function handleData(response) {
+      if (!response || !response.table) {
+        showError("Could not load table data. Please check sheet sharing permissions.");
+        return;
+      }
+
+      const table = response.table;
+      let headers = table.cols.map(c => (c.label || "").trim());
+      let dataRows = table.rows;
+
+      const hasValidHeaders = headers.some(h => 
+        h.toUpperCase().includes("MATERIAL") || h.toUpperCase().includes("BATCH")
+      );
+
+      if (!hasValidHeaders && table.rows.length > 0) {
+        headers = table.rows[0].c.map(cell => {
+          if (!cell) return "";
+          return (cell.f !== undefined ? cell.f : cell.v || "").toString().trim();
+        });
+        dataRows = table.rows.slice(1);
+      }
+
+      rawData = dataRows.map(row => {
+        const item = {};
+        row.c.forEach((cell, i) => {
+          const key = headers[i];
+          if (key) {
+            item[key] = cell ? (cell.f !== undefined ? cell.f : cell.v) : "";
+          }
+        });
+        return item;
+      });
+
+      populateBrandFilter(rawData);
+      render();
+    }
+
+    function showError(msg) {
+      const errHtml = `<tr><td colspan="4" class="empty-state" style="color: #ef4444;"><i class="fa-solid fa-triangle-exclamation" style="color:#ef4444;"></i>${msg}</td></tr>`;
+      const errMobile = `<div class="empty-state" style="color: #ef4444;"><i class="fa-solid fa-triangle-exclamation" style="color:#ef4444;"></i>${msg}</div>`;
+      
+      document.getElementById("stockTableBody").innerHTML = errHtml;
+      document.getElementById("stockMobileCards").innerHTML = errMobile;
+      document.getElementById("stockCount").innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> Error`;
+      document.getElementById("transitCard").style.display = "none";
+    }
+
+    function findValueByHeader(item, keyword) {
+      const target = keyword.toLowerCase().replace(/\s+/g, "");
+      for (const key of Object.keys(item)) {
+        if (key.toLowerCase().replace(/\s+/g, "").includes(target)) {
+          return item[key];
+        }
+      }
+      return "";
+    }
+
+    function parseCustomDate(dateStr) {
+      if (!dateStr) return null;
+      if (typeof dateStr === "string" && dateStr.startsWith("Date(")) {
+        const parts = dateStr.match(/\d+/g);
+        if (parts) return new Date(parts[0], parts[1], parts[2]);
+      }
+      const parsed = new Date(dateStr);
+      return isNaN(parsed.getTime()) ? null : parsed;
+    }
+
+    function calculateNEXLabel(dateObj) {
+      if (!dateObj) return "N/A";
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      const target = new Date(dateObj);
+      target.setHours(0, 0, 0, 0);
+
+      const diffDays = Math.ceil((target - today) / (1000 * 60 * 60 * 24));
+
+      if (diffDays <= 0) return "Expired";
+      if (diffDays <= 60) return "0–60 days";
+      if (diffDays <= 120) return "61–120 days";
+      if (diffDays <= 180) return "121–180 days";
+      return "181+ days";
+    }
+
+    // Populate dropdown with unique base names only (no package details)
+    function populateBrandFilter(data) {
+      const brandSelect = document.getElementById("brandFilter");
+      const baseBrands = new Set();
+
+      data.forEach(item => {
+        const prod = findValueByHeader(item, "MATERIAL DESCRIPTION") || findValueByHeader(item, "MATERIAL");
+        const brandName = extractBaseProductName(prod);
+        if (brandName) {
+          baseBrands.add(brandName);
+        }
+      });
+
+      Array.from(baseBrands).sort().forEach(brand => {
+        const opt = document.createElement("option");
+        opt.value = brand;
+        opt.textContent = brand;
+        brandSelect.appendChild(opt);
+      });
+    }
+
+    function render() {
+      const selectedBrand = document.getElementById("brandFilter").value;
+      const selectedNEX = document.getElementById("nexFilter").value;
+
+      const stockTbody = document.getElementById("stockTableBody");
+      const stockMobileCards = document.getElementById("stockMobileCards");
+      const transitTbody = document.getElementById("transitTableBody");
+      const transitMobileCards = document.getElementById("transitMobileCards");
+      const transitCard = document.getElementById("transitCard");
+
+      stockTbody.innerHTML = "";
+      stockMobileCards.innerHTML = "";
+      transitTbody.innerHTML = "";
+      transitMobileCards.innerHTML = "";
+
+      let stockCount = 0;
+      let transitCount = 0;
+      const transitMap = new Map();
+
+      rawData.forEach(item => {
+        const prod = findValueByHeader(item, "MATERIAL DESCRIPTION") || findValueByHeader(item, "MATERIAL") || "-";
+        const brandName = extractBaseProductName(prod);
+        const batch = findValueByHeader(item, "BATCH") || "-";
+        const rawExpiry = findValueByHeader(item, "EXPIRY DATE") || findValueByHeader(item, "EXPDATE");
+        const expDate = parseCustomDate(rawExpiry);
+        const nexLabel = calculateNEXLabel(expDate);
+
+        const casesRaw = findValueByHeader(item, "Un.Res.Qty");
+        const cases = parseFloat(String(casesRaw).replace(/,/g, "")) || 0;
+
+        const transitRaw = findValueByHeader(item, "In transit Stock");
+        const transit = parseFloat(String(transitRaw).replace(/,/g, "")) || 0;
+
+        // Base brand matching: matches all pack sizes of the chosen brand
+        const matchesBrand = (selectedBrand === "ALL" || brandName === selectedBrand);
+        const matchesNEX = (selectedNEX === "ALL" || nexLabel === selectedNEX);
+
+        // Stock Position Matches
+        if (matchesBrand && matchesNEX && cases > 0) {
+          stockCount++;
+
+          // Desktop Table Row
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td><strong>${prod}</strong></td>
+            <td><span class="batch-tag"><i class="fa-solid fa-barcode fa-xs"></i> ${batch}</span></td>
+            <td>${rawExpiry || "-"}</td>
+            <td style="text-align: right; font-weight: 700;">${cases.toLocaleString()}</td>
+          `;
+          stockTbody.appendChild(tr);
+
+          // Mobile Card
+          const cardDiv = document.createElement("div");
+          cardDiv.className = "stock-item-card";
+          cardDiv.innerHTML = `
+            <div class="mobile-card-top">
+              <span class="mobile-prod-title">${prod}</span>
+              <span class="cases-badge">${cases.toLocaleString()} cs</span>
+            </div>
+            <div class="mobile-card-bottom">
+              <span class="batch-tag"><i class="fa-solid fa-barcode fa-xs"></i> ${batch}</span>
+              <span><i class="fa-regular fa-calendar fa-xs"></i> Exp: <strong>${rawExpiry || "-"}</strong></span>
+            </div>
+          `;
+          stockMobileCards.appendChild(cardDiv);
+        }
+
+        // Tally in-transit items matching the brand
+        if (matchesBrand && transit > 0) {
+          transitMap.set(prod, (transitMap.get(prod) || 0) + transit);
+        }
+      });
+
+      // Render In-Transit Items
+      transitMap.forEach((qty, prodName) => {
+        transitCount++;
+
+        // Desktop Row
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><strong>${prodName}</strong></td>
+          <td style="text-align: right; font-weight: 700;">${qty.toLocaleString()}</td>
+        `;
+        transitTbody.appendChild(tr);
+
+        // Mobile Card
+        const mDiv = document.createElement("div");
+        mDiv.className = "transit-item-card";
+        mDiv.innerHTML = `
+          <span class="mobile-prod-title">${prodName}</span>
+          <span class="transit-badge"><i class="fa-solid fa-truck-ramp-box fa-xs"></i> ${qty.toLocaleString()} cs</span>
+        `;
+        transitMobileCards.appendChild(mDiv);
+      });
+
+      // Update counters
+      document.getElementById("stockCount").innerHTML = `<i class="fa-solid fa-layer-group"></i> ${stockCount} Batches`;
+      document.getElementById("transitCount").innerHTML = `<i class="fa-solid fa-truck"></i> ${transitCount} Items`;
+
+      // Handle empty states
+      if (stockCount === 0) {
+        const emptyMsg = `<div class="empty-state"><i class="fa-regular fa-folder-open"></i>No matching godown stock found</div>`;
+        stockTbody.innerHTML = `<tr><td colspan="4" class="empty-state"><i class="fa-regular fa-folder-open"></i>No matching godown stock found</td></tr>`;
+        stockMobileCards.innerHTML = emptyMsg;
+      }
+
+      // Hide or show transit card dynamically
+      if (transitCount > 0) {
+        transitCard.style.display = "block";
+      } else {
+        transitCard.style.display = "none";
+      }
+    }
+
+    // JSONP script tag injection
+    const script = document.createElement("script");
+    script.src = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=responseHandler:handleData`;
+    script.onerror = () => showError("Unable to connect to Google Sheets. Verify permissions are set to 'Anyone with the link can view'.");
+    document.body.appendChild(script);
+
+    document.getElementById("brandFilter").addEventListener("change", render);
+    document.getElementById("nexFilter").addEventListener("change", render);
+  </script>
+</body>
+</html>
