@@ -1,921 +1,703 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Sales & Inventory Dashboard</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Punjab Team Dashboard</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<style>
 
-  <style>
-    :root {
-      --bg: #f8fafc;
-      --card-bg: #ffffff;
-      --text: #0f172a;
-      --text-muted: #64748b;
-      
-      --tile-blue-bg: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-      --tile-blue-border: #93c5fd;
-      --tile-blue-text: #1d4ed8;
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
 
-      --tile-green-bg: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
-      --tile-green-border: #6ee7b7;
-      --tile-green-text: #047857;
+html, body{
+width:100%;
+max-width:100%;
+overflow-x:hidden;
+}
 
-      --tile-red-bg: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
-      --tile-red-border: #fca5a5;
-      --tile-red-text: #b91c1c;
+body{
+font-family:'Inter',sans-serif;
+background:#ffffff;
+color:#111827;
+}
 
-      --border: #e2e8f0;
-      --radius: 16px;
-    }
+/* PAGE WRAPPERS */
+#homePage, #tourPage {
+padding:35px 18px;
+min-height: 100vh;
+width:100%;
+max-width:100%;
+overflow-x:hidden;
+}
 
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    body {
-      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      margin: 0;
-      padding: 10px;
-      line-height: 1.35;
-    }
+#cataloguePage {
+display: none;
+background: #f1f5f9;
+min-height: 100vh;
+width:100%;
+max-width:100%;
+overflow-x:hidden;
+}
 
-    .container { max-width: 1280px; margin: 0 auto; }
+/* --- DASHBOARD HEADER --- */
+.header{
+text-align:center;
+margin-bottom:clamp(30px, 6vw, 50px);
+padding:0 8px;
+}
 
-    .top-header { margin-bottom: 14px; }
-    .title-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .icon-3d-lg {
-      width: 40px;
-      height: 40px;
-      object-fit: contain;
-      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.12));
-    }
-    .title-area h1 {
-      margin: 0;
-      font-size: 1.35rem;
-      font-weight: 800;
-      color: #0f172a;
-      letter-spacing: -0.02em;
-    }
-    .title-area p { margin: 2px 0 0; color: var(--text-muted); font-size: 0.78rem; }
+.header h1{
+font-size:clamp(24px, 5.5vw, 42px);
+font-weight:800;
+letter-spacing:-1px;
+background:linear-gradient(90deg,#2563eb,#7c3aed,#ec4899);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+line-height:1.2;
+word-wrap:break-word;
+}
 
-    /* Filters Bar */
-    .filters-bar {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 8px;
-      margin-bottom: 16px;
-      background: #f1f5f9;
-      border: 1px solid #cbd5e1;
-      padding: 10px;
-      border-radius: var(--radius);
-    }
-    @media (min-width: 768px) {
-      .filters-bar { grid-template-columns: 1.2fr 1fr 1fr; }
-      body { padding: 22px; }
-      .title-area h1 { font-size: 1.6rem; }
-    }
+.header p{
+margin-top:12px;
+font-size:clamp(13px, 2.2vw, 18px);
+color:#64748b;
+font-weight:500;
+}
 
-    .input-wrapper {
-      position: relative;
-      display: flex;
-      align-items: center;
-    }
-    .input-icon-3d {
-      position: absolute;
-      left: 12px;
-      width: 18px;
-      height: 18px;
-      pointer-events: none;
-      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
-    }
-    .input-control {
-      width: 100%;
-      padding: 9px 12px 9px 38px;
-      border: 1.5px solid #cbd5e1;
-      border-radius: 9px;
-      font-size: 0.86rem;
-      background: #ffffff;
-      font-weight: 600;
-      font-family: inherit;
-      color: var(--text);
-      outline: none;
-    }
-    .input-control:focus {
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
-    }
+/*
+  --- RESPONSIVE DASHBOARD GRID (FLUID) ---
+*/
+.grid{
+width:100%;
+max-width:1450px;
+margin:0 auto;
+display:grid;
+grid-template-columns:repeat(auto-fit, minmax(clamp(80px, 22vw, 150px), 1fr));
+column-gap:clamp(8px, 2.2vw, 24px);
+row-gap:clamp(24px, 4vw, 42px);
+align-items:start;
+justify-items:center;
+}
 
-    /* 3 KPI Metric Cards */
-    .kpi-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
-      margin-bottom: 18px;
-    }
-    @media (min-width: 640px) {
-      .kpi-grid { grid-template-columns: repeat(3, 1fr); gap: 14px; }
-    }
-    .kpi-card {
-      border-radius: var(--radius);
-      padding: 14px 18px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-      border: 1.5px solid transparent;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      overflow: hidden;
-    }
-    .kpi-card.blue { background: var(--tile-blue-bg); border-color: var(--tile-blue-border); }
-    .kpi-card.blue .kpi-label, .kpi-card.blue .kpi-sub { color: #2563eb; }
-    .kpi-card.blue .kpi-val { color: var(--tile-blue-text); }
+.app{
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:flex-start;
+width:100%;
+min-width:0;
+max-width:100%;
+text-decoration:none;
+color:#111827;
+transition:.35s ease;
+cursor:pointer;
+}
 
-    .kpi-card.green { background: var(--tile-green-bg); border-color: var(--tile-green-border); }
-    .kpi-card.green .kpi-label, .kpi-card.green .kpi-sub { color: #059669; }
-    .kpi-card.green .kpi-val { color: var(--tile-green-text); }
+.app:hover{
+transform:translateY(-6px);
+}
 
-    .kpi-card.red { background: var(--tile-red-bg); border-color: var(--tile-red-border); }
-    .kpi-card.red .kpi-label, .kpi-card.red .kpi-sub { color: #dc2626; }
-    .kpi-card.red .kpi-val { color: var(--tile-red-text); }
+.icon{
+font-size:clamp(40px, 8vw, 78px);
+transition:.35s ease;
+filter:drop-shadow(0 14px 24px rgba(0,0,0,.14));
+line-height:1;
+}
 
-    .kpi-label {
-      font-size: 0.72rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-    .kpi-val {
-      font-size: 1.85rem;
-      font-weight: 800;
-      margin: 3px 0 2px;
-      letter-spacing: -0.02em;
-    }
-    .kpi-sub { font-size: 0.72rem; font-weight: 500; }
-    .kpi-icon-3d {
-      width: 46px;
-      height: 46px;
-      object-fit: contain;
-      filter: drop-shadow(0 4px 10px rgba(0,0,0,0.15));
-      flex-shrink: 0;
-    }
+.app:hover .icon{
+transform:translateY(-8px) scale(1.12);
+}
 
-    /* Section Headings */
-    .section-title {
-      font-size: 0.88rem;
-      font-weight: 800;
-      color: #1e293b;
-      margin: 18px 0 8px 2px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-    .section-icon-3d {
-      width: 20px;
-      height: 20px;
-      object-fit: contain;
-    }
+/* Original Icon Colors */
+.stock{color:#10b981;}
+.price{color:#2563eb;}
+.tour{color:#f59e0b;}
+.farmer{color:#65a30d;}
+.products{color:#db2777;}
+.news{color:#7c3aed;}
+.sales{color:#0891b2;}
+.accounts{color:#0f766e;}
+.outstanding{color:#dc2626;}
+.misc{color:#9333ea;}
+.catalogue{color:#4f46e5;}
 
-    /* Table Container with Horizontal Scroll Guard */
-    .card-box {
-      background: var(--card-bg);
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      margin-bottom: 20px;
-    }
+.app span{
+margin-top:16px;
+font-size:clamp(11px, 2vw, 17px);
+font-weight:700;
+text-align:center;
+line-height:1.3;
+width:100%;
+word-break:break-word;
+overflow-wrap:break-word;
+hyphens:auto;
+}
 
-    /* Summary Table Specific Styling */
-    .summary-table {
-      width: 100%;
-      border-collapse: separate;
-      border-spacing: 0;
-      table-layout: fixed;
-    }
-    .summary-table th {
-      background: #f8fafc;
-      color: #475569;
-      font-size: 0.72rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
-      padding: 10px 8px;
-      border-bottom: 2px solid var(--border);
-      text-align: right;
-      white-space: nowrap;
-    }
-    .summary-table th:first-child {
-      text-align: left;
-      width: 34%;
-      padding-left: 12px;
-    }
-    .summary-table th:nth-child(2) { width: 24%; }
-    .summary-table th:nth-child(3) { width: 21%; }
-    .summary-table th:nth-child(4) { width: 21%; padding-right: 12px; }
+.footer{
+margin-top:65px;
+text-align:center;
+font-size:13px;
+color:#64748b;
+padding:0 12px;
+}
 
-    .summary-table td {
-      padding: 10px 6px;
-      border-bottom: 1px solid var(--border);
-      font-size: 0.85rem;
-      text-align: right;
-      vertical-align: middle;
-    }
-    .summary-table td:first-child {
-      text-align: left;
-      padding-left: 12px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      font-weight: 800;
-      color: #0f172a;
-    }
-    .summary-table td:last-child {
-      padding-right: 12px;
-    }
-    .summary-table tr:last-child td { border-bottom: none; }
+.footer span{
+font-weight:700;
+color:#111827;
+}
 
-    .badge-pill {
-      display: inline-block;
-      padding: 3px 6px;
-      border-radius: 6px;
-      font-weight: 800;
-      font-size: 0.8rem;
-      white-space: nowrap;
-      min-width: 48px;
-      text-align: center;
-    }
-    .pill-blue { background: #eff6ff; color: #1d4ed8; }
-    .pill-green { background: #ecfdf5; color: #047857; }
-    .pill-red { background: #fef2f2; color: #b91c1c; }
+/* --- REUSABLE BACK BUTTON --- */
+.back-btn{
+display:inline-flex;
+align-items:center;
+gap:10px;
+padding:14px 24px;
+border-radius:18px;
+background:#111827;
+color:white;
+font-weight:700;
+cursor:pointer;
+margin-bottom:24px;
+transition: .3s;
+}
 
-    @media (max-width: 450px) {
-      body { padding: 8px; }
-      .summary-table th { font-size: 0.65rem; padding: 8px 4px; }
-      .summary-table td { padding: 8px 4px; font-size: 0.78rem; }
-      .badge-pill { padding: 2px 4px; font-size: 0.72rem; min-width: 40px; }
-      .th-desktop { display: none; }
-      .th-mobile { display: inline; }
-    }
-    @media (min-width: 451px) {
-      .th-desktop { display: inline; }
-      .th-mobile { display: none; }
-    }
+.back-btn:hover {
+background: #374151;
+}
 
-    /* Second Detailed Table */
-    .detailed-table {
-      width: 100%;
-      border-collapse: separate;
-      border-spacing: 0;
-    }
-    .detailed-table th {
-      background: #f8fafc;
-      color: #475569;
-      font-size: 0.72rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      padding: 10px 14px;
-      border-bottom: 2px solid var(--border);
-      text-align: left;
-    }
-    .detailed-table td {
-      padding: 11px 14px;
-      border-bottom: 1px solid var(--border);
-      font-size: 0.85rem;
-      vertical-align: middle;
-    }
+/* --- TOUR PAGE ORIGINAL STYLES --- */
+#tourPage{
+display:none;
+}
 
-    @media (max-width: 767px) {
-      .detailed-table thead { display: none; }
-      .detailed-table, .detailed-table tbody, .detailed-table tr, .detailed-table td {
-        display: block;
-        width: 100%;
-      }
-      .detailed-table tr {
-        padding: 12px;
-        border-bottom: 1px solid var(--border);
-        background: white;
-      }
-      .m-territory {
-        font-size: 0.7rem;
-        font-weight: 800;
-        color: #64748b;
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-        display: flex;
-        align-items: center;
-        gap: 4px;
-      }
-      .m-party {
-        font-size: 0.94rem;
-        font-weight: 800;
-        color: #0f172a;
-        margin: 2px 0 4px;
-      }
-      .m-product {
-        font-size: 0.82rem;
-        font-weight: 700;
-        color: #2563eb;
-        margin-bottom: 8px;
-        padding-bottom: 6px;
-        border-bottom: 1px dashed #e2e8f0;
-      }
-      .m-stats-row {
-        display: grid !important;
-        grid-template-columns: 1fr 1fr 1fr;
-        gap: 6px;
-        padding: 0 !important;
-        border: none !important;
-        text-align: center;
-      }
-      .m-stat-box {
-        background: #f8fafc;
-        border-radius: 8px;
-        padding: 5px 3px;
-        border: 1px solid #e2e8f0;
-      }
-      .m-stat-label {
-        font-size: 0.65rem;
-        font-weight: 800;
-        color: #64748b;
-        text-transform: uppercase;
-        margin-bottom: 2px;
-        display: block;
-      }
-      .m-stat-val {
-        font-size: 0.85rem;
-        font-weight: 800;
-        display: block;
-      }
-    }
+.container{
+max-width:720px;
+width:100%;
+margin:auto;
+background:#ffffff;
+border-radius:30px;
+padding:clamp(16px, 4vw, 28px);
+box-shadow:0 12px 35px rgba(0,0,0,.08);
+overflow-x:auto;
+}
 
-    /* Compact grouped party/product rows */
-    .detailed-table td.desktop-only:nth-child(3) { width: 100%; }
-    @media (min-width: 768px) {
-      .detailed-table { table-layout: auto; }
-      .detailed-table th:first-child { width: 12%; }
-      .detailed-table th:nth-child(2) { width: 28%; }
-      .detailed-table th:nth-child(3) { width: 60%; }
-    }
-    @media (max-width: 767px) {
-      .detailed-table tr { padding: 8px 10px; }
-      .detailed-table .m-product { margin-bottom: 4px; padding-bottom: 4px; }
-    }
+.title{
+text-align:center;
+font-size:clamp(22px, 5vw, 34px);
+font-weight:800;
+}
 
-    /* Compact second table: headings appear once, values stay on one line */
-    .movement-header,
-    .movement-row {
-      display: grid;
-      grid-template-columns: minmax(68px, 0.65fr) 84px 84px 84px;
-      align-items: center;
-      gap: 6px;
-      text-align: center;
-    }
+.subtitle{
+text-align:center;
+margin-top:8px;
+margin-bottom:24px;
+font-size:clamp(13px, 2vw, 16px);
+color:#64748b;
+}
 
-    .movement-header {
-      font-size: 0.68rem;
-      font-weight: 800;
-      color: #475569;
-    }
+.tour-table{
+width:100%;
+min-width:420px;
+border-collapse:collapse;
+overflow:hidden;
+border-radius:18px;
+}
 
-    .movement-product-head {
-      text-align: left;
-    }
+.tour-table th{
+background:linear-gradient(135deg,#2563eb,#7c3aed);
+color:white;
+padding:14px 8px;
+font-size:15px;
+}
 
-    .movement-row {
-      font-size: 0.82rem;
-      font-weight: 800;
-    }
+.tour-table td{
+padding:14px 8px;
+text-align:center;
+border-bottom:1px solid #e5e7eb;
+font-size:15px;
+}
 
-    .movement-product {
-      text-align: left;
-      color: #2563eb;
-      font-weight: 800;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
+.tour-table tr:nth-child(even){
+background:#f8fafc;
+}
 
-    .movement-number {
-      font-weight: 800;
-      padding: 3px 4px;
-      border-radius: 6px;
-      background: #f8fafc;
-    }
+.brand{
+font-weight:700;
+}
 
-    .grouped-party {
-      font-weight: 800 !important;
-      color: #0f172a;
-    }
+.points{
+font-weight:700;
+color:#2563eb;
+}
 
-    .grouped-territory {
-      font-weight: 800 !important;
-    }
+.tour-table input{
+width:80px;
+max-width:100%;
+padding:10px;
+border-radius:12px;
+border:1px solid #d1d5db;
+text-align:center;
+font-weight:700;
+font-size:15px;
+}
 
-    @media (max-width: 767px) {
-      .mobile-movement-header,
-      .mobile-movement-row {
-        display: grid;
-        grid-template-columns: minmax(66px, 0.65fr) 62px 62px 62px;
-        gap: 4px;
-        align-items: center;
-      }
+.total-box{
+margin-top:24px;
+padding:clamp(18px, 4vw, 28px);
+border-radius:24px;
+background:linear-gradient(135deg,#2563eb,#7c3aed);
+text-align:center;
+color:white;
+}
 
-      .mobile-movement-header {
-        margin-top: 5px;
-        padding: 3px 0;
-        font-size: 0.57rem;
-        font-weight: 800;
-        color: #64748b;
-        text-align: center;
-      }
+.total-box h2{
+font-size:18px;
+font-weight:500;
+}
 
-      .mobile-movement-header span:first-child {
-        text-align: left;
-      }
+.total-value{
+font-size:clamp(32px, 7vw, 46px);
+font-weight:800;
+margin-top:8px;
+word-break:break-word;
+}
 
-      .mobile-movement-row {
-        padding: 4px 0;
-        font-size: 0.72rem;
-        font-weight: 800;
-        text-align: center;
-      }
+/* --- CATALOGUE PAGE STYLES --- */
+.cat-navbar { background: #0f2d6e; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; height: 56px; position: sticky; top: 0; z-index: 200; box-shadow: 0 2px 12px rgba(0,0,0,0.25); }
+.cat-navbar-brand { display: flex; align-items: center; gap: 10px; min-width:0; }
+.cat-back-arrow { color: white; font-size: 18px; cursor: pointer; padding-right: 12px; margin-right: 4px; border-right: 1px solid rgba(255,255,255,0.2); transition: opacity 0.2s; flex-shrink:0; }
+.cat-back-arrow:hover { opacity: 0.7; }
+.cat-navbar-logo { width: 34px; height: 34px; background: linear-gradient(135deg, #22c55e, #16a34a); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.cat-navbar-title { font-size: 15px; font-weight: 700; color: #fff; line-height: 1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.cat-navbar-sub { font-size: 10px; color: rgba(255,255,255,0.55); font-weight: 400; }
+.cat-navbar-badge { background: #22c55e; color: #fff; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 20px; letter-spacing: 0.3px; flex-shrink:0; }
 
-      .mobile-product {
-        text-align: left;
-        color: #2563eb;
-        font-weight: 800;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
+.cat-hero { background: linear-gradient(135deg, #0f2d6e 0%, #1a4da0 50%, #1565c0 100%); padding: 36px 20px 32px; text-align: center; position: relative; overflow: hidden; }
+.cat-hero::before { content: ''; position: absolute; top: -60px; right: -60px; width: 200px; height: 200px; background: rgba(255,255,255,0.04); border-radius: 50%; }
+.cat-hero::after { content: ''; position: absolute; bottom: -40px; left: -40px; width: 150px; height: 150px; background: rgba(34,197,94,0.08); border-radius: 50%; }
+.cat-hero h1 { font-size: clamp(20px, 5vw, 32px); font-weight: 800; color: #fff; letter-spacing: -0.5px; line-height: 1.2; margin-bottom: 8px; }
+.cat-hero h1 span { color: #86efac; }
+.cat-hero p { color: rgba(255,255,255,0.65); font-size: 13px; }
 
-      .mobile-movement-row strong { font-size: 0.84rem;
-        font-weight: 800;
-      }
+.cat-search-bar { background: #fff; padding: 14px 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); position: sticky; top: 56px; z-index: 100; }
+.cat-search-inner { max-width: 860px; margin: 0 auto; position: relative; }
+.cat-search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 16px; pointer-events: none; }
+#catSearchInput { width: 100%; padding: 11px 16px 11px 42px; font-size: 14px; font-family: inherit; border: 2px solid #e2e8f0; border-radius: 10px; outline: none; background: #f8fafc; color: #1e293b; transition: all 0.2s; }
+#catSearchInput:focus { border-color: #1a4da0; background: #fff; box-shadow: 0 0 0 4px rgba(26,77,160,0.1); }
 
-      .m-party {
-        font-weight: 800 !important;
-      }
+.cat-filter-bar { background: #fff; border-top: 1px solid #f1f5f9; padding: 0 16px 12px; }
+.cat-filter-scroll { max-width: 860px; margin: 0 auto; display: flex; gap: 8px; overflow-x: auto; padding-top: 10px; scrollbar-width: none; }
+.cat-filter-scroll::-webkit-scrollbar { display: none; }
+.cat-pill { flex-shrink: 0; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; border: 2px solid transparent; transition: all 0.18s; white-space: nowrap; user-select: none; }
+.pill-all { background: #1a4da0; color: #fff; }
+.pill-insect { background: #fff3f3; color: #dc2626; border-color: #fecaca; }
+.pill-fungus { background: #fffbeb; color: #b45309; border-color: #fde68a; }
+.pill-herb { background: #f0fdf4; color: #15803d; border-color: #bbf7d0; }
+.pill-other { background: #faf5ff; color: #7e22ce; border-color: #e9d5ff; }
+.cat-pill.active { transform: scale(1.04); box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+.pill-all.active { background: #0f2d6e; }
+.pill-insect.active { background: #dc2626; color: #fff; border-color: #dc2626; }
+.pill-fungus.active { background: #b45309; color: #fff; border-color: #b45309; }
+.pill-herb.active { background: #15803d; color: #fff; border-color: #15803d; }
+.pill-other.active { background: #7e22ce; color: #fff; border-color: #7e22ce; }
 
-      .m-territory {
-        font-weight: 800 !important;
-      }
-    }
-  </style>
+.cat-live-stats { display: flex; align-items: center; gap: 6px; padding: 8px 2px 2px; max-width: 860px; margin: 0 auto; flex-wrap:wrap; }
+.cat-live-stat { font-size: 12px; color: #64748b; font-weight: 500; }
+.cat-live-stat span { font-weight: 800; color: #1a4da0; font-size: 14px; }
+.cat-live-stat-sep { color: #cbd5e1; font-size: 14px; }
+
+.cat-main { max-width: 900px; margin: 0 auto; padding: 16px 14px 32px; }
+
+.cat-section-divider { display: flex; align-items: center; gap: 10px; margin: 24px 0 12px; }
+.cat-section-divider:first-child { margin-top: 8px; }
+.cat-section-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+.cat-section-icon-insect { background: #fef2f2; }
+.cat-section-icon-fungus { background: #fffbeb; }
+.cat-section-icon-herb { background: #f0fdf4; }
+.cat-section-icon-other { background: #faf5ff; }
+.cat-section-title { font-size: 13px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; }
+.cat-section-title-insect { color: #dc2626; }
+.cat-section-title-fungus { color: #b45309; }
+.cat-section-title-herb { color: #15803d; }
+.cat-section-title-other { color: #7e22ce; }
+.cat-section-line { flex: 1; height: 1px; background: #e2e8f0; }
+.cat-section-count { font-size: 11px; color: #94a3b8; font-weight: 600; }
+
+.cat-product-card { background: #fff; border-radius: 14px; box-shadow: 0 1px 6px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04); overflow: hidden; margin-bottom: 12px; border: 1px solid #e8edf5; transition: box-shadow 0.2s, transform 0.2s; }
+.cat-product-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.1); transform: translateY(-1px); }
+.cat-card-accent { height: 4px; }
+.accent-insect { background: linear-gradient(90deg, #ef4444, #f97316); }
+.accent-fungus { background: linear-gradient(90deg, #f59e0b, #eab308); }
+.accent-herb { background: linear-gradient(90deg, #22c55e, #16a34a); }
+.accent-other { background: linear-gradient(90deg, #a855f7, #7c3aed); }
+
+.cat-card-header { padding: 14px 16px 12px; border-bottom: 1px solid #f1f5f9; }
+@media (min-width: 560px) { .cat-card-header { display: flex; align-items: flex-start; gap: 16px; } .cat-card-header-left { min-width: 155px; max-width: 185px; flex-shrink: 0; } .cat-card-header-right { flex: 1; padding-top: 2px; min-width:0; } }
+.cat-product-name { font-size: 17px; font-weight: 800; color: #0f2d6e; letter-spacing: -0.3px; line-height: 1.2; margin-bottom: 5px; word-break:break-word; }
+.cat-tag { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 20px; font-size: 10px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
+.tag-insecticide { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+.tag-fungicide { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
+.tag-herbicide { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+.tag-other { background: #faf5ff; color: #7e22ce; border: 1px solid #e9d5ff; }
+.cat-technical-label { font-size: 9.5px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; color: #94a3b8; margin-top: 12px; margin-bottom: 2px; }
+@media (min-width: 560px) { .cat-technical-label { margin-top: 0; } }
+.cat-technical-name { font-size: 13px; color: #475569; line-height: 1.5; word-break: break-word; font-weight: 500; }
+.cat-card-body { padding: 0 14px 12px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+.cat-sub-table { width: 100%; border-collapse: collapse; font-size: 12.5px; min-width: 300px; margin-top: 10px; }
+.cat-sub-table thead tr { background: #f8fafc; }
+.cat-sub-table th { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; padding: 8px 10px; border-bottom: 2px solid #e2e8f0; white-space: nowrap; text-align: left; }
+.cat-sub-table td { padding: 8px 10px; border-bottom: 1px solid #f1f5f9; color: #374151; vertical-align: middle; line-height: 1.45; }
+.cat-sub-table tr:last-child td { border-bottom: none; }
+.cat-sub-table tbody tr:nth-child(even) td { background: #fafbff; }
+.cat-sub-table tbody tr:hover td { background: #f0f4ff; }
+.cat-sub-table td:last-child { font-weight: 600; color: #0f2d6e; white-space: nowrap; }
+
+.cat-no-results { text-align: center; padding: 60px 20px; display: none; }
+.cat-no-results-icon { font-size: 48px; margin-bottom: 12px; }
+.cat-no-results h3 { font-size: 18px; color: #374151; margin-bottom: 6px; }
+.cat-no-results p { color: #94a3b8; font-size: 13px; }
+.cat-footer { text-align: center; padding: 24px 16px; font-size: 12px; color: #94a3b8; border-top: 1px solid #e2e8f0; margin-top: 8px; }
+.cat-footer strong { color: #475569; }
+
+</style>
 </head>
 <body>
 
-<div class="container">
-  <div class="top-header">
-    <div class="title-row">
-      <img class="icon-3d-lg" src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Bar%20chart/3D/bar_chart_3d.png" alt="Analytics">
-      <div class="title-area">
-        <h1>Sales & Inventory Dashboard</h1>
-        <p>Product-Wise & Party-Wise Live Distribution Intelligence</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Filters Bar with 3D Icons -->
-  <div class="filters-bar">
-    <div class="input-wrapper">
-      <img class="input-icon-3d" src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Magnifying%20glass%20tilted%20left/3D/magnifying_glass_tilted_left_3d.png" alt="Search">
-      <input type="text" id="searchBox" class="input-control" placeholder="Search Product..." oninput="renderDashboard()">
-    </div>
-    
-    <div class="input-wrapper">
-      <img class="input-icon-3d" src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/World%20map/3D/world_map_3d.png" alt="Territory">
-      <select id="territoryFilter" class="input-control" onchange="onTerritoryChange()">
-        <option value="ALL">All Territories</option>
-      </select>
+<!-- ================= DASHBOARD PAGE ================= -->
+<div id="homePage">
+    <div class="header">
+        <h1>Punjab Team Dashboard</h1>
+        <p>Professional Smart Access Portal</p>
     </div>
 
-    <div class="input-wrapper">
-      <img class="input-icon-3d" src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Office%20building/3D/office_building_3d.png" alt="Party">
-      <select id="partyFilter" class="input-control" onchange="renderDashboard()">
-        <option value="ALL">All Parties</option>
-      </select>
+    <div class="grid">
+        <!-- Stock Report linked to godown stock report in the same GitHub folder -->
+        <a class="app" href="gemini-code-1789399537792.html" target="_blank">
+            <i class="fa-solid fa-warehouse icon stock"></i>
+            <span>Godown Stock Report</span>
+        </a>
+
+        <a class="app" href="https://yuvinder.github.io/price-list-with-VD/" target="_blank">
+            <i class="fa-solid fa-indian-rupee-sign icon price"></i>
+            <span>Price List</span>
+        </a>
+
+        <div class="app" onclick="openTourPage()">
+            <i class="fa-solid fa-plane-departure icon tour"></i>
+            <span>Tour Calculator</span>
+        </div>
+        <a class="app" href="https://datastudio.google.com/u/0/reporting/febd6f4d-bd0b-4cc4-b4e2-6c1f0b65227e/page/6wQLF" target="_blank">
+            <i class="fa-solid fa-tractor icon farmer"></i>
+            <span>Farmer Dashboard</span>
+        </a>
+        <a class="app" href="https://drive.google.com/drive/folders/1_ZlApGdobNxDFWmjzAiVKEw_tRTG_Xdr" target="_blank">
+            <i class="fa-solid fa-cubes-stacked icon products"></i>
+            <span>Products</span>
+        </a>
+        <a class="app" href="https://drive.google.com/drive/folders/1tEBbakp8xo9mVssStVOeTrmmDFwJZYpd?usp=drive_link" target="_blank">
+            <i class="fa-solid fa-photo-film icon news"></i>
+            <span>News &amp; Video</span>
+        </a>
+        <a class="app" href="https://yuvinder.github.io/Sales-dashboard/" target="_blank">
+            <i class="fa-solid fa-chart-line icon sales"></i>
+            <span>Sales Dashboard</span>
+        </a>
+        <a class="app" href="https://datastudio.google.com/reporting/3029c72e-c8f2-4495-a77f-8d8b7877da7e" target="_blank">
+            <i class="fa-solid fa-sack-dollar icon sales"></i>
+            <span>Actual Sale 2025-26</span>
+        </a>
+        <a class="app" href="https://drive.google.com/drive/folders/1KFwNQwBrOx1ULmbH5gCbvn96Rere-hDG?usp=drive_link" target="_blank">
+            <i class="fa-solid fa-building-columns icon accounts"></i>
+            <span>Account Statements</span>
+        </a>
+        <a class="app" href="https://yuvinder.github.io/OD-dashboard/" target="_blank">
+            <i class="fa-solid fa-scale-balanced icon outstanding"></i>
+            <span>OD Check</span>
+        </a>
+               
+        <!-- NEW Balance stock form -->
+        <a class="app" href="entry%20form.html" target="_blank">
+            <i class="fa-solid fa-file-signature icon farmer"></i>
+            <span>NEW Balance stock form</span>
+        </a>
+
+        <!-- NEW Liquidation dashboard -->
+        <a class="app" href="dashboard.html" target="_blank">
+            <i class="fa-solid fa-chart-column icon sales"></i>
+            <span>NEW Liquidation dashboard</span>
+        </a>
+
+        <a class="app" href="https://drive.google.com/drive/folders/1BWQHp611Wlag-7SsU8PBk2J0qr8kDHjO" target="_blank">
+            <i class="fa-solid fa-layer-group icon misc"></i>
+            <span>Misc</span>
+        </a>
+        <a class="app" href="Partywise product wise calculator.html" target="_blank">
+            <i class="fa-solid fa-briefcase icon sales"></i>
+            <span>Business Planner</span>
+        </a>
+        <a class="app" href="https://yuvinder.github.io/Dashboard-Punjab-updated-06-July/product%20catalgue.html" target="_blank">
+            <i class="fa-solid fa-book-open icon catalogue"></i>
+            <span>Digital Catalogue</span>
+        </a>
     </div>
-  </div>
 
-  <!-- 3 Colored KPI Tiles -->
-  <div class="kpi-grid">
-    <div class="kpi-card blue">
-      <div>
-        <span class="kpi-label">Quantity Billed (Sale + Opening)</span>
-        <div class="kpi-val" id="kpiBilled">0+0</div>
-        <span class="kpi-sub" id="kpiBilledSub">Total available stock: 0.0</span>
-      </div>
-      <img class="kpi-icon-3d" src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Package/3D/package_3d.png" alt="Billed">
+    <div class="footer">
+        Created &amp; Developed by <span>Yuvinder Kumar</span>
     </div>
-
-    <div class="kpi-card green">
-      <div>
-        <span class="kpi-label">Quantity Sold / Liquidated</span>
-        <div class="kpi-val" id="kpiSold">0.0</div>
-        <span class="kpi-sub">Calculated sold / dispatched</span>
-      </div>
-      <img class="kpi-icon-3d" src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Shopping%20cart/3D/shopping_cart_3d.png" alt="Sold">
-    </div>
-
-    <div class="kpi-card red">
-      <div>
-        <span class="kpi-label">Quantity Left</span>
-        <div class="kpi-val" id="kpiRemaining">0.0</div>
-        <span class="kpi-sub">Physical distributor stock</span>
-      </div>
-      <img class="kpi-icon-3d" src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Hourglass%20not%20done/3D/hourglass_not_done_3d.png" alt="Left">
-    </div>
-  </div>
-
-  <!-- FIRST TABLE: Product-Wise Summary -->
-  <div class="section-title">
-    <img class="section-icon-3d" src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Card%20file%20box/3D/card_file_box_3d.png" alt="Product Summary">
-    Product-Wise Stock Summary
-  </div>
-  <div class="card-box">
-    <table class="summary-table">
-      <thead>
-        <tr>
-          <th>Product</th>
-          <th><span class="th-desktop">Billed (Sale+Opening)</span><span class="th-mobile">Sale+Open</span></th>
-          <th><span class="th-desktop">Liquidated</span><span class="th-mobile">Liq.</span></th>
-          <th><span class="th-desktop">Total Left</span><span class="th-mobile">Left</span></th>
-        </tr>
-      </thead>
-      <tbody id="productSummaryBody">
-        <tr><td colspan="4" style="text-align:center; padding:16px; color:var(--text-muted);">Loading products...</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- SECOND TABLE: Detailed Party-Wise Movement -->
-  <div class="section-title">
-    <img class="section-icon-3d" src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Department%20store/3D/department_store_3d.png" alt="Distributors">
-    Party & Territory Detailed Movement
-  </div>
-  <div class="card-box">
-    <table class="detailed-table">
-      <thead>
-        <tr>
-          <th>Territory</th>
-          <th>Party (Payer Name)</th>
-          <th>
-            <div class="movement-header">
-              <span class="movement-product-head">PRODUCT</span>
-              <span>STOCK</span>
-              <span>LIQ.</span>
-              <span>INVENTORY</span>
-            </div>
-          </th>
-        </tr>
-      </thead>
-      <tbody id="detailedTableBody">
-        <tr><td colspan="6" style="text-align:center; padding:18px; color:var(--text-muted);">Loading data...</td></tr>
-      </tbody>
-    </table>
-  </div>
 </div>
 
-<script>
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx9JMLkBAi7a_bbVtdOzZ6kbfMIn9EYA45th7cbUzayoE1Sr_k80ytOY2mZTmQdUAPY/exec";
+<!-- ================= TOUR CALCULATOR PAGE ================= -->
+<div id="tourPage">
+    <div class="container">
+        <div class="back-btn" onclick="goHome()"><i class="fa-solid fa-arrow-left"></i> Back</div>
+        <div class="title">Tour Calculator</div>
+        <div class="subtitle">Enter quantity to calculate points</div>
+        <table class="tour-table">
+            <thead>
+                <tr><th>Brand</th><th>Points/Unit</th><th>Quantity</th><th>Total</th></tr>
+            </thead>
+            <tbody id="tour-tbl"></tbody>
+        </table>
+        <div class="total-box">
+            <h2>Grand Total Points</h2>
+            <div class="total-value" id="tour-grand">0.00</div>
+        </div>
+    </div>
+</div>
 
-  // Opening Inventory Dataset (from Excel as on 01-04-2026)
-  const OPENING_DATA = [{"t": "AMRITSAR", "p": "Damodar Dass Jai Chand Aggarwal", "k": "DAMODAR DASS JAI CHAND AGGARWAL", "pr": "SLAYDEN", "o": 60.0}, {"t": "AMRITSAR", "p": "Damodar Dass Jai Chand Aggarwal", "k": "DAMODAR DASS JAI CHAND AGGARWAL", "pr": "XYMEN", "o": 3.0}, {"t": "AMRITSAR", "p": "Friends Agro Chemicals (India)", "k": "FRIENDS AGRO CHEMICALS (INDIA)", "pr": "GLANZ", "o": 5.0}, {"t": "AMRITSAR", "p": "Friends Agro Chemicals (India)", "k": "FRIENDS AGRO CHEMICALS (INDIA)", "pr": "NATCORE", "o": 7.0}, {"t": "AMRITSAR", "p": "Friends Agro Chemicals (India)", "k": "FRIENDS AGRO CHEMICALS (INDIA)", "pr": "NATGEN PRO", "o": 3.2}, {"t": "AMRITSAR", "p": "G.H. Kheti Store", "k": "G.H. KHETI STORE", "pr": "OMNINAT", "o": 5.0}, {"t": "AMRITSAR", "p": "Gill Kheti Store", "k": "GILL KHETI STORE", "pr": "GLANZ", "o": 10.0}, {"t": "AMRITSAR", "p": "National Agro Centre", "k": "NATIONAL AGRO CENTRE", "pr": "GLANZ", "o": 10.0}, {"t": "AMRITSAR", "p": "National Agro Centre", "k": "NATIONAL AGRO CENTRE", "pr": "NATGEN", "o": 4.0}, {"t": "AMRITSAR", "p": "National Agro Centre", "k": "NATIONAL AGRO CENTRE", "pr": "NATLIGO", "o": 7.0}, {"t": "AMRITSAR", "p": "National Agro Centre", "k": "NATIONAL AGRO CENTRE", "pr": "NATPEARL", "o": 50.0}, {"t": "AMRITSAR", "p": "National Agro Centre", "k": "NATIONAL AGRO CENTRE", "pr": "SLAYDEN", "o": 18.0}, {"t": "AMRITSAR", "p": "National Agro Centre", "k": "NATIONAL AGRO CENTRE", "pr": "TOPRASURE", "o": 1.2}, {"t": "AMRITSAR", "p": "New Kamboj Kheti Store", "k": "NEW KAMBOJ KHETI STORE", "pr": "GLANZ", "o": 2.0}, {"t": "AMRITSAR", "p": "New Kamboj Kheti Store", "k": "NEW KAMBOJ KHETI STORE", "pr": "NATCORE", "o": 20.0}, {"t": "AMRITSAR", "p": "New Kamboj Kheti Store", "k": "NEW KAMBOJ KHETI STORE", "pr": "NATDUO", "o": 440.0}, {"t": "AMRITSAR", "p": "New Kamboj Kheti Store", "k": "NEW KAMBOJ KHETI STORE", "pr": "NATERRA", "o": 904.0}, {"t": "AMRITSAR", "p": "New Kamboj Kheti Store", "k": "NEW KAMBOJ KHETI STORE", "pr": "NATGEN PRO", "o": 4.0}, {"t": "AMRITSAR", "p": "New Kamboj Kheti Store", "k": "NEW KAMBOJ KHETI STORE", "pr": "NATJEWEL", "o": 30.0}, {"t": "AMRITSAR", "p": "New Kamboj Kheti Store", "k": "NEW KAMBOJ KHETI STORE", "pr": "NATLIGO", "o": 7.0}, {"t": "AMRITSAR", "p": "New Kamboj Kheti Store", "k": "NEW KAMBOJ KHETI STORE", "pr": "SLAYDEN", "o": 18.0}, {"t": "AMRITSAR", "p": "New Kamboj Kheti Store", "k": "NEW KAMBOJ KHETI STORE", "pr": "TOPRASURE", "o": 2.4}, {"t": "AMRITSAR", "p": "Ram Rachhpal Dhawan And Sons", "k": "RAM RACHHPAL DHAWAN AND SONS", "pr": "NATJEWEL", "o": 5.0}, {"t": "AMRITSAR", "p": "Ram Rachhpal Dhawan And Sons", "k": "RAM RACHHPAL DHAWAN AND SONS", "pr": "SLAYDEN", "o": 6.0}, {"t": "AMRITSAR", "p": "Ram Rachhpal Dhawan And Sons", "k": "RAM RACHHPAL DHAWAN AND SONS", "pr": "TOPRASURE", "o": 1.2}, {"t": "AMRITSAR", "p": "S.K. Commission Agent", "k": "S.K. COMMISSION AGENT", "pr": "SLAYDEN", "o": 6.0}, {"t": "AMRITSAR", "p": "Vishnu Khad Store", "k": "VISHNU KHAD STORE", "pr": "NATDUO", "o": 200.0}, {"t": "AMRITSAR", "p": "Vishnu Khad Store", "k": "VISHNU KHAD STORE", "pr": "NATERRA", "o": 440.0}, {"t": "BATHINDA", "p": "Janta Kheti Centre", "k": "JANTA KHETI CENTRE", "pr": "NATCORE", "o": 40.0}, {"t": "BATHINDA", "p": "Janta Kheti Centre", "k": "JANTA KHETI CENTRE", "pr": "NATPEARL", "o": 20.0}, {"t": "BATHINDA", "p": "Lekh Raj Kukkar And Sons", "k": "LEKH RAJ KUKKAR AND SONS", "pr": "GLANZ", "o": 24.0}, {"t": "BATHINDA", "p": "New Shere Punjab Pesticides", "k": "NEW SHERE PUNJAB PESTICIDES", "pr": "GLANZ", "o": 20.0}, {"t": "BATHINDA", "p": "New Shere Punjab Pesticides", "k": "NEW SHERE PUNJAB PESTICIDES", "pr": "NATCORE", "o": 20.0}, {"t": "BATHINDA", "p": "New Shere Punjab Pesticides", "k": "NEW SHERE PUNJAB PESTICIDES", "pr": "NATGEN", "o": 12.0}, {"t": "BATHINDA", "p": "New Shere Punjab Pesticides", "k": "NEW SHERE PUNJAB PESTICIDES", "pr": "NATLIGO", "o": 30.0}, {"t": "BATHINDA", "p": "New Shere Punjab Pesticides", "k": "NEW SHERE PUNJAB PESTICIDES", "pr": "NATZOATE", "o": 15.0}, {"t": "BATHINDA", "p": "Raj Agro Chemicals", "k": "RAJ AGRO CHEMICALS", "pr": "NATCORE", "o": 90.0}, {"t": "BATHINDA", "p": "Rakesh Kumar And Co.", "k": "RAKESH KUMAR AND CO.", "pr": "GLANZ", "o": 40.0}, {"t": "BATHINDA", "p": "Rakesh Kumar And Co.", "k": "RAKESH KUMAR AND CO.", "pr": "NATERRA", "o": 450.0}, {"t": "BATHINDA", "p": "Rakesh Kumar And Co.", "k": "RAKESH KUMAR AND CO.", "pr": "NATJEWEL", "o": 60.0}, {"t": "BATHINDA", "p": "Rakesh Kumar And Co.", "k": "RAKESH KUMAR AND CO.", "pr": "NATZOATE", "o": 10.0}, {"t": "BATHINDA", "p": "Shakti Pesticides", "k": "SHAKTI PESTICIDES", "pr": "TOPRASURE", "o": 4.0}, {"t": "BATHINDA", "p": "Surinder Singh And Co", "k": "SURINDER SINGH AND CO", "pr": "GLANZ", "o": 20.0}, {"t": "BATHINDA", "p": "Surinder Singh And Co", "k": "SURINDER SINGH AND CO", "pr": "NATZOATE", "o": 10.0}, {"t": "BATHINDA", "p": "Sushil Trading Co", "k": "SUSHIL TRADING CO", "pr": "NATZOATE", "o": 20.0}, {"t": "BATHINDA", "p": "Zamidara Pesticide", "k": "ZAMIDARA PESTICIDE", "pr": "GLANZ", "o": 20.0}, {"t": "BATHINDA", "p": "Zimidara Agro Traders", "k": "ZIMIDARA AGRO TRADERS", "pr": "GLANZ", "o": 20.0}, {"t": "BATHINDA", "p": "Zimidara Agro Traders", "k": "ZIMIDARA AGRO TRADERS", "pr": "NATCORE", "o": 100.0}, {"t": "BATHINDA", "p": "Zimidara Agro Traders", "k": "ZIMIDARA AGRO TRADERS", "pr": "NATERRA", "o": 1700.0}, {"t": "BATHINDA", "p": "Zimidara Agro Traders", "k": "ZIMIDARA AGRO TRADERS", "pr": "NATJEWEL", "o": 70.0}, {"t": "BATHINDA", "p": "Zimidara Agro Traders", "k": "ZIMIDARA AGRO TRADERS", "pr": "NATZOATE", "o": 35.0}, {"t": "JALANDHAR", "p": "Goyal Traders", "k": "GOYAL TRADERS", "pr": "SLAYDEN", "o": 5.0}, {"t": "JALANDHAR", "p": "Hazara Agro Centre", "k": "HAZARA AGRO CENTRE", "pr": "NATZOATE", "o": 20.0}, {"t": "JALANDHAR", "p": "Hazara Agro Centre", "k": "HAZARA AGRO CENTRE", "pr": "TOPRASURE", "o": 1.4}, {"t": "JALANDHAR", "p": "Khalsa Traders", "k": "KHALSA TRADERS", "pr": "NATCORE", "o": 20.0}, {"t": "JALANDHAR", "p": "Khalsa Traders", "k": "KHALSA TRADERS", "pr": "NATZOATE", "o": 20.0}, {"t": "JALANDHAR", "p": "Khalsa Traders", "k": "KHALSA TRADERS", "pr": "TOPRASURE", "o": 10.0}, {"t": "JALANDHAR", "p": "Kheti Suvidha Kender", "k": "KHETI SUVIDHA KENDER", "pr": "GLANZ", "o": 2.0}, {"t": "JALANDHAR", "p": "Kisan Seed Company", "k": "KISAN SEED COMPANY", "pr": "NATGEN", "o": 6.0}, {"t": "JALANDHAR", "p": "Kisan Seed Company", "k": "KISAN SEED COMPANY", "pr": "SLAYDEN", "o": 8.0}, {"t": "JALANDHAR", "p": "Minhas Pesticides & Seed Store", "k": "MINHAS PESTICIDES & SEED STORE", "pr": "GLANZ", "o": 5.0}, {"t": "JALANDHAR", "p": "Pandtan Di Hatti", "k": "PANDTAN DI HATTI", "pr": "SLAYDEN", "o": 3.0}, {"t": "JALANDHAR", "p": "Punjab Seed Store", "k": "PUNJAB SEED STORE", "pr": "NATERRA", "o": 600.0}, {"t": "JALANDHAR", "p": "Saini Brothers", "k": "SAINI BROTHERS", "pr": "GLANZ", "o": 4.0}, {"t": "JALANDHAR", "p": "Saini Brothers", "k": "SAINI BROTHERS", "pr": "NATGEN", "o": 18.0}, {"t": "MOGA", "p": "Aggarwal Khad Store", "k": "AGGARWAL KHAD STORE", "pr": "GLANZ", "o": 4.0}, {"t": "MOGA", "p": "Batra Pestcides & Fertilizer", "k": "BATRA PESTCIDES & FERTILIZER", "pr": "ASTOR", "o": 0.5}, {"t": "MOGA", "p": "Batra Pestcides & Fertilizer", "k": "BATRA PESTCIDES & FERTILIZER", "pr": "NATCORE", "o": 35.0}, {"t": "MOGA", "p": "Batra Pestcides & Fertilizer", "k": "BATRA PESTCIDES & FERTILIZER", "pr": "NATPEARL", "o": 5.0}, {"t": "MOGA", "p": "Batra Pestcides & Fertilizer", "k": "BATRA PESTCIDES & FERTILIZER", "pr": "TOPRASURE", "o": 6.3}, {"t": "MOGA", "p": "Bhushan & Sons", "k": "BHUSHAN & SONS", "pr": "TOPRASURE", "o": 1.2}, {"t": "MOGA", "p": "Brar Seed And Fertilizer", "k": "BRAR SEED AND FERTILIZER", "pr": "ATMOS", "o": 20.0}, {"t": "MOGA", "p": "Gill Spray Store", "k": "GILL SPRAY STORE", "pr": "GLANZ", "o": 16.0}, {"t": "MOGA", "p": "Gill Spray Store", "k": "GILL SPRAY STORE", "pr": "NATCORE", "o": 40.0}, {"t": "MOGA", "p": "Gill Spray Store", "k": "GILL SPRAY STORE", "pr": "NATLAM", "o": 16.0}, {"t": "MOGA", "p": "Gill Spray Store", "k": "GILL SPRAY STORE", "pr": "NATPEARL", "o": 25.0}, {"t": "MOGA", "p": "Gill Spray Store", "k": "GILL SPRAY STORE", "pr": "NATZOATE", "o": 8.0}, {"t": "MOGA", "p": "Goyal Spray Company", "k": "GOYAL SPRAY COMPANY", "pr": "NATLIGO", "o": 20.0}, {"t": "MOGA", "p": "Grover Pesticide", "k": "GROVER PESTICIDE", "pr": "NATZOATE", "o": 18.0}, {"t": "MOGA", "p": "Hari Om Khad Agency", "k": "HARI OM KHAD AGENCY", "pr": "NATGEN PRO", "o": 0.68}, {"t": "MOGA", "p": "Hari Om Khad Agency", "k": "HARI OM KHAD AGENCY", "pr": "SLAYDEN", "o": 16.0}, {"t": "MOGA", "p": "Kamal Kheti Store", "k": "KAMAL KHETI STORE", "pr": "GLANZ", "o": 41.5}, {"t": "MOGA", "p": "Kamal Kheti Store", "k": "KAMAL KHETI STORE", "pr": "NATGEN PRO", "o": 3.4}, {"t": "MOGA", "p": "Kamal Kheti Store", "k": "KAMAL KHETI STORE", "pr": "TOPRASURE", "o": 0.51}, {"t": "MOGA", "p": "Kissan Agro Centre", "k": "KISSAN AGRO CENTRE", "pr": "GLANZ", "o": 5.0}, {"t": "MOGA", "p": "Kissan Agro Centre", "k": "KISSAN AGRO CENTRE", "pr": "NATGEN", "o": 12.0}, {"t": "MOGA", "p": "Kissan Agro Centre", "k": "KISSAN AGRO CENTRE", "pr": "NATGEN PRO", "o": 3.4}, {"t": "MOGA", "p": "Kissan Agro Centre", "k": "KISSAN AGRO CENTRE", "pr": "TOPRASURE", "o": 6.0}, {"t": "MOGA", "p": "Kissan Agro Centre", "k": "KISSAN AGRO CENTRE", "pr": "XYMEN", "o": 1.5}, {"t": "MOGA", "p": "Mittal Brothers", "k": "MITTAL BROTHERS", "pr": "GLANZ", "o": 3.0}, {"t": "MOGA", "p": "Mittal Brothers", "k": "MITTAL BROTHERS", "pr": "NATGEN PRO", "o": 0.85}, {"t": "MOGA", "p": "Mittal Brothers", "k": "MITTAL BROTHERS", "pr": "NATPEARL", "o": 6.0}, {"t": "MOGA", "p": "Modern Kheti Sewa Centre", "k": "MODERN KHETI SEWA CENTRE", "pr": "NATCORE", "o": 60.0}, {"t": "MOGA", "p": "Modern Kheti Sewa Centre", "k": "MODERN KHETI SEWA CENTRE", "pr": "NATJEWEL", "o": 17.0}, {"t": "MOGA", "p": "Modern Kheti Sewa Centre", "k": "MODERN KHETI SEWA CENTRE", "pr": "NATPEARL", "o": 50.0}, {"t": "MOGA", "p": "Modern Kheti Sewa Centre", "k": "MODERN KHETI SEWA CENTRE", "pr": "NATZOATE", "o": 32.0}, {"t": "MOGA", "p": "Nand Lal Pesticides And Fertilizer", "k": "NAND LAL PESTICIDES AND FERTILIZER", "pr": "NATGEN", "o": 9.0}, {"t": "MOGA", "p": "Nand Lal Pesticides And Fertilizer", "k": "NAND LAL PESTICIDES AND FERTILIZER", "pr": "NATPEARL", "o": 11.0}, {"t": "MOGA", "p": "Nand Lal Pesticides And Fertilizer", "k": "NAND LAL PESTICIDES AND FERTILIZER", "pr": "NATZOATE", "o": 12.0}, {"t": "MOGA", "p": "National Seed Depot", "k": "NATIONAL SEED DEPOT", "pr": "NATLIGO", "o": 14.0}, {"t": "MOGA", "p": "National Seed Depot", "k": "NATIONAL SEED DEPOT", "pr": "NATPEARL", "o": 6.0}, {"t": "MOGA", "p": "National Seed Depot", "k": "NATIONAL SEED DEPOT", "pr": "NATZOATE", "o": 30.0}, {"t": "MOGA", "p": "National Seed Depot", "k": "NATIONAL SEED DEPOT", "pr": "TOPRASURE", "o": 0.39}, {"t": "MOGA", "p": "Pest Control Service", "k": "PEST CONTROL SERVICE", "pr": "GLANZ", "o": 6.0}, {"t": "MOGA", "p": "Pest Control Service", "k": "PEST CONTROL SERVICE", "pr": "NATJEWEL", "o": 10.0}, {"t": "PATIALA", "p": "Guru Nanak Pesticides", "k": "GURU NANAK PESTICIDES", "pr": "NATGEN", "o": 2.0}, {"t": "PATIALA", "p": "Kisan Seed Store", "k": "KISAN SEED STORE", "pr": "NATERRA", "o": 240.0}, {"t": "PATIALA", "p": "Kisan Seed Store", "k": "KISAN SEED STORE", "pr": "OMNINAT", "o": 2.0}, {"t": "PATIALA", "p": "Kissan Kheti Centre", "k": "KISSAN KHETI CENTRE", "pr": "NATGEN PRO", "o": 13.6}, {"t": "PATIALA", "p": "Kissan Kheti Centre", "k": "KISSAN KHETI CENTRE", "pr": "NATJEWEL", "o": 10.0}, {"t": "PATIALA", "p": "Kissan Kheti Centre", "k": "KISSAN KHETI CENTRE", "pr": "NATLAM", "o": 30.0}, {"t": "PATIALA", "p": "Kissan Kheti Centre", "k": "KISSAN KHETI CENTRE", "pr": "NATLIGO", "o": 50.0}, {"t": "PATIALA", "p": "Kissan Kheti Centre", "k": "KISSAN KHETI CENTRE", "pr": "NATPEARL", "o": 5.0}, {"t": "PATIALA", "p": "New Zimidara Khad Store", "k": "NEW ZIMIDARA KHAD STORE", "pr": "GLANZ", "o": 4.0}, {"t": "PATIALA", "p": "Zimidara Khad Store", "k": "ZIMIDARA KHAD STORE", "pr": "GLANZ", "o": 15.0}, {"t": "PATIALA", "p": "Yameen Seed & Pesticide Store", "k": "YAMEEN SEED & PESTICIDE STORE", "pr": "ATMOS", "o": 10.0}, {"t": "PATIALA", "p": "Yameen Seed & Pesticide Store", "k": "YAMEEN SEED & PESTICIDE STORE", "pr": "CYANAT", "o": 6.0}, {"t": "PATIALA", "p": "Yameen Seed & Pesticide Store", "k": "YAMEEN SEED & PESTICIDE STORE", "pr": "GLANZ", "o": 8.0}, {"t": "PATIALA", "p": "Yameen Seed & Pesticide Store", "k": "YAMEEN SEED & PESTICIDE STORE", "pr": "HATRIK", "o": 10.0}, {"t": "PATIALA", "p": "Yameen Seed & Pesticide Store", "k": "YAMEEN SEED & PESTICIDE STORE", "pr": "TOPRASURE", "o": 0.6}, {"t": "SANGRUR", "p": "Budh Ram & Sons", "k": "BUDH RAM & SONS", "pr": "SLAYDEN", "o": 10.0}, {"t": "SANGRUR", "p": "Jagdambey Pesticides", "k": "JAGDAMBEY PESTICIDES", "pr": "NATERRA", "o": 552.0}, {"t": "SANGRUR", "p": "Jagdambey Pesticides", "k": "JAGDAMBEY PESTICIDES", "pr": "SLAYDEN", "o": 12.0}, {"t": "SANGRUR", "p": "Jagdambey Pesticides", "k": "JAGDAMBEY PESTICIDES", "pr": "XYMEN", "o": 1.0}, {"t": "SANGRUR", "p": "Malwa Beej Store", "k": "MALWA BEEJ STORE", "pr": "NATJEWEL", "o": 20.0}, {"t": "SANGRUR", "p": "Malwa Beej Store", "k": "MALWA BEEJ STORE", "pr": "NATLIGO", "o": 6.0}, {"t": "SANGRUR", "p": "Malwa Beej Store", "k": "MALWA BEEJ STORE", "pr": "NATPEARL", "o": 4.0}, {"t": "SANGRUR", "p": "Malwa Beej Store", "k": "MALWA BEEJ STORE", "pr": "OMNINAT", "o": 3.0}, {"t": "SANGRUR", "p": "Mukesh Kumar Bansal & Co.", "k": "MUKESH KUMAR BANSAL & CO.", "pr": "NATGEN", "o": 6.0}, {"t": "SANGRUR", "p": "Mukesh Kumar Bansal & Co.", "k": "MUKESH KUMAR BANSAL & CO.", "pr": "NATGEN PRO", "o": 1.0}, {"t": "SANGRUR", "p": "Mukesh Kumar Bansal & Co.", "k": "MUKESH KUMAR BANSAL & CO.", "pr": "OMNINAT", "o": 2.0}, {"t": "SANGRUR", "p": "Mukesh Kumar Bansal & Co.", "k": "MUKESH KUMAR BANSAL & CO.", "pr": "SLAYDEN", "o": 4.0}, {"t": "SANGRUR", "p": "Navbharat Agro Agencies", "k": "NAVBHARAT AGRO AGENCIES", "pr": "GLANZ", "o": 3.0}, {"t": "SANGRUR", "p": "Navbharat Agro Agencies", "k": "NAVBHARAT AGRO AGENCIES", "pr": "NATGEN", "o": 1.0}, {"t": "SANGRUR", "p": "Navbharat Agro Agencies", "k": "NAVBHARAT AGRO AGENCIES", "pr": "NATLIGO", "o": 6.0}, {"t": "SANGRUR", "p": "New Kissan Sewa Centre", "k": "NEW KISSAN SEWA CENTRE", "pr": "GLANZ", "o": 6.0}, {"t": "SANGRUR", "p": "New Kissan Sewa Centre", "k": "NEW KISSAN SEWA CENTRE", "pr": "NATPEARL", "o": 4.0}, {"t": "SANGRUR", "p": "Om Parkash Ramesh Kumar", "k": "OM PARKASH RAMESH KUMAR", "pr": "GLANZ", "o": 8.0}, {"t": "SANGRUR", "p": "Om Parkash Ramesh Kumar", "k": "OM PARKASH RAMESH KUMAR", "pr": "NATLIGO", "o": 85.0}, {"t": "SANGRUR", "p": "Om Parkash Ramesh Kumar", "k": "OM PARKASH RAMESH KUMAR", "pr": "NATPEARL", "o": 11.0}, {"t": "SANGRUR", "p": "Om Parkash Ramesh Kumar", "k": "OM PARKASH RAMESH KUMAR", "pr": "NATWEEZ", "o": 24.0}, {"t": "SANGRUR", "p": "Sarao Pesticides", "k": "SARAO PESTICIDES", "pr": "GLANZ", "o": 9.0}, {"t": "SANGRUR", "p": "Sarao Pesticides", "k": "SARAO PESTICIDES", "pr": "SLAYDEN", "o": 2.0}, {"t": "SANGRUR", "p": "Sarao Pesticides", "k": "SARAO PESTICIDES", "pr": "XYMEN", "o": 2.0}, {"t": "SANGRUR", "p": "Zimidara Pesticides", "k": "ZIMIDARA PESTICIDES", "pr": "GLANZ", "o": 18.0}, {"t": "SANGRUR", "p": "Zimidara Pesticides", "k": "ZIMIDARA PESTICIDES", "pr": "NATCORE", "o": 24.0}, {"t": "SANGRUR", "p": "Zimidara Pesticides", "k": "ZIMIDARA PESTICIDES", "pr": "NATGEN PRO", "o": 3.0}, {"t": "SANGRUR", "p": "Zimidara Pesticides", "k": "ZIMIDARA PESTICIDES", "pr": "NATPEARL", "o": 7.0}, {"t": "SANGRUR", "p": "Zimidara Pesticides", "k": "ZIMIDARA PESTICIDES", "pr": "XYMEN", "o": 0.5}];
-  const MASTER_PARTIES = [{"t": "AMRITSAR", "p": "Damodar Dass Jai Chand Aggarwal"}, {"t": "AMRITSAR", "p": "Friends Agro Chemicals (India)"}, {"t": "AMRITSAR", "p": "G.H. Kheti Store"}, {"t": "AMRITSAR", "p": "Gill Kheti Store"}, {"t": "AMRITSAR", "p": "Kissan Pesticide And Seed Store"}, {"t": "AMRITSAR", "p": "Mahajan Traders"}, {"t": "AMRITSAR", "p": "National Agro Centre"}, {"t": "AMRITSAR", "p": "New Kamboj Kheti Store"}, {"t": "AMRITSAR", "p": "Rajesh Gupta Seed Farms"}, {"t": "AMRITSAR", "p": "Ram Rachhpal Dhawan And Sons"}, {"t": "AMRITSAR", "p": "S.K. Commission Agent"}, {"t": "AMRITSAR", "p": "Vishnu Khad Store"}, {"t": "BATHINDA", "p": "Babbu Trading Company"}, {"t": "BATHINDA", "p": "Bansal Pesticide Store"}, {"t": "BATHINDA", "p": "Darvesh Agro Chemicals"}, {"t": "BATHINDA", "p": "Giana Trading Co"}, {"t": "BATHINDA", "p": "Jai Shree Agro Chemicals"}, {"t": "BATHINDA", "p": "Janta Kheti Centre"}, {"t": "BATHINDA", "p": "Lekh Raj Kukkar And Sons"}, {"t": "BATHINDA", "p": "New Malwa Pesticides Store"}, {"t": "BATHINDA", "p": "New Shere Punjab Pesticides"}, {"t": "BATHINDA", "p": "Raj Agro Chemicals"}, {"t": "BATHINDA", "p": "Rakesh Kumar And Co."}, {"t": "BATHINDA", "p": "Ram Sarup Narotam Dass"}, {"t": "BATHINDA", "p": "Satguru Pesticides And Fertilizers"}, {"t": "BATHINDA", "p": "Shakti Pesticides"}, {"t": "BATHINDA", "p": "Surinder Singh And Co"}, {"t": "BATHINDA", "p": "Sushil Trading Co"}, {"t": "BATHINDA", "p": "Zamidara Pesticide"}, {"t": "BATHINDA", "p": "Zimidara Agro Traders"}, {"t": "SANGRUR", "p": "Zimidara Pesticides"}, {"t": "JALANDHAR", "p": "Goyal Traders"}, {"t": "JALANDHAR", "p": "Hazara Agro Centre"}, {"t": "JALANDHAR", "p": "Josan Kissan Service Centre"}, {"t": "JALANDHAR", "p": "Khalsa Traders"}, {"t": "JALANDHAR", "p": "Kheti Suvidha Kender"}, {"t": "JALANDHAR", "p": "Kisan Seed Company"}, {"t": "JALANDHAR", "p": "Malerkotla Pestcides Store"}, {"t": "JALANDHAR", "p": "Minhas Pesticides & Seed Store"}, {"t": "JALANDHAR", "p": "Pandtan Di Hatti"}, {"t": "JALANDHAR", "p": "Punjab Seed Store"}, {"t": "JALANDHAR", "p": "Saini Brothers"}, {"t": "JALANDHAR", "p": "Timmy Trading Co."}, {"t": "MOGA", "p": "Aggarwal Khad Store"}, {"t": "MOGA", "p": "Batra Pestcides & Fertilizer"}, {"t": "MOGA", "p": "Bhushan & Sons"}, {"t": "MOGA", "p": "Brar Seed And Fertilizer"}, {"t": "MOGA", "p": "Gill Spray Store"}, {"t": "MOGA", "p": "Goyal Spray Company"}, {"t": "MOGA", "p": "Grover Pesticide"}, {"t": "MOGA", "p": "Hari Om Khad Agency"}, {"t": "MOGA", "p": "Hind Pesticides & Fertilizers"}, {"t": "MOGA", "p": "Kamal Kheti Store"}, {"t": "MOGA", "p": "Kissan Agro Centre"}, {"t": "MOGA", "p": "Mehta Kheti Store"}, {"t": "MOGA", "p": "Mittal Brothers"}, {"t": "MOGA", "p": "Modern Kheti Sewa Centre"}, {"t": "MOGA", "p": "Nand Lal Pesticides And Fertilizer"}, {"t": "MOGA", "p": "National Seed Depot"}, {"t": "MOGA", "p": "Pest Control Service"}, {"t": "PATIALA", "p": "Aarib Trading Co"}, {"t": "PATIALA", "p": "Guru Nanak Pesticides"}, {"t": "PATIALA", "p": "Khalsa Agro Centre"}, {"t": "PATIALA", "p": "Kisan Seed Store"}, {"t": "PATIALA", "p": "Kissan Kheti Centre"}, {"t": "PATIALA", "p": "N.D Khad Store"}, {"t": "PATIALA", "p": "New Zimidara Khad Store"}, {"t": "PATIALA", "p": "Punjab Agro Centre"}, {"t": "PATIALA", "p": "Punjab Kheti Bari Advise Point"}, {"t": "PATIALA", "p": "Singla Khetti Sewa Center"}, {"t": "PATIALA", "p": "Zimidara Khad Store"}, {"t": "PATIALA", "p": "Yameen Seed & Pesticide Store"}, {"t": "SANGRUR", "p": "Aulakh Kheti Sewa Centre"}, {"t": "SANGRUR", "p": "Budh Ram & Sons"}, {"t": "SANGRUR", "p": "Dhan Dhan Baba Nand Singh Pesticied"}, {"t": "SANGRUR", "p": "Garg Fertilizers"}, {"t": "SANGRUR", "p": "India Seed Supply Co"}, {"t": "SANGRUR", "p": "Jagdambey Pesticides"}, {"t": "SANGRUR", "p": "Jagdish Oil Company"}, {"t": "SANGRUR", "p": "Malwa Beej Store"}, {"t": "SANGRUR", "p": "Mukesh Kumar Bansal & Co."}, {"t": "SANGRUR", "p": "Navbharat Agro Agencies"}, {"t": "SANGRUR", "p": "New Kissan Pesticides"}, {"t": "SANGRUR", "p": "New Kissan Sewa Centre"}, {"t": "SANGRUR", "p": "Om Parkash Ramesh Kumar"}, {"t": "SANGRUR", "p": "Rishu Trading Company"}, {"t": "SANGRUR", "p": "Sarao Pesticides"}];
-
-  let rawBilled = [];
-  let rawLogs = [];
-  let unifiedRecords = [];
-
-  function normalizeKey(s) {
-      return String(s || "")
-        .trim()
-        .toLowerCase()
-        .replace(/\band\b/g, "&")
-        .replace(/\s*&\s*/g, " & ")
-        .replace(/\s+/g, " ");
-    }
-
-  function formatDigit(num) {
-      const n = Number(num) || 0;
-      return n.toLocaleString(undefined, {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2
-      });
-    }
-
-  function buildUnifiedRecords() {
-    const unifiedMap = {};
-
-    // 1. Invoiced Billing Data from Google Sheet SAP export
-    rawBilled.forEach(item => {
-      const pKey = normalizeKey(item.party);
-      const prKey = normalizeKey(item.product);
-      const key = pKey + "___" + prKey;
-
-      unifiedMap[key] = {
-        territory: item.territory || "Unassigned",
-        party: item.party,
-        product: item.product,
-        partyKey: pKey,
-        prodKey: prKey,
-        billing: Number(item.billedQty) || 0,
-        opening: 0
-      };
-    });
-
-    // 2. Merge Opening Inventory from 01 April
-    OPENING_DATA.forEach(op => {
-      const pKey = normalizeKey(op.p);
-      const prKey = normalizeKey(op.pr);
-      const key = pKey + "___" + prKey;
-
-      if (unifiedMap[key]) {
-        unifiedMap[key].opening = Number(op.o) || 0;
-        if (!unifiedMap[key].territory || unifiedMap[key].territory === "General") {
-          unifiedMap[key].territory = op.t;
-        }
-      } else {
-        unifiedMap[key] = {
-          territory: op.t || "Unassigned",
-          party: op.p,
-          product: op.pr,
-          partyKey: pKey,
-          prodKey: prKey,
-          billing: 0,
-          opening: Number(op.o) || 0
-        };
-      }
-    });
-
-    return Object.values(unifiedMap);
-  }
-
-  window.onload = async () => {
-    try {
-      const res = await fetch(SCRIPT_URL);
-      const data = await res.json();
-      
-      rawBilled = data.billed || [];
-      rawLogs = data.stockLogs || [];
-
-      unifiedRecords = buildUnifiedRecords();
-
-      populateTerritories();
-      populateParties();
-      renderDashboard();
-    } catch(e) {
-      document.getElementById('detailedTableBody').innerHTML = 
-        `<tr><td colspan="6" style="text-align:center; color:#ef4444; padding:20px;">Failed to load data. Please refresh.</td></tr>`;
-    }
-  };
-
-  function populateTerritories() {
-    const territories = [...new Set([
-      ...unifiedRecords.map(b => (b.territory || "Unassigned").trim()),
-      ...MASTER_PARTIES.map(mp => (mp.t || "Unassigned").trim())
-    ])].filter(Boolean).sort();
-
-    const sel = document.getElementById("territoryFilter");
-    sel.innerHTML = '<option value="ALL">All Territories</option>';
-    territories.forEach(t => {
-      const opt = document.createElement("option");
-      opt.value = t;
-      opt.innerText = t;
-      sel.appendChild(opt);
-    });
-  }
-
-  function onTerritoryChange() {
-    populateParties();
-    renderDashboard();
-  }
-
-  function populateParties() {
-    const selectedTerritory = document.getElementById("territoryFilter").value;
-    const partyMap = {};
-
-    unifiedRecords.forEach(r => {
-      if (selectedTerritory === "ALL" || (r.territory || "Unassigned").trim() === selectedTerritory) {
-        partyMap[normalizeKey(r.party)] = r.party;
-      }
-    });
-
-    MASTER_PARTIES.forEach(mp => {
-      if (selectedTerritory === "ALL" || (mp.t || "Unassigned").trim() === selectedTerritory) {
-        const k = normalizeKey(mp.p);
-        if (!partyMap[k]) {
-          partyMap[k] = mp.p;
-        }
-      }
-    });
-
-    const parties = Object.values(partyMap).sort((a, b) => a.localeCompare(b));
-    const sel = document.getElementById("partyFilter");
-    sel.innerHTML = '<option value="ALL">All Parties</option>';
-    parties.forEach(p => {
-      const opt = document.createElement("option");
-      opt.value = p;
-      opt.innerText = p;
-      sel.appendChild(opt);
-    });
-  }
-
-  function getCalculatedData() {
-    const selectedTerritory = document.getElementById('territoryFilter').value;
-    const selectedParty = document.getElementById('partyFilter').value;
-    const search = document.getElementById('searchBox').value.toLowerCase().trim();
-
-    return unifiedRecords
-      .filter(item => (selectedTerritory === "ALL" || (item.territory || "Unassigned").trim() === selectedTerritory))
-      .filter(item => (selectedParty === "ALL" || normalizeKey(item.party) === normalizeKey(selectedParty)))
-      .filter(item => (!search || item.product.toLowerCase().includes(search)))
-      .map(item => {
-        const matchLogs = rawLogs.filter(l => normalizeKey(l.party) === item.partyKey && normalizeKey(l.product) === item.prodKey);
-        const hasAudit = matchLogs.length > 0;
-        
-        // Total Available = Invoiced Billing + Opening Inventory
-        const totalAvailable = (item.billing || 0) + (item.opening || 0);
-
-        // If no past physical audit, Quantity Left defaults to Total Available
-        const remaining = hasAudit ? matchLogs[matchLogs.length - 1].quantityLeft : totalAvailable;
-        const sold = Math.max(0, totalAvailable - remaining);
-        
-        return {
-          territory: item.territory || "-",
-          party: item.party,
-          product: item.product,
-          billing: item.billing,
-          opening: item.opening,
-          totalAvailable: totalAvailable,
-          remaining: remaining,
-          sold: sold,
-          hasAudit: hasAudit
-        };
-      });
-  }
-
-  function renderDashboard() {
-    const rows = getCalculatedData();
-    const productSummaryBody = document.getElementById('productSummaryBody');
-    const detailedBody = document.getElementById('detailedTableBody');
-
-    productSummaryBody.innerHTML = "";
-    detailedBody.innerHTML = "";
-
-    let totalBillingSum = 0;
-    let totalOpeningSum = 0;
-    let totalAvailableSum = 0;
-    let totalRS = 0;
-    let totalSS = 0;
-
-    const productSummary = {};
-    rows.forEach(r => {
-      totalBillingSum += r.billing;
-      totalOpeningSum += r.opening;
-      totalAvailableSum += r.totalAvailable;
-      totalRS += r.remaining;
-      totalSS += r.sold;
-
-      const pKey = normalizeKey(r.product);
-      if (!productSummary[pKey]) {
-        productSummary[pKey] = {
-          displayName: r.product,
-          billing: 0,
-          opening: 0,
-          totalAvailable: 0,
-          sold: 0,
-          remaining: 0
-        };
-      }
-      productSummary[pKey].billing += r.billing;
-      productSummary[pKey].opening += r.opening;
-      productSummary[pKey].totalAvailable += r.totalAvailable;
-      productSummary[pKey].sold += r.sold;
-      productSummary[pKey].remaining += r.remaining;
-    });
-
-    // Render First Table: Product Summary with Sale+Opening in digits
-    const prodKeys = Object.keys(productSummary).sort((a, b) => productSummary[a].displayName.localeCompare(productSummary[b].displayName));
-    if (!prodKeys.length) {
-      productSummaryBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:15px; color:#94a3b8;">No products found.</td></tr>`;
-    } else {
-      prodKeys.forEach(k => {
-        const item = productSummary[k];
-        const billedStr = `${formatDigit(item.billing)}+${formatDigit(item.opening)}`;
-
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${item.displayName}</td>
-          <td><span class="badge-pill pill-blue">${billedStr}</span></td>
-          <td><span class="badge-pill pill-green">${formatDigit(item.sold)}</span></td>
-          <td><span class="badge-pill pill-red">${formatDigit(item.remaining)}</span></td>
-        `;
-        productSummaryBody.appendChild(tr);
-      });
-    }
-
-    // Render Second Table: Detailed Rows
-    if (!rows.length) {
-      detailedBody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:18px; color:#94a3b8;">No records match your filters.</td></tr>`;
-    } else {
-      // Group all products under one party
-      const partyGroups = {};
-
-      rows.forEach(r => {
-        const partyKey = normalizeKey(r.party);
-
-        if (!partyGroups[partyKey]) {
-          partyGroups[partyKey] = {
-            party: r.party,
-            territory: r.territory,
-            rows: []
-          };
-        }
-
-        partyGroups[partyKey].rows.push(r);
-      });
-
-      Object.values(partyGroups).forEach(group => {
-        group.rows.forEach((r, index) => {
-          const billedStr = `${formatDigit(r.billing)}+${formatDigit(r.opening)}`;
-          const soldStr = formatDigit(r.sold);
-          const remainingStr = formatDigit(r.remaining);
-          const tr = document.createElement('tr');
-
-          const territoryCell = index === 0
-            ? group.territory
-            : `<span style="visibility:hidden;">${group.territory}</span>`;
-
-          const partyCell = index === 0
-            ? `<strong>${group.party}</strong>`
-            : `<span style="visibility:hidden;">${group.party}</span>`;
-
-          tr.innerHTML = `
-            <!-- Compact Desktop View -->
-            <td class="desktop-only grouped-territory">${territoryCell}</td>
-            <td class="desktop-only grouped-party">${partyCell}</td>
-            <td class="desktop-only movement-cell">
-              <div class="movement-row">
-                <span class="movement-product">${r.product}</span>
-                <span class="movement-number">${billedStr}</span>
-                <span class="movement-number">${soldStr}</span>
-                <span class="movement-number">${remainingStr}</span>
-              </div>
-            </td>
-
-            <!-- Mobile Compact View -->
-            <div class="mobile-card-content" style="display:none;">
-              ${index === 0 ? `
-                <div class="m-territory">
-                  <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Round%20pushpin/3D/round_pushpin_3d.png" style="width:14px; height:14px;" alt="Pin">
-                  ${group.territory}
-                </div>
-                <div class="m-party">${group.party}</div>
-                <div class="mobile-movement-header">
-                  <span>PRODUCT</span>
-                  <span>STOCK</span>
-                  <span>LIQ.</span>
-                  <span>INVENTORY</span>
-                </div>
-              ` : ''}
-              <div class="mobile-movement-row">
-                <span class="mobile-product">${r.product}</span>
-                <strong>${billedStr}</strong>
-                <strong>${soldStr}</strong>
-                <strong>${remainingStr}</strong>
-              </div>
+<!-- ================= DIGITAL CATALOGUE PAGE ================= -->
+<div id="cataloguePage">
+    <div class="cat-navbar">
+        <div class="cat-navbar-brand">
+            <i class="cat-back-arrow fa-solid fa-arrow-left" onclick="goHome()"></i>
+            <div class="cat-navbar-logo"><i class="fa-solid fa-leaf" style="color:#fff;"></i></div>
+            <div>
+                <div class="cat-navbar-title">Digital Catalogue</div>
+                <div class="cat-navbar-sub">Punjab Team</div>
             </div>
-          `;
+        </div>
+        <div class="cat-navbar-badge">LIVE</div>
+    </div>
 
-          detailedBody.appendChild(tr);
-        });
-      });
+    <div class="cat-hero">
+        <h1>Product <span>Catalogue</span></h1>
+        <p>Search and filter products by crop, category or name</p>
+    </div>
+
+    <div class="cat-search-bar">
+        <div class="cat-search-inner">
+            <i class="cat-search-icon fa-solid fa-magnifying-glass"></i>
+            <input id="catSearchInput" oninput="filterCards()" placeholder="Search products or crops..." type="text"/>
+        </div>
+    </div>
+
+    <div class="cat-filter-bar">
+        <div class="cat-filter-scroll">
+            <div class="cat-pill pill-all active" onclick="setFilter('all', this)">All</div>
+            <div class="cat-pill pill-insect" onclick="setFilter('insecticide', this)">Insecticide</div>
+            <div class="cat-pill pill-fungus" onclick="setFilter('fungicide', this)">Fungicide</div>
+            <div class="cat-pill pill-herb" onclick="setFilter('herbicide', this)">Herbicide</div>
+            <div class="cat-pill pill-other" onclick="setFilter('other', this)">Other</div>
+        </div>
+        <div class="cat-live-stats">
+            <div class="cat-live-stat"><span id="stat-products">0</span> Products</div>
+            <div class="cat-live-stat-sep">&#183;</div>
+            <div class="cat-live-stat"><span id="stat-categories">0</span> Categories</div>
+            <div class="cat-live-stat-sep">&#183;</div>
+            <div class="cat-live-stat"><span id="stat-crops">0</span> Crop entries</div>
+        </div>
+    </div>
+
+    <div class="cat-main">
+
+        <div class="cat-section-divider" data-section="insecticide">
+            <div class="cat-section-icon cat-section-icon-insect"><i class="fa-solid fa-bug" style="color:#dc2626;"></i></div>
+            <div class="cat-section-title cat-section-title-insect">Insecticides</div>
+            <div class="cat-section-line"></div>
+            <div class="cat-section-count" id="count-insecticide"></div>
+        </div>
+
+        <div class="cat-product-card" data-category="insecticide">
+            <div class="cat-card-accent accent-insect"></div>
+            <div class="cat-card-header">
+                <div class="cat-card-header-left">
+                    <div class="cat-product-name">ASTOR</div>
+                    <span class="cat-tag tag-insecticide">Insecticide</span>
+                </div>
+                <div class="cat-card-header-right">
+                    <div class="cat-technical-label">Technical Name</div>
+                    <div class="cat-technical-name">Example technical composition goes here</div>
+                </div>
+            </div>
+            <div class="cat-card-body">
+                <table class="cat-sub-table">
+                    <thead><tr><th>Crop</th><th>Target Pest</th><th>Dose</th></tr></thead>
+                    <tbody>
+                        <tr><td>Cotton</td><td>Whitefly</td><td>100 ml/acre</td></tr>
+                        <tr><td>Rice</td><td>Stem Borer</td><td>120 ml/acre</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="cat-no-results" id="catNoResults">
+            <div class="cat-no-results-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+            <h3>No products found</h3>
+            <p>Try a different search term or category</p>
+        </div>
+    </div>
+
+    <div class="cat-footer">Created &amp; Developed by <strong>Yuvinder Kumar</strong></div>
+</div>
+
+
+<script>
+    // NAVIGATION LOGIC
+    function goHome(){
+        document.getElementById("tourPage").style.display = "none";
+        document.getElementById("cataloguePage").style.display = "none";
+        document.getElementById("homePage").style.display = "block";
+        window.scrollTo(0,0);
     }
 
-    // Update 3 KPI Tiles
-    document.getElementById('kpiBilled').innerText = `${formatDigit(totalBillingSum)}+${formatDigit(totalOpeningSum)}`;
-    document.getElementById('kpiBilledSub').innerText = `Total available stock: ${formatDigit(totalAvailableSum)}`;
-    document.getElementById('kpiSold').innerText = formatDigit(totalSS);
-    document.getElementById('kpiRemaining').innerText = formatDigit(totalRS);
-  }
+    function openTourPage(){
+        document.getElementById("homePage").style.display = "none";
+        document.getElementById("cataloguePage").style.display = "none";
+        document.getElementById("tourPage").style.display = "block";
+        window.scrollTo(0,0);
+    }
+
+    function openCataloguePage(){
+        document.getElementById("homePage").style.display = "none";
+        document.getElementById("tourPage").style.display = "none";
+        document.getElementById("cataloguePage").style.display = "block";
+        window.scrollTo(0,0);
+        filterCards();
+    }
+
+
+    // TOUR CALCULATOR LOGIC
+    const products = [
+        ["ASTOR", 9.5], ["ATMOS", 5.5], ["CYANAT", 2.5], ["GLANZ", 2],
+        ["NATDUO", 0.06], ["NATERRA", 0.02], ["NATGEN", 6], ["NATGEN PRO", 3.5],
+        ["NATLIGO", 1], ["SLAYDEN", 1.5], ["DEXARON", 0.5], ["PAMUK", 3],
+        ["DI-FORCE", 1], ["SPIROVANTA", 1], ["VECTRA", 1]
+    ];
+
+    let tourHtml = "";
+    products.forEach((p, i) => {
+        tourHtml += `
+        <tr>
+            <td class="brand">${p[0]}</td>
+            <td class="points">${p[1]}</td>
+            <td><input type="number" id="q${i}" placeholder="0" oninput="calc()"></td>
+            <td id="t${i}">0.00</td>
+        </tr>
+        `;
+    });
+    document.getElementById("tour-tbl").innerHTML = tourHtml;
+
+    function calc(){
+        let grand = 0;
+        products.forEach((p, i) => {
+            let inputEl = document.getElementById("q"+i);
+            let qty = inputEl ? (parseFloat(inputEl.value) || 0) : 0;
+            let total = qty * p[1];
+            let totalEl = document.getElementById("t"+i);
+            if (totalEl) { totalEl.innerText = total.toFixed(2); }
+            grand += total;
+        });
+        document.getElementById("tour-grand").innerText = grand.toFixed(2);
+    }
+
+    // DIGITAL CATALOGUE LOGIC
+    let activeCategory = 'all';
+
+    function setFilter(cat, el) {
+        activeCategory = cat;
+        document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+        el.classList.add('active');
+        filterCards();
+    }
+
+    function filterCards() {
+        const searchInput = document.getElementById('catSearchInput');
+        if (!searchInput) return;
+
+        const filter = searchInput.value.toLowerCase().trim();
+        const cards = document.querySelectorAll('.cat-product-card');
+        const counts = { insecticide: 0, fungicide: 0, herbicide: 0, other: 0 };
+        let totalVisible = 0;
+        let totalCrops = 0;
+
+        cards.forEach(card => {
+            const cat = card.dataset.category;
+            const catMatch = activeCategory === 'all' || cat === activeCategory;
+
+            if (!catMatch) {
+                card.style.display = 'none';
+                card.querySelectorAll('.cat-sub-table tr').forEach(r => r.style.display = '');
+                return;
+            }
+
+            if (!filter) {
+                card.style.display = '';
+                card.querySelectorAll('.cat-sub-table tr').forEach(r => r.style.display = '');
+                counts[cat]++;
+                totalVisible++;
+                totalCrops += card.querySelectorAll('.cat-sub-table tr:not(:first-child)').length;
+                return;
+            }
+
+            const headerText = card.querySelector('.cat-card-header').innerText.toLowerCase();
+            const headerMatch = headerText.includes(filter);
+
+            const dataRows = card.querySelectorAll('.cat-sub-table tr:not(:first-child)');
+            let rowVisible = 0;
+            dataRows.forEach(row => {
+                const match = row.innerText.toLowerCase().includes(filter);
+                row.style.display = match ? '' : 'none';
+                if (match) rowVisible++;
+            });
+
+            if (headerMatch) {
+                dataRows.forEach(r => r.style.display = '');
+                card.style.display = '';
+                counts[cat]++;
+                totalVisible++;
+                totalCrops += dataRows.length;
+            } else if (rowVisible > 0) {
+                card.style.display = '';
+                counts[cat]++;
+                totalVisible++;
+                totalCrops += rowVisible;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        const activeCats = Object.values(counts).filter(v => v > 0).length;
+        document.getElementById('stat-products').textContent = totalVisible;
+        document.getElementById('stat-categories').textContent = activeCats;
+        document.getElementById('stat-crops').textContent = totalCrops;
+
+        document.querySelectorAll('.cat-section-divider').forEach(div => {
+            const sec = div.dataset.section;
+            const visible = counts[sec] > 0;
+            div.style.display = visible ? '' : 'none';
+            const countEl = document.getElementById('count-' + sec);
+            if (countEl) countEl.textContent = visible ? counts[sec] + ' product' + (counts[sec] !== 1 ? 's' : '') : '';
+        });
+
+        document.getElementById('catNoResults').style.display = totalVisible === 0 ? 'block' : 'none';
+    }
+
 </script>
-
-<style>
-  @media (max-width: 767px) {
-    .desktop-only { display: none !important; }
-    .mobile-card-content { display: block !important; }
-  }
-</style>
-
 </body>
 </html>
