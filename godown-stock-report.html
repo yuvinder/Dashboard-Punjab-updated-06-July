@@ -450,7 +450,7 @@
         <label for="brandFilter"><i class="fa-solid fa-box-archive"></i> Filter by Product Name</label>
         <div class="select-wrapper">
           <i class="fa-solid fa-magnifying-glass"></i>
-          <select id="brandFilter" onchange="render()">
+          <select id="brandFilter">
             <option value="ALL">All Products</option>
           </select>
         </div>
@@ -460,7 +460,7 @@
         <label for="nexFilter"><i class="fa-regular fa-clock"></i> Filter by Days to Expire (NEX)</label>
         <div class="select-wrapper">
           <i class="fa-solid fa-hourglass-half"></i>
-          <select id="nexFilter" onchange="render()">
+          <select id="nexFilter">
             <option value="ALL">All Durations</option>
             <option value="Expired">Expired (≤ 0 days)</option>
             <option value="0–60 days">0–60 days</option>
@@ -505,8 +505,8 @@
       </div>
     </div>
 
-    <!-- In Transit Stock Card (Hidden by default) -->
-    <div class="card" id="transitCard" style="display: none !important;">
+    <!-- In Transit Stock Card -->
+    <div class="card" id="transitCard" style="display: none;">
       <div class="card-header transit-header">
         <div class="header-left">
           <i class="fa-solid fa-truck-fast"></i>
@@ -537,12 +537,11 @@
     const SHEET_ID = "15IIuOlziFvGqPGb75GhIfpKdoq7GaeYyqcGDIvmnYY4";
     let rawData = [];
 
-    // Robust base product extractor (matches NATGEN even if written as 'NATGEN PRO 100ML' or 'NATGEN-1L')
     function extractBaseProductName(description) {
       if (!description || typeof description !== "string") return "";
-      const cleaned = description.trim().replace(/^[^a-zA-Z0-9]+/, '');
-      const tokens = cleaned.split(/[\s\-_/]+/);
-      return tokens[0] ? tokens[0].toUpperCase() : "";
+      const cleaned = description.trim();
+      const tokens = cleaned.split(/\s+/);
+      return tokens[0].toUpperCase();
     }
 
     function handleData(response) {
@@ -593,14 +592,13 @@
       document.getElementById("stockTableBody").innerHTML = errHtml;
       document.getElementById("stockMobileCards").innerHTML = errMobile;
       document.getElementById("stockCount").innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> Error`;
-      document.getElementById("transitCard").style.setProperty("display", "none", "important");
+      document.getElementById("transitCard").style.display = "none";
     }
 
     function findValueByHeader(item, keyword) {
-      const target = keyword.toLowerCase().replace(/[^a-z0-9]/g, "");
+      const target = keyword.toLowerCase().replace(/\s+/g, "");
       for (const key of Object.keys(item)) {
-        const cleanKey = key.toLowerCase().replace(/[^a-z0-9]/g, "");
-        if (cleanKey === target || cleanKey.includes(target)) {
+        if (key.toLowerCase().replace(/\s+/g, "") === target || key.toLowerCase().replace(/\s+/g, "").includes(target)) {
           return item[key];
         }
       }
@@ -683,7 +681,6 @@
         }
       });
 
-      brandSelect.innerHTML = '<option value="ALL">All Products</option>';
       Array.from(baseBrands).sort().forEach(brand => {
         const opt = document.createElement("option");
         opt.value = brand;
@@ -693,11 +690,8 @@
     }
 
     function render() {
-      const brandFilterEl = document.getElementById("brandFilter");
-      const nexFilterEl = document.getElementById("nexFilter");
-
-      const selectedBrand = brandFilterEl ? brandFilterEl.value.trim().toUpperCase() : "ALL";
-      const selectedNEX = nexFilterEl ? nexFilterEl.value : "ALL";
+      const selectedBrand = document.getElementById("brandFilter").value;
+      const selectedNEX = document.getElementById("nexFilter").value;
 
       const stockTbody = document.getElementById("stockTableBody");
       const stockMobileCards = document.getElementById("stockMobileCards");
@@ -711,6 +705,8 @@
       transitMobileCards.innerHTML = "";
 
       let stockCount = 0;
+      let transitCount = 0;
+      let totalTransitCasesForBrand = 0;
       const transitMap = new Map();
 
       rawData.forEach(item => {
@@ -734,7 +730,6 @@
         const matchesBrand = (selectedBrand === "ALL" || brandName === selectedBrand);
         const matchesNEX = (selectedNEX === "ALL" || nexLabel === selectedNEX);
 
-        // Stock Position Rows
         if (matchesBrand && matchesNEX && cases > 0) {
           stockCount++;
           const badgeHTML = getExpiryBadgeHTML(rawDisplayExpiry, diffDays);
@@ -763,16 +758,14 @@
           stockMobileCards.appendChild(cardDiv);
         }
 
-        // Tally strictly matching In-Transit rows for the chosen brand
         if (matchesBrand && transit > 0) {
+          totalTransitCasesForBrand += transit;
           transitMap.set(prod, (transitMap.get(prod) || 0) + transit);
         }
       });
 
-      // Render In Transit Rows ONLY if matching items exist
-      let transitItemsCount = 0;
       transitMap.forEach((qty, prodName) => {
-        transitItemsCount++;
+        transitCount++;
 
         const tr = document.createElement("tr");
         tr.innerHTML = `
@@ -791,7 +784,7 @@
       });
 
       document.getElementById("stockCount").innerHTML = `<i class="fa-solid fa-layer-group"></i> ${stockCount} Batches`;
-      document.getElementById("transitCount").innerHTML = `<i class="fa-solid fa-truck"></i> ${transitItemsCount} Items`;
+      document.getElementById("transitCount").innerHTML = `<i class="fa-solid fa-truck"></i> ${transitCount} Items`;
 
       if (stockCount === 0) {
         const emptyMsg = `<div class="empty-state"><i class="fa-regular fa-folder-open"></i>No matching godown stock found</div>`;
@@ -799,19 +792,21 @@
         stockMobileCards.innerHTML = emptyMsg;
       }
 
-      // Strictly control In-Transit visibility: Hide completely if 0 matching items
-      if (transitItemsCount > 0) {
-        transitCard.style.setProperty("display", "block", "important");
+      // Hide In-Transit card if 0 items or total cases are 0 for the selected brand
+      if (transitCount > 0 && totalTransitCasesForBrand > 0) {
+        transitCard.style.display = "block";
       } else {
-        transitCard.style.setProperty("display", "none", "important");
+        transitCard.style.display = "none";
       }
     }
 
-    // JSONP script tag injection
     const script = document.createElement("script");
     script.src = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=responseHandler:handleData`;
     script.onerror = () => showError("Unable to connect to Google Sheets. Verify permissions are set to 'Anyone with the link can view'.");
     document.body.appendChild(script);
+
+    document.getElementById("brandFilter").addEventListener("change", render);
+    document.getElementById("nexFilter").addEventListener("change", render);
   </script>
 </body>
 </html>
