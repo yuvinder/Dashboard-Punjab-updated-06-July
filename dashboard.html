@@ -185,6 +185,159 @@
       height: 32px;
     }
 
+    /* Performance Charts Toolbar & Grid */
+    .perf-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 18px 0 10px;
+      padding: 10px 14px;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+    }
+    .perf-toolbar-title {
+      font-size: 0.88rem;
+      font-weight: 800;
+      color: #0f172a;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .perf-toggle-group {
+      display: inline-flex;
+      background: #f1f5f9;
+      padding: 3px;
+      border-radius: 10px;
+      border: 1px solid #cbd5e1;
+      gap: 4px;
+    }
+    .perf-toggle-btn {
+      border: none;
+      background: transparent;
+      padding: 6px 14px;
+      border-radius: 7px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      font-family: inherit;
+      color: #64748b;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    .perf-toggle-btn.active {
+      background: #ffffff;
+      color: #1d4ed8;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+      font-weight: 800;
+    }
+
+    .performers-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    @media (min-width: 900px) {
+      .performers-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    .perf-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+      padding: 16px;
+    }
+    .perf-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .perf-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .perf-badge-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .perf-badge-dot.top { background: #059669; }
+    .perf-badge-dot.bottom { background: #dc2626; }
+    .perf-title {
+      font-size: 0.88rem;
+      font-weight: 800;
+      color: #0f172a;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .perf-sub-note {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    /* Bar Item */
+    .chart-bar-item {
+      display: grid;
+      grid-template-columns: 24px minmax(110px, 1.4fr) minmax(90px, 1.6fr) 60px;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 0;
+      font-size: 0.78rem;
+    }
+    .chart-rank {
+      font-weight: 800;
+      color: #94a3b8;
+      font-size: 0.72rem;
+      text-align: center;
+    }
+    .chart-name {
+      font-weight: 800;
+      color: #1e293b;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .chart-track {
+      background: #f1f5f9;
+      border-radius: 999px;
+      height: 10px;
+      overflow: hidden;
+      width: 100%;
+      position: relative;
+    }
+    .chart-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.4s ease;
+    }
+    .chart-fill.top {
+      background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+    }
+    .chart-fill.bottom {
+      background: linear-gradient(90deg, #f87171 0%, #dc2626 100%);
+    }
+    .chart-val-box {
+      text-align: right;
+      font-weight: 800;
+      font-size: 0.78rem;
+    }
+    .chart-val-box.top { color: #059669; }
+    .chart-val-box.bottom { color: #dc2626; }
+
     /* Section Headings */
     .section-title {
       font-size: 0.88rem;
@@ -286,6 +439,7 @@
       .badge-pill { padding: 2px 4px; font-size: 0.68rem; min-width: 36px; }
       .th-desktop { display: none; }
       .th-mobile { display: inline; }
+      .chart-bar-item { grid-template-columns: 20px minmax(80px, 1.2fr) 1fr 50px; gap: 6px; }
     }
     @media (min-width: 541px) {
       .th-desktop { display: inline; }
@@ -521,6 +675,52 @@
     </div>
   </div>
 
+  <!-- Performance Toolbar: Performer Parties vs Products Toggle -->
+  <div class="perf-toolbar">
+    <div class="perf-toolbar-title">
+      <img class="section-icon-3d" src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Direct%20hit/3D/direct_hit_3d.png" alt="Target">
+      Liquidation Performance
+    </div>
+    
+    <div class="perf-toggle-group">
+      <button type="button" id="btnPerfParties" class="perf-toggle-btn" onclick="setPerformerMode('parties')">
+        1. Performer Parties
+      </button>
+      <button type="button" id="btnPerfProducts" class="perf-toggle-btn active" onclick="setPerformerMode('products')">
+        2. Performer Products
+      </button>
+    </div>
+  </div>
+
+  <!-- Best and Worst Performers Chart Grid -->
+  <div class="performers-grid">
+    <div class="perf-card">
+      <div class="perf-header">
+        <div class="perf-title-wrap">
+          <span class="perf-badge-dot top"></span>
+          <span class="perf-title" id="perfBestTitle">Top 10 Best Liquidating Products</span>
+        </div>
+        <span class="perf-sub-note">By % Liquidation</span>
+      </div>
+      <div id="topPerformersChart">
+        <div style="text-align:center; padding:15px; color:var(--text-muted); font-size:0.8rem;">Loading performers...</div>
+      </div>
+    </div>
+
+    <div class="perf-card">
+      <div class="perf-header">
+        <div class="perf-title-wrap">
+          <span class="perf-badge-dot bottom"></span>
+          <span class="perf-title" id="perfWorstTitle">Top 10 Slowest / Worst Products</span>
+        </div>
+        <span class="perf-sub-note">By % Liquidation</span>
+      </div>
+      <div id="worstPerformersChart">
+        <div style="text-align:center; padding:15px; color:var(--text-muted); font-size:0.8rem;">Loading performers...</div>
+      </div>
+    </div>
+  </div>
+
   <!-- FIRST TABLE: Product-Wise Summary -->
   <div class="section-title">
     <img class="section-icon-3d" src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Card%20file%20box/3D/card_file_box_3d.png" alt="Product Summary">
@@ -598,12 +798,26 @@
 
   // Opening Inventory Dataset
   const OPENING_DATA = [{"t": "AMRITSAR", "p": "Damodar Dass Jai Chand Aggarwal", "k": "DAMODAR DASS JAI CHAND AGGARWAL", "pr": "SLAYDEN", "o": 60.0}, {"t": "AMRITSAR", "p": "Damodar Dass Jai Chand Aggarwal", "k": "DAMODAR DASS JAI CHAND AGGARWAL", "pr": "XYMEN", "o": 3.0}, {"t": "AMRITSAR", "p": "Friends Agro Chemicals (India)", "k": "FRIENDS AGRO CHEMICALS (INDIA)", "pr": "GLANZ", "o": 5.0}, {"t": "AMRITSAR", "p": "Friends Agro Chemicals (India)", "k": "FRIENDS AGRO CHEMICALS (INDIA)", "pr": "NATCORE", "o": 7.0}, {"t": "AMRITSAR", "p": "Friends Agro Chemicals (India)", "k": "FRIENDS AGRO CHEMICALS (INDIA)", "pr": "NATGEN PRO", "o": 3.2}, {"t": "AMRITSAR", "p": "G.H. Kheti Store", "k": "G.H. KHETI STORE", "pr": "OMNINAT", "o": 5.0}, {"t": "AMRITSAR", "p": "Gill Kheti Store", "k": "GILL KHETI STORE", "pr": "GLANZ", "o": 10.0}, {"t": "AMRITSAR", "p": "National Agro Centre", "k": "NATIONAL AGRO CENTRE", "pr": "GLANZ", "o": 10.0}, {"t": "AMRITSAR", "p": "National Agro Centre", "k": "NATIONAL AGRO CENTRE", "pr": "NATGEN", "o": 4.0}, {"t": "AMRITSAR", "p": "National Agro Centre", "k": "NATIONAL AGRO CENTRE", "pr": "NATLIGO", "o": 7.0}, {"t": "AMRITSAR", "p": "National Agro Centre", "k": "NATIONAL AGRO CENTRE", "pr": "NATPEARL", "o": 50.0}, {"t": "AMRITSAR", "p": "National Agro Centre", "k": "NATIONAL AGRO CENTRE", "pr": "SLAYDEN", "o": 18.0}, {"t": "AMRITSAR", "p": "National Agro Centre", "k": "NATIONAL AGRO CENTRE", "pr": "TOPRASURE", "o": 1.2}, {"t": "AMRITSAR", "p": "New Kamboj Kheti Store", "k": "NEW KAMBOJ KHETI STORE", "pr": "GLANZ", "o": 2.0}, {"t": "AMRITSAR", "p": "New Kamboj Kheti Store", "k": "NEW KAMBOJ KHETI STORE", "pr": "NATCORE", "o": 20.0}, {"t": "AMRITSAR", "p": "New Kamboj Kheti Store", "k": "NEW KAMBOJ KHETI STORE", "pr": "NATDUO", "o": 440.0}, {"t": "AMRITSAR", "p": "New Kamboj Kheti Store", "k": "NEW KAMBOJ KHETI STORE", "pr": "NATERRA", "o": 904.0}, {"t": "AMRITSAR", "p": "New Kamboj Kheti Store", "k": "NEW KAMBOJ KHETI STORE", "pr": "NATGEN PRO", "o": 4.0}, {"t": "AMRITSAR", "p": "New Kamboj Kheti Store", "k": "NEW KAMBOJ KHETI STORE", "pr": "NATJEWEL", "o": 30.0}, {"t": "AMRITSAR", "p": "New Kamboj Kheti Store", "k": "NEW KAMBOJ KHETI STORE", "pr": "NATLIGO", "o": 7.0}, {"t": "AMRITSAR", "p": "New Kamboj Kheti Store", "k": "NEW KAMBOJ KHETI STORE", "pr": "SLAYDEN", "o": 18.0}, {"t": "AMRITSAR", "p": "New Kamboj Kheti Store", "k": "NEW KAMBOJ KHETI STORE", "pr": "TOPRASURE", "o": 2.4}, {"t": "AMRITSAR", "p": "Ram Rachhpal Dhawan And Sons", "k": "RAM RACHHPAL DHAWAN AND SONS", "pr": "NATJEWEL", "o": 5.0}, {"t": "AMRITSAR", "p": "Ram Rachhpal Dhawan And Sons", "k": "RAM RACHHPAL DHAWAN AND SONS", "pr": "SLAYDEN", "o": 6.0}, {"t": "AMRITSAR", "p": "Ram Rachhpal Dhawan And Sons", "k": "RAM RACHHPAL DHAWAN AND SONS", "pr": "TOPRASURE", "o": 1.2}, {"t": "AMRITSAR", "p": "S.K. Commission Agent", "k": "S.K. COMMISSION AGENT", "pr": "SLAYDEN", "o": 6.0}, {"t": "AMRITSAR", "p": "Vishnu Khad Store", "k": "VISHNU KHAD STORE", "pr": "NATDUO", "o": 200.0}, {"t": "AMRITSAR", "p": "Vishnu Khad Store", "k": "VISHNU KHAD STORE", "pr": "NATERRA", "o": 440.0}, {"t": "BATHINDA", "p": "Janta Kheti Centre", "k": "JANTA KHETI CENTRE", "pr": "NATCORE", "o": 40.0}, {"t": "BATHINDA", "p": "Janta Kheti Centre", "k": "JANTA KHETI CENTRE", "pr": "NATPEARL", "o": 20.0}, {"t": "BATHINDA", "p": "Lekh Raj Kukkar And Sons", "k": "LEKH RAJ KUKKAR AND SONS", "pr": "GLANZ", "o": 24.0}, {"t": "BATHINDA", "p": "New Shere Punjab Pesticides", "k": "NEW SHERE PUNJAB PESTICIDES", "pr": "GLANZ", "o": 20.0}, {"t": "BATHINDA", "p": "New Shere Punjab Pesticides", "k": "NEW SHERE PUNJAB PESTICIDES", "pr": "NATCORE", "o": 20.0}, {"t": "BATHINDA", "p": "New Shere Punjab Pesticides", "k": "NEW SHERE PUNJAB PESTICIDES", "pr": "NATGEN", "o": 12.0}, {"t": "BATHINDA", "p": "New Shere Punjab Pesticides", "k": "NEW SHERE PUNJAB PESTICIDES", "pr": "NATLIGO", "o": 30.0}, {"t": "BATHINDA", "p": "New Shere Punjab Pesticides", "k": "NEW SHERE PUNJAB PESTICIDES", "pr": "NATZOATE", "o": 15.0}, {"t": "BATHINDA", "p": "Raj Agro Chemicals", "k": "RAJ AGRO CHEMICALS", "pr": "NATCORE", "o": 90.0}, {"t": "BATHINDA", "p": "Rakesh Kumar And Co.", "k": "RAKESH KUMAR AND CO.", "pr": "GLANZ", "o": 40.0}, {"t": "BATHINDA", "p": "Rakesh Kumar And Co.", "k": "RAKESH KUMAR AND CO.", "pr": "NATERRA", "o": 450.0}, {"t": "BATHINDA", "p": "Rakesh Kumar And Co.", "k": "RAKESH KUMAR AND CO.", "pr": "NATJEWEL", "o": 60.0}, {"t": "BATHINDA", "p": "Rakesh Kumar And Co.", "k": "RAKESH KUMAR AND CO.", "pr": "NATZOATE", "o": 10.0}, {"t": "BATHINDA", "p": "Shakti Pesticides", "k": "SHAKTI PESTICIDES", "pr": "TOPRASURE", "o": 4.0}, {"t": "BATHINDA", "p": "Surinder Singh And Co", "k": "SURINDER SINGH AND CO", "pr": "GLANZ", "o": 20.0}, {"t": "BATHINDA", "p": "Surinder Singh And Co", "k": "SURINDER SINGH AND CO", "pr": "NATZOATE", "o": 10.0}, {"t": "BATHINDA", "p": "Sushil Trading Co", "k": "SUSHIL TRADING CO", "pr": "NATZOATE", "o": 20.0}, {"t": "BATHINDA", "p": "Zamidara Pesticide", "k": "ZAMIDARA PESTICIDE", "pr": "GLANZ", "o": 20.0}, {"t": "BATHINDA", "p": "Zimidara Agro Traders", "k": "ZIMIDARA AGRO TRADERS", "pr": "GLANZ", "o": 20.0}, {"t": "BATHINDA", "p": "Zimidara Agro Traders", "k": "ZIMIDARA AGRO TRADERS", "pr": "NATCORE", "o": 100.0}, {"t": "BATHINDA", "p": "Zimidara Agro Traders", "k": "ZIMIDARA AGRO TRADERS", "pr": "NATERRA", "o": 1700.0}, {"t": "BATHINDA", "p": "Zimidara Agro Traders", "k": "ZIMIDARA AGRO TRADERS", "pr": "NATJEWEL", "o": 70.0}, {"t": "BATHINDA", "p": "Zimidara Agro Traders", "k": "ZIMIDARA AGRO TRADERS", "pr": "NATZOATE", "o": 35.0}, {"t": "JALANDHAR", "p": "Goyal Traders", "k": "GOYAL TRADERS", "pr": "SLAYDEN", "o": 5.0}, {"t": "JALANDHAR", "p": "Hazara Agro Centre", "k": "HAZARA AGRO CENTRE", "pr": "NATZOATE", "o": 20.0}, {"t": "JALANDHAR", "p": "Hazara Agro Centre", "k": "HAZARA AGRO CENTRE", "pr": "TOPRASURE", "o": 1.4}, {"t": "JALANDHAR", "p": "Khalsa Traders", "k": "KHALSA TRADERS", "pr": "NATCORE", "o": 20.0}, {"t": "JALANDHAR", "p": "Khalsa Traders", "k": "KHALSA TRADERS", "pr": "NATZOATE", "o": 20.0}, {"t": "JALANDHAR", "p": "Khalsa Traders", "k": "KHALSA TRADERS", "pr": "TOPRASURE", "o": 10.0}, {"t": "JALANDHAR", "p": "Kheti Suvidha Kender", "k": "KHETI SUVIDHA KENDER", "pr": "GLANZ", "o": 2.0}, {"t": "JALANDHAR", "p": "Kisan Seed Company", "k": "KISAN SEED COMPANY", "pr": "NATGEN", "o": 6.0}, {"t": "JALANDHAR", "p": "Kisan Seed Company", "k": "KISAN SEED COMPANY", "pr": "SLAYDEN", "o": 8.0}, {"t": "JALANDHAR", "p": "Minhas Pesticides & Seed Store", "k": "MINHAS PESTICIDES & SEED STORE", "pr": "GLANZ", "o": 5.0}, {"t": "JALANDHAR", "p": "Pandtan Di Hatti", "k": "PANDTAN DI HATTI", "pr": "SLAYDEN", "o": 3.0}, {"t": "JALANDHAR", "p": "Punjab Seed Store", "k": "PUNJAB SEED STORE", "pr": "NATERRA", "o": 600.0}, {"t": "JALANDHAR", "p": "Saini Brothers", "k": "SAINI BROTHERS", "pr": "GLANZ", "o": 4.0}, {"t": "JALANDHAR", "p": "Saini Brothers", "k": "SAINI BROTHERS", "pr": "NATGEN", "o": 18.0}, {"t": "MOGA", "p": "Aggarwal Khad Store", "k": "AGGARWAL KHAD STORE", "pr": "GLANZ", "o": 4.0}, {"t": "MOGA", "p": "Batra Pestcides & Fertilizer", "k": "BATRA PESTCIDES & FERTILIZER", "pr": "ASTOR", "o": 0.5}, {"t": "MOGA", "p": "Batra Pestcides & Fertilizer", "k": "BATRA PESTCIDES & FERTILIZER", "pr": "NATCORE", "o": 35.0}, {"t": "MOGA", "p": "Batra Pestcides & Fertilizer", "k": "BATRA PESTCIDES & FERTILIZER", "pr": "NATPEARL", "o": 5.0}, {"t": "MOGA", "p": "Batra Pestcides & Fertilizer", "k": "BATRA PESTCIDES & FERTILIZER", "pr": "TOPRASURE", "o": 6.3}, {"t": "MOGA", "p": "Bhushan & Sons", "k": "BHUSHAN & SONS", "pr": "TOPRASURE", "o": 1.2}, {"t": "MOGA", "p": "Brar Seed And Fertilizer", "k": "BRAR SEED AND FERTILIZER", "pr": "ATMOS", "o": 20.0}, {"t": "MOGA", "p": "Gill Spray Store", "k": "GILL SPRAY STORE", "pr": "GLANZ", "o": 16.0}, {"t": "MOGA", "p": "Gill Spray Store", "k": "GILL SPRAY STORE", "pr": "NATCORE", "o": 40.0}, {"t": "MOGA", "p": "Gill Spray Store", "k": "GILL SPRAY STORE", "pr": "NATLAM", "o": 16.0}, {"t": "MOGA", "p": "Gill Spray Store", "k": "GILL SPRAY STORE", "pr": "NATPEARL", "o": 25.0}, {"t": "MOGA", "p": "Gill Spray Store", "k": "GILL SPRAY STORE", "pr": "NATZOATE", "o": 8.0}, {"t": "MOGA", "p": "Goyal Spray Company", "k": "GOYAL SPRAY COMPANY", "pr": "NATLIGO", "o": 20.0}, {"t": "MOGA", "p": "Grover Pesticide", "k": "GROVER PESTICIDE", "pr": "NATZOATE", "o": 18.0}, {"t": "MOGA", "p": "Hari Om Khad Agency", "k": "HARI OM KHAD AGENCY", "pr": "NATGEN PRO", "o": 0.68}, {"t": "MOGA", "p": "Hari Om Khad Agency", "k": "HARI OM KHAD AGENCY", "pr": "SLAYDEN", "o": 16.0}, {"t": "MOGA", "p": "Kamal Kheti Store", "k": "KAMAL KHETI STORE", "pr": "GLANZ", "o": 41.5}, {"t": "MOGA", "p": "Kamal Kheti Store", "k": "KAMAL KHETI STORE", "pr": "NATGEN PRO", "o": 3.4}, {"t": "MOGA", "p": "Kamal Kheti Store", "k": "KAMAL KHETI STORE", "pr": "TOPRASURE", "o": 0.51}, {"t": "MOGA", "p": "Kissan Agro Centre", "k": "KISSAN AGRO CENTRE", "pr": "GLANZ", "o": 5.0}, {"t": "MOGA", "p": "Kissan Agro Centre", "k": "KISSAN AGRO CENTRE", "pr": "NATGEN", "o": 12.0}, {"t": "MOGA", "p": "Kissan Agro Centre", "k": "KISSAN AGRO CENTRE", "pr": "NATGEN PRO", "o": 3.4}, {"t": "MOGA", "p": "Kissan Agro Centre", "k": "KISSAN AGRO CENTRE", "pr": "TOPRASURE", "o": 6.0}, {"t": "MOGA", "p": "Kissan Agro Centre", "k": "KISSAN AGRO CENTRE", "pr": "XYMEN", "o": 1.5}, {"t": "MOGA", "p": "Mittal Brothers", "k": "MITTAL BROTHERS", "pr": "GLANZ", "o": 3.0}, {"t": "MOGA", "p": "Mittal Brothers", "k": "MITTAL BROTHERS", "pr": "NATGEN PRO", "o": 0.85}, {"t": "MOGA", "p": "Mittal Brothers", "k": "MITTAL BROTHERS", "pr": "NATPEARL", "o": 6.0}, {"t": "MOGA", "p": "Modern Kheti Sewa Centre", "k": "MODERN KHETI SEWA CENTRE", "pr": "NATCORE", "o": 60.0}, {"t": "MOGA", "p": "Modern Kheti Sewa Centre", "k": "MODERN KHETI SEWA CENTRE", "pr": "NATJEWEL", "o": 17.0}, {"t": "MOGA", "p": "Modern Kheti Sewa Centre", "k": "MODERN KHETI SEWA CENTRE", "pr": "NATPEARL", "o": 50.0}, {"t": "MOGA", "p": "Modern Kheti Sewa Centre", "k": "MODERN KHETI SEWA CENTRE", "pr": "NATZOATE", "o": 32.0}, {"t": "MOGA", "p": "Nand Lal Pesticides And Fertilizer", "k": "NAND LAL PESTICIDES AND FERTILIZER", "pr": "NATGEN", "o": 9.0}, {"t": "MOGA", "p": "Nand Lal Pesticides And Fertilizer", "k": "NAND LAL PESTICIDES AND FERTILIZER", "pr": "NATPEARL", "o": 11.0}, {"t": "MOGA", "p": "Nand Lal Pesticides And Fertilizer", "k": "NAND LAL PESTICIDES AND FERTILIZER", "pr": "NATZOATE", "o": 12.0}, {"t": "MOGA", "p": "National Seed Depot", "k": "NATIONAL SEED DEPOT", "pr": "NATLIGO", "o": 14.0}, {"t": "MOGA", "p": "National Seed Depot", "k": "NATIONAL SEED DEPOT", "pr": "NATPEARL", "o": 6.0}, {"t": "MOGA", "p": "National Seed Depot", "k": "NATIONAL SEED DEPOT", "pr": "NATZOATE", "o": 30.0}, {"t": "MOGA", "p": "National Seed Depot", "k": "NATIONAL SEED DEPOT", "pr": "TOPRASURE", "o": 0.39}, {"t": "MOGA", "p": "Pest Control Service", "k": "PEST CONTROL SERVICE", "pr": "GLANZ", "o": 6.0}, {"t": "MOGA", "p": "Pest Control Service", "k": "PEST CONTROL SERVICE", "pr": "NATJEWEL", "o": 10.0}, {"t": "PATIALA", "p": "Guru Nanak Pesticides", "k": "GURU NANAK PESTICIDES", "pr": "NATGEN", "o": 2.0}, {"t": "PATIALA", "p": "Kisan Seed Store", "k": "KISAN SEED STORE", "pr": "NATERRA", "o": 240.0}, {"t": "PATIALA", "p": "Kisan Seed Store", "k": "KISAN SEED STORE", "pr": "OMNINAT", "o": 2.0}, {"t": "PATIALA", "p": "Kissan Kheti Centre", "k": "KISSAN KHETI CENTRE", "pr": "NATGEN PRO", "o": 13.6}, {"t": "PATIALA", "p": "Kissan Kheti Centre", "k": "KISSAN KHETI CENTRE", "pr": "NATJEWEL", "o": 10.0}, {"t": "PATIALA", "p": "Kissan Kheti Centre", "k": "KISSAN KHETI CENTRE", "pr": "NATLAM", "o": 30.0}, {"t": "PATIALA", "p": "Kissan Kheti Centre", "k": "KISSAN KHETI CENTRE", "pr": "NATLIGO", "o": 50.0}, {"t": "PATIALA", "p": "Kissan Kheti Centre", "k": "KISSAN KHETI CENTRE", "pr": "NATPEARL", "o": 5.0}, {"t": "PATIALA", "p": "New Zimidara Khad Store", "k": "NEW ZIMIDARA KHAD STORE", "pr": "GLANZ", "o": 4.0}, {"t": "PATIALA", "p": "Zimidara Khad Store", "k": "ZIMIDARA KHAD STORE", "pr": "GLANZ", "o": 15.0}, {"t": "PATIALA", "p": "Yameen Seed & Pesticide Store", "k": "YAMEEN SEED & PESTICIDE STORE", "pr": "ATMOS", "o": 10.0}, {"t": "PATIALA", "p": "Yameen Seed & Pesticide Store", "k": "YAMEEN SEED & PESTICIDE STORE", "pr": "CYANAT", "o": 6.0}, {"t": "PATIALA", "p": "Yameen Seed & Pesticide Store", "k": "YAMEEN SEED & PESTICIDE STORE", "pr": "GLANZ", "o": 8.0}, {"t": "PATIALA", "p": "Yameen Seed & Pesticide Store", "k": "YAMEEN SEED & PESTICIDE STORE", "pr": "HATRIK", "o": 10.0}, {"t": "PATIALA", "p": "Yameen Seed & Pesticide Store", "k": "YAMEEN SEED & PESTICIDE STORE", "pr": "TOPRASURE", "o": 0.6}, {"t": "SANGRUR", "p": "Budh Ram & Sons", "k": "BUDH RAM & SONS", "pr": "SLAYDEN", "o": 10.0}, {"t": "SANGRUR", "p": "Jagdambey Pesticides", "k": "JAGDAMBEY PESTICIDES", "pr": "NATERRA", "o": 552.0}, {"t": "SANGRUR", "p": "Jagdambey Pesticides", "k": "JAGDAMBEY PESTICIDES", "pr": "SLAYDEN", "o": 12.0}, {"t": "SANGRUR", "p": "Jagdambey Pesticides", "k": "JAGDAMBEY PESTICIDES", "pr": "XYMEN", "o": 1.0}, {"t": "SANGRUR", "p": "Malwa Beej Store", "k": "MALWA BEEJ STORE", "pr": "NATJEWEL", "o": 20.0}, {"t": "SANGRUR", "p": "Malwa Beej Store", "k": "MALWA BEEJ STORE", "pr": "NATLIGO", "o": 6.0}, {"t": "SANGRUR", "p": "Malwa Beej Store", "k": "MALWA BEEJ STORE", "pr": "NATPEARL", "o": 4.0}, {"t": "SANGRUR", "p": "Malwa Beej Store", "k": "MALWA BEEJ STORE", "pr": "OMNINAT", "o": 3.0}, {"t": "SANGRUR", "p": "Mukesh Kumar Bansal & Co.", "k": "MUKESH KUMAR BANSAL & CO.", "pr": "NATGEN", "o": 6.0}, {"t": "SANGRUR", "p": "Mukesh Kumar Bansal & Co.", "k": "MUKESH KUMAR BANSAL & CO.", "pr": "NATGEN PRO", "o": 1.0}, {"t": "SANGRUR", "p": "Mukesh Kumar Bansal & Co.", "k": "MUKESH KUMAR BANSAL & CO.", "pr": "OMNINAT", "o": 2.0}, {"t": "SANGRUR", "p": "Mukesh Kumar Bansal & Co.", "k": "MUKESH KUMAR BANSAL & CO.", "pr": "SLAYDEN", "o": 4.0}, {"t": "SANGRUR", "p": "Navbharat Agro Agencies", "k": "NAVBHARAT AGRO AGENCIES", "pr": "GLANZ", "o": 3.0}, {"t": "SANGRUR", "p": "Navbharat Agro Agencies", "k": "NAVBHARAT AGRO AGENCIES", "pr": "NATGEN", "o": 1.0}, {"t": "SANGRUR", "p": "Navbharat Agro Agencies", "k": "NAVBHARAT AGRO AGENCIES", "pr": "NATLIGO", "o": 6.0}, {"t": "SANGRUR", "p": "New Kissan Sewa Centre", "k": "NEW KISSAN SEWA CENTRE", "pr": "GLANZ", "o": 6.0}, {"t": "SANGRUR", "p": "New Kissan Sewa Centre", "k": "NEW KISSAN SEWA CENTRE", "pr": "NATPEARL", "o": 4.0}, {"t": "SANGRUR", "p": "Om Parkash Ramesh Kumar", "k": "OM PARKASH RAMESH KUMAR", "pr": "GLANZ", "o": 8.0}, {"t": "SANGRUR", "p": "Om Parkash Ramesh Kumar", "k": "OM PARKASH RAMESH KUMAR", "pr": "NATLIGO", "o": 85.0}, {"t": "SANGRUR", "p": "Om Parkash Ramesh Kumar", "k": "OM PARKASH RAMESH KUMAR", "pr": "NATPEARL", "o": 11.0}, {"t": "SANGRUR", "p": "Om Parkash Ramesh Kumar", "k": "OM PARKASH RAMESH KUMAR", "pr": "NATWEEZ", "o": 24.0}, {"t": "SANGRUR", "p": "Sarao Pesticides", "k": "SARAO PESTICIDES", "pr": "GLANZ", "o": 9.0}, {"t": "SANGRUR", "p": "Sarao Pesticides", "k": "SARAO PESTICIDES", "pr": "SLAYDEN", "o": 2.0}, {"t": "SANGRUR", "p": "Sarao Pesticides", "k": "SARAO PESTICIDES", "pr": "XYMEN", "o": 2.0}, {"t": "SANGRUR", "p": "Zimidara Pesticides", "k": "ZIMIDARA PESTICIDES", "pr": "GLANZ", "o": 18.0}, {"t": "SANGRUR", "p": "Zimidara Pesticides", "k": "ZIMIDARA PESTICIDES", "pr": "NATCORE", "o": 24.0}, {"t": "SANGRUR", "p": "Zimidara Pesticides", "k": "ZIMIDARA PESTICIDES", "pr": "NATGEN PRO", "o": 3.0}, {"t": "SANGRUR", "p": "Zimidara Pesticides", "k": "ZIMIDARA PESTICIDES", "pr": "NATPEARL", "o": 7.0}, {"t": "SANGRUR", "p": "Zimidara Pesticides", "k": "ZIMIDARA PESTICIDES", "pr": "XYMEN", "o": 0.5}];
-  
-  const MASTER_PARTIES = [{"t": "AMRITSAR", "p": "Damodar Dass Jai Chand Aggarwal"}, {"t": "AMRITSAR", "p": "Friends Agro Chemicals (India)"}, {"t": "AMRITSAR", "p": "G.H. Kheti Store"}, {"t": "AMRITSAR", "p": "Gill Kheti Store"}, {"t": "AMRITSAR", "p": "Kissan Pesticide And Seed Store"}, {"t": "AMRITSAR", "p": "Mahajan Traders"}, {"t": "AMRITSAR", "p": "National Agro Centre"}, {"t": "AMRITSAR", "p": "New Kamboj Kheti Store"}, {"t": "AMRITSAR", "p": "Rajesh Gupta Seed Farms"}, {"t": "AMRITSAR", "p": "Ram Rachhpal Dhawan And Sons"}, {"t": "AMRITSAR", "p": "S.K. Commission Agent"}, {"t": "AMRITSAR", "p": "Vishnu Khad Store"}, {"t": "BATHINDA", "p": "Babbu Trading Company"}, {"t": "BATHINDA", "p": "Bansal Pesticide Store"}, {"t": "BATHINDA", "p": "Darvesh Agro Chemicals"}, {"t": "BATHINDA", "p": "Giana Trading Co"}, {"t": "BATHINDA", "p": "Jai Shree Agro Chemicals"}, {"t": "BATHINDA", "p": "Janta Kheti Centre"}, {"t": "BATHINDA", "p": "Lekh Raj Kukkar And Sons"}, {"t": "BATHINDA", "p": "New Malwa Pesticides Store"}, {"t": "BATHINDA", "p": "New Shere Punjab Pesticides"}, {"t": "BATHINDA", "p": "Raj Agro Chemicals"}, {"t": "BATHINDA", "p": "Rakesh Kumar And Co."}, {"t": "BATHINDA", "p": "Ram Sarup Narotam Dass"}, {"t": "BATHINDA", "p": "Satguru Pesticides And Fertilizers"}, {"t": "BATHINDA", "p": "Shakti Pesticides"}, {"t": "BATHINDA", "p": "Surinder Singh And Co"}, {"t": "BATHINDA", "p": "Sushil Trading Co"}, {"t": "BATHINDA", "p": "Zamidara Pesticide"}, {"t": "BATHINDA", "p": "Zimidara Agro Traders"}, {"t": "SANGRUR", "p": "Zimidara Pesticides"}, {"t": "JALANDHAR", "p": "Goyal Traders"}, {"t": "JALANDHAR", "p": "Hazara Agro Centre"}, {"t": "JALANDHAR", "p": "Josan Kissan Service Centre"}, {"t": "JALANDHAR", "p": "Khalsa Traders"}, {"t": "JALANDHAR", "p": "Kheti Suvidha Kender"}, {"t": "JALANDHAR", "p": "Kisan Seed Company"}, {"t": "JALANDHAR", "p": "Malerkotla Pestcides Store"}, {"t": "JALANDHAR", "p": "Minhas Pesticides & Seed Store"}, {"t": "JALANDHAR", "p": "Pandtan Di Hatti"}, {"t": "JALANDHAR", "p": "Punjab Seed Store"}, {"t": "JALANDHAR", "p": "Saini Brothers"}, {"t": "JALANDHAR", "p": "Timmy Trading Co."}, {"t": "MOGA", "p": "Aggarwal Khad Store"}, {"t": "MOGA", "p": "Batra Pestcides & Fertilizer"}, {"t": "MOGA", "p": "Bhushan & Sons"}, {"t": "MOGA", "p": "Brar Seed And Fertilizer"}, {"t": "MOGA", "p": "Gill Spray Store"}, {"t": "MOGA", "p": "Goyal Spray Company"}, {"t": "MOGA", "p": "Grover Pesticide"}, {"t": "MOGA", "p": "Hari Om Khad Agency"}, {"t": "MOGA", "p": "Hind Pesticides & Fertilizers"}, {"t": "MOGA", "p": "Kamal Kheti Store"}, {"t": "MOGA", "p": "Kissan Agro Centre"}, {"t": "MOGA", "p": "Mehta Kheti Store"}, {"t": "MOGA", "p": "Mittal Brothers"}, {"t": "MOGA", "p": "Modern Kheti Sewa Centre"}, {"t": "MOGA", "p": "Nand Lal Pesticides And Fertilizer"}, {"t": "MOGA", "p": "National Seed Depot"}, {"t": "MOGA", "p": "Pest Control Service"}, {"t": "PATIALA", "p": "Aarib Trading Co"}, {"t": "PATIALA", "p": "Guru Nanak Pesticides"}, {"t": "PATIALA", "p": "Khalsa Agro Centre"}, {"t": "PATIALA", "p": "Kisan Seed Store"}, {"t": "PATIALA", "p": "Kissan Kheti Centre"}, {"t": "PATIALA", "p": "N.D Khad Store"}, {"t": "PATIALA", "p": "New Zimidara Khad Store"}, {"t": "PATIALA", "p": "Punjab Agro Centre"}, {"t": "PATIALA", "p": "Punjab Kheti Bari Advise Point"}, {"t": "PATIALA", "p": "Singla Khetti Sewa Center"}, {"t": "PATIALA", "p": "Zimidara Khad Store"}, {"t": "PATIALA", "p": "Yameen Seed & Pesticide Store"}, {"t": "SANGRUR", "p": "Aulakh Kheti Sewa Centre"}, {"t": "SANGRUR", "p": "Budh Ram & Sons"}, {"t": "SANGRUR", "p": "Dhan Dhan Baba Nand Singh Pesticied"}, {"t": "SANGRUR", "p": "Garg Fertilizers"}, {"t": "SANGRUR", "p": "India Seed Supply Co"}, {"t": "SANGRUR", "p": "Jagdambey Pesticides"}, {"t": "SANGRUR", "p": "Jagdish Oil Company"}, {"t": "SANGRUR", "p": "Malwa Beej Store"}, {"t": "SANGRUR", "p": "Mukesh Kumar Bansal & Co."}, {"t": "SANGRUR", "p": "Navbharat Agro Agencies"}, {"t": "SANGRUR", "p": "New Kissan Pesticides"}, {"t": "SANGRUR", "p": "New Kissan Sewa Centre"}, {"t": "SANGRUR", "p": "Om Parkash Ramesh Kumar"}, {"t": "SANGRUR", "p": "Rishu Trading Company"}, {"t": "SANGRUR", "p": "Sarao Pesticides"}];
 
   let rawBilled = [];
   let rawLogs = [];
   let unifiedRecords = [];
+  let currentPerformerMode = 'products'; // Default to products chart view
+
+  function setPerformerMode(mode) {
+    currentPerformerMode = mode;
+    document.getElementById('btnPerfParties').classList.toggle('active', mode === 'parties');
+    document.getElementById('btnPerfProducts').classList.toggle('active', mode === 'products');
+    
+    if (mode === 'parties') {
+      document.getElementById('perfBestTitle').innerText = "Top 10 Best Parties";
+      document.getElementById('perfWorstTitle').innerText = "Top 10 Slowest / Worst Parties";
+    } else {
+      document.getElementById('perfBestTitle').innerText = "Top 10 Best Liquidating Products";
+      document.getElementById('perfWorstTitle').innerText = "Top 10 Slowest / Worst Products";
+    }
+    renderDashboard();
+  }
 
   function normalizeKey(s) {
     return String(s || "")
@@ -713,10 +927,9 @@
   };
 
   function populateTerritories() {
-    const territories = [...new Set([
-      ...unifiedRecords.map(b => (b.territory || "Unassigned").trim()),
-      ...MASTER_PARTIES.map(mp => (mp.t || "Unassigned").trim())
-    ])].filter(Boolean).sort();
+    const territories = [...new Set(
+      unifiedRecords.map(b => (b.territory || "Unassigned").trim())
+    )].filter(Boolean).sort();
 
     const sel = document.getElementById("territoryFilter");
     sel.innerHTML = '<option value="ALL">All Territories</option>';
@@ -740,15 +953,6 @@
     unifiedRecords.forEach(r => {
       if (selectedTerritory === "ALL" || (r.territory || "Unassigned").trim() === selectedTerritory) {
         partyMap[normalizeKey(r.party)] = r.party;
-      }
-    });
-
-    MASTER_PARTIES.forEach(mp => {
-      if (selectedTerritory === "ALL" || (mp.t || "Unassigned").trim() === selectedTerritory) {
-        const k = normalizeKey(mp.p);
-        if (!partyMap[k]) {
-          partyMap[k] = mp.p;
-        }
       }
     });
 
@@ -803,6 +1007,59 @@
       });
   }
 
+  function renderPerformersCharts(itemsList) {
+    const topContainer = document.getElementById('topPerformersChart');
+    const worstContainer = document.getElementById('worstPerformersChart');
+
+    if (!itemsList || itemsList.length === 0) {
+      topContainer.innerHTML = `<div style="text-align:center; padding:15px; color:#94a3b8; font-size:0.8rem;">No data available</div>`;
+      worstContainer.innerHTML = `<div style="text-align:center; padding:15px; color:#94a3b8; font-size:0.8rem;">No data available</div>`;
+      return;
+    }
+
+    // Sort descending for Top 10 Best
+    const sortedDesc = [...itemsList].sort((a, b) => b.liqPercent - a.liqPercent || b.totalAvailable - a.totalAvailable);
+    const top10 = sortedDesc.slice(0, 10);
+
+    // Sort ascending for Top 10 Worst / Slowest
+    const sortedAsc = [...itemsList].sort((a, b) => a.liqPercent - b.liqPercent || b.totalAvailable - a.totalAvailable);
+    const worst10 = sortedAsc.slice(0, 10);
+
+    // Render Best Performers
+    let topHtml = '';
+    top10.forEach((item, idx) => {
+      const pctClamped = Math.min(100, Math.max(0, item.liqPercent));
+      topHtml += `
+        <div class="chart-bar-item">
+          <span class="chart-rank">#${idx + 1}</span>
+          <span class="chart-name" title="${item.displayName}">${item.displayName}</span>
+          <div class="chart-track">
+            <div class="chart-fill top" style="width: ${pctClamped}%"></div>
+          </div>
+          <span class="chart-val-box top">${item.liqPercent.toFixed(1)}%</span>
+        </div>
+      `;
+    });
+    topContainer.innerHTML = topHtml;
+
+    // Render Worst Performers
+    let worstHtml = '';
+    worst10.forEach((item, idx) => {
+      const pctClamped = Math.min(100, Math.max(0, item.liqPercent));
+      worstHtml += `
+        <div class="chart-bar-item">
+          <span class="chart-rank">#${idx + 1}</span>
+          <span class="chart-name" title="${item.displayName}">${item.displayName}</span>
+          <div class="chart-track">
+            <div class="chart-fill bottom" style="width: ${pctClamped}%"></div>
+          </div>
+          <span class="chart-val-box bottom">${item.liqPercent.toFixed(1)}%</span>
+        </div>
+      `;
+    });
+    worstContainer.innerHTML = worstHtml;
+  }
+
   function renderDashboard() {
     const rows = getCalculatedData();
     const productSummaryBody = document.getElementById('productSummaryBody');
@@ -822,6 +1079,8 @@
     let totalRemainingValSum = 0;
 
     const productSummary = {};
+    const partySummary = {};
+
     rows.forEach(r => {
       totalBillingSum += r.billing;
       totalOpeningSum += r.opening;
@@ -833,6 +1092,7 @@
       totalSoldValSum += r.soldValue;
       totalRemainingValSum += r.remainingValue;
 
+      // Product Aggregations
       const pKey = normalizeKey(r.product);
       if (!productSummary[pKey]) {
         productSummary[pKey] = {
@@ -841,7 +1101,9 @@
           opening: 0,
           totalAvailable: 0,
           sold: 0,
-          remaining: 0
+          remaining: 0,
+          billedVal: 0,
+          soldVal: 0
         };
       }
       productSummary[pKey].billing += r.billing;
@@ -849,7 +1111,55 @@
       productSummary[pKey].totalAvailable += r.totalAvailable;
       productSummary[pKey].sold += r.sold;
       productSummary[pKey].remaining += r.remaining;
+      productSummary[pKey].billedVal += r.billedValue;
+      productSummary[pKey].soldVal += r.soldValue;
+
+      // Party Aggregations
+      const partyKey = normalizeKey(r.party);
+      if (!partySummary[partyKey]) {
+        partySummary[partyKey] = {
+          displayName: r.party,
+          territory: r.territory,
+          billedVal: 0,
+          soldVal: 0,
+          leftVal: 0,
+          totalAvailable: 0
+        };
+      }
+      partySummary[partyKey].billedVal += r.billedValue;
+      partySummary[partyKey].soldVal += r.soldValue;
+      partySummary[partyKey].leftVal += r.remainingValue;
+      partySummary[partyKey].totalAvailable += r.totalAvailable;
     });
+
+    // Performer dataset selection: Products vs Parties
+    let performersDataset = [];
+    if (currentPerformerMode === 'products') {
+      performersDataset = Object.values(productSummary)
+        .filter(pr => pr.totalAvailable > 0)
+        .map(pr => {
+          const liqPercent = (pr.sold / pr.totalAvailable) * 100;
+          return {
+            displayName: pr.displayName,
+            liqPercent: liqPercent,
+            totalAvailable: pr.totalAvailable
+          };
+        });
+    } else {
+      performersDataset = Object.values(partySummary)
+        .filter(p => p.billedVal > 0)
+        .map(p => {
+          const liqPercent = (p.soldVal / p.billedVal) * 100;
+          return {
+            displayName: p.displayName,
+            liqPercent: liqPercent,
+            totalAvailable: p.billedVal
+          };
+        });
+    }
+
+    // Render Performer Bar Charts
+    renderPerformersCharts(performersDataset);
 
     // Render Product Summary Table
     const prodKeys = Object.keys(productSummary).sort((a, b) => productSummary[a].displayName.localeCompare(productSummary[b].displayName));
@@ -873,7 +1183,7 @@
       });
     }
 
-    // Render Detailed Party Cards with 4 Tiles Each
+    // Render Detailed Party Cards
     if (!rows.length) {
       partyCardsContainer.innerHTML = `<div style="text-align:center; padding:22px; color:#94a3b8; background:#fff; border-radius:14px; border:1px solid var(--border);">No records match your filters.</div>`;
     } else {
