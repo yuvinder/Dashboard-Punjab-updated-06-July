@@ -261,7 +261,7 @@ table($('#tMat'),$('#nMat'),group(rows,'p'),'mat','Material Description')}
 try{const src=JSON.parse($('#data').textContent);if(!src||!Array.isArray(src.rows)||!src.rows.length)throw new Error('No data rows found.');if(typeof Chart==='undefined')throw new Error('Chart library did not load — check internet connection.');
 state.rows=src.rows.map(r=>({m:r.m||'',t:r.t||'Unassigned',s:r.s||'Unknown',c:r.c||'Unknown',p:r.p||'Unknown',k:+r.k||0,n:+r.n||0,q:+r.q||0,i:r.i||''})).filter(r=>r.m);state.meta=src.meta||{};
 const ms_=uniq(state.rows.map(r=>r.m)).sort();$('#sub').textContent=`${mlab(ms_[0])} – ${mlab(ms_[ms_.length-1])} · ${num(state.rows.length)} invoice lines`;$('#upd').textContent='Updated '+(state.meta.generated||'');
-$('#foot').textContent=`Source: ${state.meta.source||''} · Taxable Amt = pre-GST, credit notes netted off · KG/LTRS as per invoice lines · 1 MT = 1,000 KG`;
+$('#foot').textContent=`Source: ${state.meta.source||''} · Developed and Created by Skymat Solutions`;
 $$('.ms').forEach(el=>{ms[el.dataset.k]=mkMS(el)});
 $('#loading').classList.add('hidden');$('#app').classList.remove('hidden');refreshOpts();chips();render();
 let rt;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>Object.values(charts).forEach(c=>c.resize()),150)});
