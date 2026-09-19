@@ -35,6 +35,16 @@ max-width:100%;
 overflow-x:hidden;
 }
 
+/* DARK DASHBOARD PAGE */
+#homePage{
+background:
+ radial-gradient(900px 500px at 15% -10%, rgba(56,108,255,.22), transparent 60%),
+ radial-gradient(700px 450px at 90% 10%, rgba(124,58,237,.18), transparent 60%),
+ radial-gradient(600px 400px at 50% 110%, rgba(16,185,129,.12), transparent 60%),
+ #0b1020;
+color:#e5e9f5;
+}
+
 #cataloguePage {
 display: none;
 background: #f1f5f9;
@@ -55,7 +65,7 @@ padding:0 8px;
 font-size:clamp(24px, 5.5vw, 42px);
 font-weight:800;
 letter-spacing:-1px;
-background:linear-gradient(90deg,#2563eb,#7c3aed,#ec4899);
+background:linear-gradient(90deg,#60a5fa,#a78bfa,#f472b6);
 -webkit-background-clip:text;
 -webkit-text-fill-color:transparent;
 line-height:1.2;
@@ -65,7 +75,7 @@ word-wrap:break-word;
 .header p{
 margin-top:12px;
 font-size:clamp(13px, 2.2vw, 18px);
-color:#64748b;
+color:#8b95b3;
 font-weight:500;
 }
 
@@ -93,7 +103,7 @@ width:100%;
 min-width:0;
 max-width:100%;
 text-decoration:none;
-color:#111827;
+color:#e5e9f5;
 transition:.35s ease;
 cursor:pointer;
 }
@@ -102,29 +112,30 @@ cursor:pointer;
 transform:translateY(-6px);
 }
 
+/* Floating 3D icons - no tile boundary, just soft shadow + glow */
 .icon{
-font-size:clamp(40px, 8vw, 78px);
+width:clamp(56px, 11vw, 104px);
+height:clamp(56px, 11vw, 104px);
+object-fit:contain;
+display:block;
 transition:.35s ease;
-filter:drop-shadow(0 14px 24px rgba(0,0,0,.14));
-line-height:1;
+filter:drop-shadow(0 18px 28px rgba(0,0,0,.55)) drop-shadow(0 0 18px rgba(99,140,255,.18));
+animation:float 5s ease-in-out infinite;
+}
+
+.app:nth-child(3n+2) .icon{animation-delay:-1.6s;}
+.app:nth-child(3n+3) .icon{animation-delay:-3.2s;}
+
+@keyframes float{
+0%,100%{transform:translateY(0);}
+50%{transform:translateY(-6px);}
 }
 
 .app:hover .icon{
+animation-play-state:paused;
 transform:translateY(-8px) scale(1.12);
+filter:drop-shadow(0 26px 34px rgba(0,0,0,.6)) drop-shadow(0 0 26px rgba(120,160,255,.38));
 }
-
-/* Original Icon Colors */
-.stock{color:#10b981;}
-.price{color:#2563eb;}
-.tour{color:#f59e0b;}
-.farmer{color:#65a30d;}
-.products{color:#db2777;}
-.news{color:#7c3aed;}
-.sales{color:#0891b2;}
-.accounts{color:#0f766e;}
-.outstanding{color:#dc2626;}
-.misc{color:#9333ea;}
-.catalogue{color:#4f46e5;}
 
 .app span{
 margin-top:16px;
@@ -142,13 +153,25 @@ hyphens:auto;
 margin-top:65px;
 text-align:center;
 font-size:13px;
-color:#64748b;
+color:#8b95b3;
 padding:0 12px;
 }
 
 .footer span{
 font-weight:700;
-color:#111827;
+color:#e5e9f5;
+}
+
+.footer a{
+color:#8b95b3;
+text-decoration:none;
+}
+
+.footer .credit{
+display:block;
+margin-top:6px;
+font-size:11px;
+color:#5d6784;
 }
 
 /* --- REUSABLE BACK BUTTON --- */
@@ -379,76 +402,77 @@ word-break:break-word;
     <div class="grid">
         <!-- Stock Report linked directly to godown-stock-report.html -->
         <a class="app" href="godown-stock-report.html" target="_blank">
-            <i class="fa-solid fa-warehouse icon stock"></i>
+            <img class="icon" src="https://img.icons8.com/3d-fluency/188/package.png" alt="" loading="lazy"/>
             <span>Godown Stock Report</span>
         </a>
 
         <a class="app" href="https://yuvinder.github.io/price-list-with-VD/" target="_blank">
-            <i class="fa-solid fa-indian-rupee-sign icon price"></i>
+            <img class="icon" src="https://img.icons8.com/3d-fluency/188/price-tag.png" alt="" loading="lazy"/>
             <span>Price List</span>
         </a>
 
         <div class="app" onclick="openTourPage()">
-            <i class="fa-solid fa-plane-departure icon tour"></i>
+            <img class="icon" src="https://img.icons8.com/3d-fluency/188/airplane-take-off.png" alt="" loading="lazy"/>
             <span>Tour Calculator</span>
         </div>
         <a class="app" href="https://datastudio.google.com/u/0/reporting/febd6f4d-bd0b-4cc4-b4e2-6c1f0b65227e/page/6wQLF" target="_blank">
-            <i class="fa-solid fa-tractor icon farmer"></i>
+            <img class="icon" src="https://img.icons8.com/3d-fluency/188/tractor.png" alt="" loading="lazy"/>
             <span>Farmer Dashboard</span>
         </a>
         <a class="app" href="https://drive.google.com/drive/folders/1_ZlApGdobNxDFWmjzAiVKEw_tRTG_Xdr" target="_blank">
-            <i class="fa-solid fa-cubes-stacked icon products"></i>
+            <img class="icon" src="https://img.icons8.com/3d-fluency/188/open-box.png" alt="" loading="lazy"/>
             <span>Products</span>
         </a>
         <a class="app" href="https://drive.google.com/drive/folders/1tEBbakp8xo9mVssStVOeTrmmDFwJZYpd?usp=drive_link" target="_blank">
-            <i class="fa-solid fa-photo-film icon news"></i>
+            <img class="icon" src="https://img.icons8.com/3d-fluency/188/clapperboard.png" alt="" loading="lazy"/>
             <span>News &amp; Video</span>
         </a>
         <a class="app" href="https://yuvinder.github.io/Sales-dashboard/" target="_blank">
-            <i class="fa-solid fa-chart-line icon sales"></i>
+            <img class="icon" src="https://img.icons8.com/3d-fluency/188/combo-chart.png" alt="" loading="lazy"/>
             <span>Sales Dashboard</span>
         </a>
         <a class="app" href="https://yuvinder.github.io/Dashboard-Punjab-updated-06-July/Actual%20Sale%202025-26.html" target="_blank">
-            <i class="fa-solid fa-sack-dollar icon sales"></i>
+            <img class="icon" src="https://img.icons8.com/3d-fluency/188/money-bag.png" alt="" loading="lazy"/>
             <span>Actual Sale 2025-26</span>
         </a>
         <a class="app" href="https://drive.google.com/drive/folders/1KFwNQwBrOx1ULmbH5gCbvn96Rere-hDG?usp=drive_link" target="_blank">
-            <i class="fa-solid fa-building-columns icon accounts"></i>
+            <img class="icon" src="https://img.icons8.com/3d-fluency/188/bank-building.png" alt="" loading="lazy"/>
             <span>Account Statements</span>
         </a>
         <a class="app" href="https://yuvinder.github.io/OD-dashboard/" target="_blank">
-            <i class="fa-solid fa-scale-balanced icon outstanding"></i>
+            <img class="icon" src="https://img.icons8.com/3d-fluency/188/scales.png" alt="" loading="lazy"/>
             <span>OD Check</span>
         </a>
                
         <!-- NEW Balance stock form -->
         <a class="app" href="entry%20form.html" target="_blank">
-            <i class="fa-solid fa-file-signature icon farmer"></i>
+            <img class="icon" src="https://img.icons8.com/3d-fluency/188/form.png" alt="" loading="lazy"/>
             <span>NEW Balance stock form</span>
         </a>
 
         <!-- NEW Liquidation dashboard -->
         <a class="app" href="dashboard.html" target="_blank">
-            <i class="fa-solid fa-chart-column icon sales"></i>
+            <img class="icon" src="https://img.icons8.com/3d-fluency/188/bar-chart.png" alt="" loading="lazy"/>
             <span>NEW Liquidation dashboard</span>
         </a>
 
         <a class="app" href="https://drive.google.com/drive/folders/1BWQHp611Wlag-7SsU8PBk2J0qr8kDHjO" target="_blank">
-            <i class="fa-solid fa-layer-group icon misc"></i>
+            <img class="icon" src="https://img.icons8.com/3d-fluency/188/puzzle.png" alt="" loading="lazy"/>
             <span>Misc</span>
         </a>
         <a class="app" href="Partywise product wise calculator.html" target="_blank">
-            <i class="fa-solid fa-briefcase icon sales"></i>
+            <img class="icon" src="https://img.icons8.com/3d-fluency/188/briefcase.png" alt="" loading="lazy"/>
             <span>Business Planner</span>
         </a>
         <a class="app" href="https://yuvinder.github.io/Dashboard-Punjab-updated-06-July/product%20catalgue.html" target="_blank">
-            <i class="fa-solid fa-book-open icon catalogue"></i>
+            <img class="icon" src="https://img.icons8.com/3d-fluency/188/open-book.png" alt="" loading="lazy"/>
             <span>Digital Catalogue</span>
         </a>
     </div>
 
     <div class="footer">
         Created &amp; Developed by <span>Skymat Solutions</span>
+        <a class="credit" href="https://icons8.com" target="_blank" rel="noopener">3D icons by Icons8</a>
     </div>
 </div>
 
