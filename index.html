@@ -411,10 +411,17 @@ word-break:break-word;
             <span>Price List</span>
         </a>
 
-        <div class="app" onclick="openTourPage()">
-            <img class="icon" src="https://img.icons8.com/3d-fluency/188/airplane-take-off.png" alt="" loading="lazy"/>
-            <span>Tour Calculator</span>
-        </div>
+        <a class="app" href="TBM%20wise%20targets%202025-26.html" target="_blank">
+            <img class="icon" src="https://img.icons8.com/3d-fluency/188/goal.png" alt="" loading="lazy"/>
+            <span>Targets 2026-27</span>
+        </a>
+
+        <a class="app" href="tasker.html" target="_blank">
+            <img class="icon" src="https://img.icons8.com/fluency/188/task.png" alt="Tasker" loading="lazy"/>
+            <span>Tasker</span>
+        </a>
+
+
         <a class="app" href="https://datastudio.google.com/u/0/reporting/febd6f4d-bd0b-4cc4-b4e2-6c1f0b65227e/page/6wQLF" target="_blank">
             <img class="icon" src="https://img.icons8.com/3d-fluency/188/tractor.png" alt="" loading="lazy"/>
             <span>Farmer Dashboard</span>
@@ -473,25 +480,6 @@ word-break:break-word;
     <div class="footer">
         Created &amp; Developed by <span>Skymat Solutions</span>
         <a class="credit" href="https://icons8.com" target="_blank" rel="noopener">3D icons by Icons8</a>
-    </div>
-</div>
-
-<!-- ================= TOUR CALCULATOR PAGE ================= -->
-<div id="tourPage">
-    <div class="container">
-        <div class="back-btn" onclick="goHome()"><i class="fa-solid fa-arrow-left"></i> Back</div>
-        <div class="title">Tour Calculator</div>
-        <div class="subtitle">Enter quantity to calculate points</div>
-        <table class="tour-table">
-            <thead>
-                <tr><th>Brand</th><th>Points/Unit</th><th>Quantity</th><th>Total</th></tr>
-            </thead>
-            <tbody id="tour-tbl"></tbody>
-        </table>
-        <div class="total-box">
-            <h2>Grand Total Points</h2>
-            <div class="total-value" id="tour-grand">0.00</div>
-        </div>
     </div>
 </div>
 
@@ -584,61 +572,18 @@ word-break:break-word;
 <script>
     // NAVIGATION LOGIC
     function goHome(){
-        document.getElementById("tourPage").style.display = "none";
         document.getElementById("cataloguePage").style.display = "none";
         document.getElementById("homePage").style.display = "block";
         window.scrollTo(0,0);
     }
 
-    function openTourPage(){
-        document.getElementById("homePage").style.display = "none";
-        document.getElementById("cataloguePage").style.display = "none";
-        document.getElementById("tourPage").style.display = "block";
-        window.scrollTo(0,0);
-    }
-
     function openCataloguePage(){
         document.getElementById("homePage").style.display = "none";
-        document.getElementById("tourPage").style.display = "none";
         document.getElementById("cataloguePage").style.display = "block";
         window.scrollTo(0,0);
         filterCards();
     }
 
-
-    // TOUR CALCULATOR LOGIC
-    const products = [
-        ["ASTOR", 9.5], ["ATMOS", 5.5], ["CYANAT", 2.5], ["GLANZ", 2],
-        ["NATDUO", 0.06], ["NATERRA", 0.02], ["NATGEN", 6], ["NATGEN PRO", 3.5],
-        ["NATLIGO", 1], ["SLAYDEN", 1.5], ["DEXARON", 0.5], ["PAMUK", 3],
-        ["DI-FORCE", 1], ["SPIROVANTA", 1], ["VECTRA", 1]
-    ];
-
-    let tourHtml = "";
-    products.forEach((p, i) => {
-        tourHtml += `
-        <tr>
-            <td class="brand">${p[0]}</td>
-            <td class="points">${p[1]}</td>
-            <td><input type="number" id="q${i}" placeholder="0" oninput="calc()"></td>
-            <td id="t${i}">0.00</td>
-        </tr>
-        `;
-    });
-    document.getElementById("tour-tbl").innerHTML = tourHtml;
-
-    function calc(){
-        let grand = 0;
-        products.forEach((p, i) => {
-            let inputEl = document.getElementById("q"+i);
-            let qty = inputEl ? (parseFloat(inputEl.value) || 0) : 0;
-            let total = qty * p[1];
-            let totalEl = document.getElementById("t"+i);
-            if (totalEl) { totalEl.innerText = total.toFixed(2); }
-            grand += total;
-        });
-        document.getElementById("tour-grand").innerText = grand.toFixed(2);
-    }
 
     // DIGITAL CATALOGUE LOGIC
     let activeCategory = 'all';
