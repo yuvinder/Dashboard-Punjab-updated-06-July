@@ -1,0 +1,1868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Natco Crop Health Sciences</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --natco-blue: #0b4594;
+      --natco-dark-blue: #072d63;
+      --natco-red: #d9232a;
+      --natco-green: #2e8b3b;
+      --natco-green-dark: #1b6326;
+      --natco-amber: #d97706;
+      --bg: #f4f6fa;
+      --card: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --border-focus: #0b4594;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --success: #10b981;
+      --radius: 14px;
+      --shadow: 0 4px 18px rgba(11, 69, 148, 0.08);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background: var(--bg); color: var(--text); padding: 12px; max-width: 600px; margin: 0 auto; line-height: 1.45; }
+
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    .login-container {
+      background: var(--card);
+      border-radius: 20px;
+      padding: 34px 22px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.07);
+      margin-top: 30px;
+      text-align: center;
+      border: 1px solid var(--border);
+    }
+    .login-title {
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: var(--natco-blue);
+      letter-spacing: -0.3px;
+      margin-bottom: 4px;
+    }
+    .login-punchline {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--natco-red);
+      margin-bottom: 3px;
+    }
+    .login-credit {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+    .login-select, .login-input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1.5px solid var(--border);
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text);
+      background: #fff;
+      outline: none;
+      margin-bottom: 14px;
+    }
+
+    header.main-header {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 3px 12px rgba(11, 69, 148, 0.07);
+      border: 1px solid #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .header-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .brand-meta-column {
+      display: flex;
+      flex-direction: column;
+    }
+    .brand-main-title {
+      font-size: 1.25rem;
+      font-weight: 900;
+      color: var(--natco-blue);
+      letter-spacing: -0.3px;
+      line-height: 1.2;
+    }
+    .punchline-text {
+      font-size: 0.76rem;
+      font-weight: 800;
+      color: var(--natco-red);
+      letter-spacing: 0.3px;
+      margin-top: 3px;
+    }
+    .credit-text {
+      font-size: 0.68rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: 0.2px;
+    }
+
+    .profile-strip {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .profile-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .avatar-box {
+      position: relative;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 2px solid var(--natco-blue);
+      overflow: hidden;
+      cursor: pointer;
+      background: #ffffff;
+      flex-shrink: 0;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .avatar-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .avatar-edit-label {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(11, 69, 148, 0.85);
+      color: #ffffff;
+      font-size: 0.52rem;
+      text-align: center;
+      font-weight: 800;
+      padding: 1px 0;
+    }
+    .profile-name-text {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--text);
+    }
+    .profile-sub-text {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .profile-btns {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .btn-header-small {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-header-small:hover { background: #f1f5f9; }
+
+    /* 3 COLOR-CODED MAIN NAVIGATION TILES */
+    .main-nav-tabs-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .nav-tab-btn-3 {
+      padding: 10px 6px;
+      border-radius: 12px;
+      border: 1.5px solid var(--border);
+      background: #ffffff;
+      color: var(--text-muted);
+      font-weight: 800;
+      font-size: 0.82rem;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+      transition: all 0.15s ease;
+      text-align: center;
+    }
+    .nav-tab-btn-3 span.tab-sub {
+      font-size: 0.68rem;
+      font-weight: 600;
+      opacity: 0.85;
+    }
+
+    /* Active States with Distinct Colors */
+    .nav-tab-btn-3.active-party {
+      background: var(--natco-blue);
+      border-color: var(--natco-blue);
+      color: #ffffff;
+      box-shadow: 0 4px 10px rgba(11, 69, 148, 0.25);
+    }
+    .nav-tab-btn-3.active-assign {
+      background: var(--natco-green-dark);
+      border-color: var(--natco-green-dark);
+      color: #ffffff;
+      box-shadow: 0 4px 10px rgba(27, 99, 38, 0.25);
+    }
+    .nav-tab-btn-3.active-mywork {
+      background: var(--natco-amber);
+      border-color: var(--natco-amber);
+      color: #ffffff;
+      box-shadow: 0 4px 10px rgba(217, 119, 6, 0.25);
+    }
+
+    .app-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 12px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+    .section-heading {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--natco-blue);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .reached-box {
+      background: linear-gradient(135deg, #0b4594 0%, #1555a6 100%);
+      color: #ffffff;
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 4px 14px rgba(11, 69, 148, 0.2);
+    }
+    .reached-title {
+      font-size: 0.86rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .reached-dropdown {
+      width: 100%;
+      padding: 11px 12px;
+      border-radius: 10px;
+      border: 1.5px solid rgba(255, 255, 255, 0.4);
+      background: #ffffff;
+      color: var(--text);
+      font-size: 0.92rem;
+      font-weight: 700;
+      outline: none;
+      cursor: pointer;
+    }
+    .reached-action-row {
+      margin-top: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .btn-add-party-trigger {
+      background: rgba(255, 255, 255, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      color: #ffffff;
+      padding: 5px 12px;
+      border-radius: 8px;
+      font-size: 0.76rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .btn-add-party-trigger:hover { background: rgba(255, 255, 255, 0.35); }
+
+    .source-filter-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .source-btn {
+      padding: 7px 4px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      background: #f8fafc;
+      font-size: 0.74rem;
+      font-weight: 800;
+      cursor: pointer;
+      color: var(--text);
+      text-align: center;
+    }
+    .source-btn.active {
+      background: var(--natco-blue);
+      border-color: var(--natco-blue);
+      color: #fff;
+    }
+
+    .step-block { margin-bottom: 12px; }
+    .step-tag {
+      font-size: 0.74rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .step-badge {
+      width: 18px;
+      height: 18px;
+      background: #e0edff;
+      color: var(--natco-blue);
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 800;
+    }
+
+    .tiles-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+    }
+    .tile-button {
+      padding: 11px 6px;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      background: #f8fafc;
+      font-size: 0.86rem;
+      font-weight: 800;
+      cursor: pointer;
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      transition: all 0.15s;
+    }
+    .tile-button .tile-ico { font-size: 1.25rem; }
+    .tile-button.active {
+      background: var(--natco-green-dark);
+      border-color: var(--natco-green-dark);
+      color: #ffffff;
+      box-shadow: 0 4px 10px rgba(27, 99, 38, 0.25);
+    }
+
+    .form-dropdown, .form-input {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1.5px solid var(--border);
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text);
+      background: #ffffff;
+      outline: none;
+    }
+    .form-dropdown:focus, .form-input:focus { border-color: var(--natco-blue); }
+
+    .segmented-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .seg-pill {
+      padding: 9px 8px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      background: #f8fafc;
+      font-size: 0.84rem;
+      font-weight: 700;
+      cursor: pointer;
+      color: var(--text);
+      text-align: center;
+    }
+    .seg-pill.active {
+      background: var(--natco-green-dark);
+      border-color: var(--natco-green-dark);
+      color: #ffffff;
+    }
+
+    .priority-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+    }
+    .prio-pill {
+      padding: 9px 6px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 800;
+      cursor: pointer;
+      text-align: center;
+      background: #f8fafc;
+      color: var(--text);
+    }
+    .prio-pill.active-high { background: #ef4444; border-color: #ef4444; color: #fff; }
+    .prio-pill.active-med { background: #f59e0b; border-color: #f59e0b; color: #fff; }
+    .prio-pill.active-low { background: #10b981; border-color: #10b981; color: #fff; }
+
+    .btn-submit-task {
+      width: 100%;
+      padding: 13px;
+      background: linear-gradient(135deg, #1b6326 0%, #2e8b3b 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(27, 99, 38, 0.25);
+    }
+
+    .task-card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 13px 14px;
+      margin-bottom: 10px;
+      border: 1px solid var(--border);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      border-left: 5px solid #cbd5e1;
+    }
+    .task-card.prio-high { border-left-color: var(--danger); background: #fffcfc; }
+    .task-card.prio-med { border-left-color: var(--warning); }
+    .task-card.prio-low { border-left-color: var(--success); }
+    .task-card.completed { opacity: 0.55; text-decoration: line-through; }
+
+    .task-check {
+      width: 22px;
+      height: 22px;
+      margin-top: 3px;
+      cursor: pointer;
+      accent-color: var(--natco-blue);
+      flex-shrink: 0;
+    }
+    .task-info { flex: 1; }
+    .task-text { font-size: 0.94rem; font-weight: 700; margin-bottom: 5px; line-height: 1.35; }
+
+    .task-tags-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      font-size: 0.7rem;
+      margin-bottom: 6px;
+    }
+    .badge {
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .badge.high { background: #fee2e2; color: #b91c1c; }
+    .badge.med { background: #fef3c7; color: #b45309; }
+    .badge.low { background: #d1fae5; color: #047857; }
+    .badge.mgr-source { background: #fee2e2; color: var(--natco-red); border: 1px solid #fecaca; }
+    .badge.self-source { background: #e0edff; color: var(--natco-blue); border: 1px solid #bfdbfe; }
+    .badge.other-source { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+    .badge.dest { background: #f1f5f9; color: #334155; border: 1px solid #e2e8f0; }
+    .badge.rep { background: #eff6ff; color: #1d4ed8; }
+
+    .aging-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 800;
+    }
+    .aging-tag.today { background: #ecfdf5; color: #047857; }
+    .aging-tag.warning { background: #fffbeb; color: #b45309; }
+    .aging-tag.delayed { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+
+    .task-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      border-top: 1px dashed #e2e8f0;
+      padding-top: 6px;
+    }
+    .btn-trash {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      font-size: 1rem;
+      cursor: pointer;
+      padding: 2px 4px;
+    }
+    .btn-trash:hover { color: var(--danger); }
+
+    .empty-state {
+      text-align: center;
+      padding: 32px 16px;
+      background: #ffffff;
+      border-radius: var(--radius);
+      border: 1px dashed var(--border);
+      color: var(--text-muted);
+      font-size: 0.88rem;
+    }
+
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15, 23, 42, 0.6);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      backdrop-filter: blur(4px);
+    }
+    .modal-box {
+      background: #ffffff;
+      border-radius: 18px;
+      width: 100%;
+      max-width: 440px;
+      padding: 22px 18px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+    .modal-box h3 {
+      font-size: 1.08rem;
+      font-weight: 800;
+      color: var(--natco-blue);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .modal-btn-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .btn-cancel {
+      flex: 1;
+      padding: 11px;
+      background: #e2e8f0;
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+      color: var(--text);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SCREEN 1: LOGIN WITH PASSWORD -->
+  <div id="loginScreen" class="screen">
+    <div class="login-container">
+      <h1 class="login-title">Natco Crop Health Sciences</h1>
+      <div class="login-punchline">Efficient, time saving, on time</div>
+      <div class="login-credit">Created by Skymat Solutions</div>
+      
+      <select id="loginUserSelect" class="login-select">
+        <option value="Yuvinder Kumar (Manager)">👔 Yuvinder Kumar (Manager)</option>
+        <option value="Pardeep Kumar (Amritsar & Jalandhar)">👤 Pardeep Kumar (Amritsar & Jalandhar)</option>
+        <option value="Niteesh Kumar (Moga)">👤 Niteesh Kumar (Moga)</option>
+        <option value="Jagdish Kumar (Bathinda)">👤 Jagdish Kumar (Bathinda)</option>
+        <option value="Abadhesh Kumar (Patiala)">👤 Abadhesh Kumar (Patiala)</option>
+        <option value="Vivek (Sangrur)">👤 Vivek (Sangrur)</option>
+      </select>
+
+      <input type="password" id="loginPasswordInput" class="login-input" placeholder="Enter Password" />
+
+      <button class="btn-submit-task" onclick="attemptLogin()" style="background:var(--natco-blue);">Enter Application</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 2: DASHBOARD -->
+  <div id="mainScreen" class="screen">
+    <header class="main-header">
+      <div class="header-top-row">
+        <div class="brand-meta-column">
+          <span class="brand-main-title">Natco Crop Health Sciences</span>
+          <span class="punchline-text">Efficient, time saving, on time</span>
+          <span class="credit-text">Created by Skymat Solutions</span>
+        </div>
+      </div>
+
+      <div class="profile-strip">
+        <div class="profile-left">
+          <div class="avatar-box" onclick="triggerPhotoUpload()" title="Tap to change your photo">
+            <img id="userPhotoImg" src="" alt="Profile Avatar" />
+            <div class="avatar-edit-label">EDIT</div>
+          </div>
+          <input type="file" id="filePhotoInput" accept="image/*" style="display:none;" onchange="handlePhotoUpload(event)" />
+          
+          <div>
+            <div class="profile-name-text" id="userNameText">Loading...</div>
+            <div class="profile-sub-text">Active Session</div>
+          </div>
+        </div>
+
+        <div class="profile-btns">
+          <button class="btn-header-small" id="btnNotify" onclick="requestNotificationPermission()">🔔 Alerts</button>
+          <button class="btn-header-small" onclick="logout()">Logout</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- 3 COLOR-CODED MAIN TILES -->
+    <div class="main-nav-tabs-3">
+      <button class="nav-tab-btn-3 active-party" id="tabReachedParty" onclick="switchNavMode('REACHED_PARTY')">
+        <span>📍 Reached Party</span>
+        <span class="tab-sub">Instant Check</span>
+      </button>
+      <button class="nav-tab-btn-3" id="tabAssignTask" onclick="switchNavMode('ASSIGN_TASK')">
+        <span>➕ Assign Work</span>
+        <span class="tab-sub">Dispatch Tasks</span>
+      </button>
+      <button class="nav-tab-btn-3" id="tabMyWork" onclick="switchNavMode('MY_WORK')">
+        <span>📥 My Work</span>
+        <span class="tab-sub">Assigned To Me</span>
+      </button>
+    </div>
+
+    <!-- MODE 1: REACHED A PARTY -->
+    <div id="viewReachedPartyMode">
+      <div class="reached-box">
+        <div class="reached-title">
+          <span>🏪 Select Reached Customer / Party</span>
+          <span id="reachedPartyCountBadge">0 Parties</span>
+        </div>
+        <select id="reachedPartyDropdown" class="reached-dropdown" onchange="onReachedPartySelected(this.value)">
+          <option value="">-- Tap to Select Party You Reached --</option>
+        </select>
+
+        <div class="reached-action-row">
+          <button type="button" class="btn-add-party-trigger" onclick="openAddPartyModal()">
+            ➕ Add New Party
+          </button>
+          <span style="font-size:0.72rem; opacity:0.9;" id="partyNoticeSub">Select party to view work</span>
+        </div>
+      </div>
+
+      <div class="source-filter-grid">
+        <button class="source-btn active" id="srcAll" onclick="setSourceFilter('ALL')">🌐 All</button>
+        <button class="source-btn" id="srcMgr" onclick="setSourceFilter('MGR')">👔 Manager</button>
+        <button class="source-btn" id="srcSelf" onclick="setSourceFilter('SELF')">👤 Self</button>
+        <button class="source-btn" id="srcOther" onclick="setSourceFilter('OTHER')">👥 Team</button>
+      </div>
+
+      <div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 0 4px;">
+          <h3 id="partyHeadingText" style="font-size: 0.95rem; font-weight: 800; color: var(--natco-blue);">
+            Pending Tasks for Selected Party
+          </h3>
+          <span id="partyTaskCounter" style="font-size: 0.74rem; font-weight: 700; color: var(--text-muted);">0 tasks</span>
+        </div>
+        <div id="partyTasksList"></div>
+      </div>
+    </div>
+
+    <!-- MODE 2: ASSIGN WORK -->
+    <div id="viewAssignTaskMode" style="display: none;">
+      <div class="app-card">
+        <div class="section-heading" style="color: var(--natco-green-dark);">
+          <span>➕ Create & Assign Task</span>
+        </div>
+
+        <!-- STEP 1: 3 SUB-TILES -->
+        <div class="step-block">
+          <div class="step-tag">
+            <span class="step-badge">1</span>
+            Select Assignment Destination
+          </div>
+          <div class="tiles-grid">
+            <button type="button" class="tile-button active" id="tileParty" onclick="setStep1Type('PARTY')">
+              <span class="tile-ico">🏪</span>
+              <span>Party</span>
+            </button>
+            <button type="button" class="tile-button" id="tilePerson" onclick="setStep1Type('PERSON')">
+              <span class="tile-ico">👤</span>
+              <span>Person</span>
+            </button>
+            <button type="button" class="tile-button" id="tileBulk" onclick="setStep1Type('BULK')">
+              <span class="tile-ico">⚡</span>
+              <span>Bulk</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- STEP 2: DYNAMIC DROPDOWN -->
+        <div class="step-block">
+          <div class="step-tag" id="step2Label">
+            <span class="step-badge">2</span>
+            Choose Customer / Party
+          </div>
+          <div style="display:flex; gap:6px;">
+            <select id="step2Dropdown" class="form-dropdown" style="flex:1;"></select>
+            <button type="button" id="btnQuickAddParty" class="btn-header-small" onclick="openAddPartyModal()" style="white-space:nowrap; background:#eff6ff; color:var(--natco-blue); border-color:#bfdbfe;">
+              ➕ Add
+            </button>
+          </div>
+        </div>
+
+        <!-- STEP 3: WHAT IS TASK -->
+        <div class="step-block">
+          <div class="step-tag">
+            <span class="step-badge">3</span>
+            What is the task?
+          </div>
+          <input type="text" id="taskInputText" class="form-input" placeholder="" />
+        </div>
+
+        <!-- STEP 4: TASK DUE DATE -->
+        <div class="step-block">
+          <div class="step-tag">
+            <span class="step-badge">4</span>
+            Task Due Date
+          </div>
+          <input type="date" id="taskDueDateInput" class="form-input" />
+        </div>
+
+        <!-- STEP 5: REPEATED TASK OR ONE-TIME -->
+        <div class="step-block">
+          <div class="step-tag">
+            <span class="step-badge">5</span>
+            Task Repetition
+          </div>
+          <div class="segmented-grid">
+            <button type="button" class="seg-pill active" id="btnFreqOnce" onclick="setFrequency('ONE_TIME')">
+              ⚡ One-Time Task
+            </button>
+            <button type="button" class="seg-pill" id="btnFreqRepeat" onclick="setFrequency('REPEATED')">
+              🔁 Repeated (Routine)
+            </button>
+          </div>
+        </div>
+
+        <!-- STEP 6: PRIORITY LEVEL -->
+        <div class="step-block">
+          <div class="step-tag">
+            <span class="step-badge">6</span>
+            Priority Level
+          </div>
+          <div class="priority-row">
+            <button type="button" class="prio-pill active-high" id="prioHigh" onclick="setPriority('HIGH')">
+              🔴 High
+            </button>
+            <button type="button" class="prio-pill" id="prioMed" onclick="setPriority('MED')">
+              🟡 Med
+            </button>
+            <button type="button" class="prio-pill" id="prioLow" onclick="setPriority('LOW')">
+              🟢 Low
+            </button>
+          </div>
+        </div>
+
+        <button type="button" class="btn-submit-task" onclick="saveAndAssignTask()">Save & Dispatch Task</button>
+      </div>
+
+      <div>
+        <h3 style="font-size: 0.95rem; font-weight: 800; margin-bottom: 8px; color: var(--text);">
+          📋 Tasks created by you
+        </h3>
+        <div id="allDispatchedTasksList"></div>
+      </div>
+    </div>
+
+    <!-- MODE 3: MY WORK -->
+    <div id="viewMyWorkMode" style="display: none;">
+      <div class="app-card" style="padding: 0; background: transparent; border: none; box-shadow: none;">
+        <div id="myWorkTasksList"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD NEW PARTY -->
+  <div class="modal-backdrop" id="addPartyModal">
+    <div class="modal-box">
+      <h3>🏪 Add New Party / Customer</h3>
+      <div class="step-block">
+        <label class="step-tag">Party / Customer Name *</label>
+        <input type="text" id="newPartyNameInput" class="form-input" placeholder="e.g. Soni Seeds & Pesticides" />
+      </div>
+      <div class="step-block">
+        <label class="step-tag">Territory / District *</label>
+        <select id="newPartyTerritorySelect" class="form-dropdown">
+          <option value="AMRITSAR">Amritsar (Pardeep)</option>
+          <option value="JALANDHAR">Jalandhar (Pardeep)</option>
+          <option value="BATHINDA">Bathinda (Jagdish)</option>
+          <option value="MOGA">Moga (Niteesh)</option>
+          <option value="PATIALA">Patiala (Abadhesh)</option>
+          <option value="SANGRUR">Sangrur (Vivek)</option>
+        </select>
+      </div>
+      <div class="modal-btn-row">
+        <button type="button" class="btn-cancel" onclick="closeAddPartyModal()">Cancel</button>
+        <button type="button" class="btn-submit-task" style="flex:1;" onclick="saveNewParty()">Save Party</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: APP OPENING PENDING TASK WARNING WITH 2 DAYS LEFT -->
+  <div class="modal-backdrop" id="dueDateWarningModal">
+    <div class="modal-box" style="text-align: center;">
+      <div style="font-size: 2.2rem; margin-bottom: 8px;">⚠️</div>
+      <h3 style="justify-content: center; color: var(--natco-red);">Pending Task Reminder!</h3>
+      <p id="dueDateWarningText" style="font-size: 0.9rem; color: var(--text); margin-bottom: 16px; font-weight: 600;"></p>
+      <button type="button" class="btn-submit-task" style="background:var(--natco-blue);" onclick="confirmAndEnterApp()">OK / Agree</button>
+    </div>
+  </div>
+
+  <script>
+    const userPasswords = {
+      "Yuvinder Kumar (Manager)": "Noddy@12",
+      "Pardeep Kumar (Amritsar & Jalandhar)": "Par@123",
+      "Niteesh Kumar (Moga)": "Har@765",
+      "Jagdish Kumar (Bathinda)": "Abo@987",
+      "Abadhesh Kumar (Patiala)": "Raj@098",
+      "Vivek (Sangrur)": "San@654"
+    };
+
+    const territoryOwners = {
+      "AMRITSAR": "Pardeep Kumar (Amritsar & Jalandhar)",
+      "JALANDHAR": "Pardeep Kumar (Amritsar & Jalandhar)",
+      "MOGA": "Niteesh Kumar (Moga)",
+      "BATHINDA": "Jagdish Kumar (Bathinda)",
+      "PATIALA": "Abadhesh Kumar (Patiala)",
+      "SANGRUR": "Vivek (Sangrur)"
+    };
+
+    const userTerritories = {
+      "Pardeep Kumar (Amritsar & Jalandhar)": ["AMRITSAR", "JALANDHAR"],
+      "Niteesh Kumar (Moga)": ["MOGA"],
+      "Jagdish Kumar (Bathinda)": ["BATHINDA"],
+      "Abadhesh Kumar (Patiala)": ["PATIALA"],
+      "Vivek (Sangrur)": ["SANGRUR"]
+    };
+
+    const allPersonsList = [
+      "Yuvinder Kumar (Manager)",
+      "Pardeep Kumar (Amritsar & Jalandhar)",
+      "Niteesh Kumar (Moga)",
+      "Jagdish Kumar (Bathinda)",
+      "Abadhesh Kumar (Patiala)",
+      "Vivek (Sangrur)"
+    ];
+
+    const masterPunjabParties = [
+      {"name": "GARG PESTICIDES", "territory": "BATHINDA"},
+      {"name": "NEW MALWA PESTICIDES STORE", "territory": "BATHINDA"},
+      {"name": "VISHNU KHAD STORE", "territory": "AMRITSAR"},
+      {"name": "HEM RAJ GARG PESTISIDES & SEEDS", "territory": "BATHINDA"},
+      {"name": "NATIONAL SEED DEPOT", "territory": "MOGA"},
+      {"name": "NATIONAL AGRO CENTRE", "territory": "AMRITSAR"},
+      {"name": "HIND PESTICIDES & FERTILIZERS", "territory": "MOGA"},
+      {"name": "GOYAL SPRAY COMPANY", "territory": "MOGA"},
+      {"name": "OM PARKASH RAMESH KUMAR", "territory": "SANGRUR"},
+      {"name": "LUXMI PESTICIDES AND FERTILIZER", "territory": "SANGRUR"},
+      {"name": "NEW FARM AGRO", "territory": "SANGRUR"},
+      {"name": "NEW KAMBOJ KHETI STORE", "territory": "AMRITSAR"},
+      {"name": "MUKESH KUMAR BANSAL & CO.", "territory": "SANGRUR"},
+      {"name": "NAND LAL PESTICIDES AND FERTILIZER", "territory": "MOGA"},
+      {"name": "S.K. COMMISSION AGENT", "territory": "AMRITSAR"},
+      {"name": "ZIMIDARA KHETI STORE", "territory": "AMRITSAR"},
+      {"name": "NEW KISSAN PESTICIDES", "territory": "SANGRUR"},
+      {"name": "DHALIWAL KHETI SEWA CENTRE", "territory": "MOGA"},
+      {"name": "AGGARWAL KHAD STORE", "territory": "MOGA"},
+      {"name": "NARANG PESTICIDES AND FERTILIZER", "territory": "BATHINDA"},
+      {"name": "MALWA BEEJ STORE", "territory": "SANGRUR"},
+      {"name": "SURINDER SINGH AND CO", "territory": "BATHINDA"},
+      {"name": "RAJ AGRO CHEMICALS", "territory": "BATHINDA"},
+      {"name": "ZAMIDARA PESTICIDE", "territory": "BATHINDA"},
+      {"name": "RAKESH KUMAR AND CO.", "territory": "BATHINDA"},
+      {"name": "GOYAL TRADERS", "territory": "JALANDHAR"},
+      {"name": "PEST CONTROL SERVICE", "territory": "MOGA"},
+      {"name": "MODERN KHETI SEWA CENTRE", "territory": "MOGA"},
+      {"name": "KHETI SEWA CENTRE", "territory": "SANGRUR"},
+      {"name": "LAKSHYA TRADING COMPANY", "territory": "SANGRUR"},
+      {"name": "KAMAL KHETI STORE", "territory": "MOGA"},
+      {"name": "HARI OM KHAD AGENCY", "territory": "MOGA"},
+      {"name": "FRIENDS AGRO CHEMICALS (INDIA)", "territory": "AMRITSAR"},
+      {"name": "Zimidara Pesticides", "territory": "SANGRUR"},
+      {"name": "JANTA KHETI CENTRE", "territory": "BATHINDA"},
+      {"name": "ZIMIDARA AGRO TRADERS", "territory": "BATHINDA"},
+      {"name": "Mehta Kheti Store", "territory": "MOGA"},
+      {"name": "BUDH RAM & SONS", "territory": "SANGRUR"},
+      {"name": "KHALSA AGRO CENTRE", "territory": "PATIALA"},
+      {"name": "ZIMIDARA KHAD STORE", "territory": "PATIALA"},
+      {"name": "KISSAN AGRO CENTRE", "territory": "MOGA"},
+      {"name": "KISSAN KHETI CENTRE", "territory": "PATIALA"},
+      {"name": "SARAO PESTICIDES", "territory": "SANGRUR"},
+      {"name": "JAGDAMBEY PESTICIDES", "territory": "SANGRUR"},
+      {"name": "GURU NANAK PESTICIDES", "territory": "PATIALA"},
+      {"name": "NEW KISSAN SEWA CENTRE", "territory": "SANGRUR"},
+      {"name": "SATGURU PESTICIDES AND FERTILIZERS", "territory": "BATHINDA"},
+      {"name": "NEW ZIMIDARA KHAD STORE", "territory": "PATIALA"},
+      {"name": "MAHAJAN TRADERS", "territory": "AMRITSAR"},
+      {"name": "SAINI BROTHERS", "territory": "JALANDHAR"},
+      {"name": "G.H. KHETI STORE", "territory": "AMRITSAR"},
+      {"name": "N.D KHAD STORE", "territory": "PATIALA"},
+      {"name": "GILL KHETI STORE", "territory": "AMRITSAR"},
+      {"name": "GILL SPRAY STORE", "territory": "MOGA"},
+      {"name": "KHALSA TRADERS", "territory": "JALANDHAR"},
+      {"name": "RAM RACHHPAL DHAWAN AND SONS", "territory": "AMRITSAR"},
+      {"name": "BRAR SEED AND FERTILIZER", "territory": "MOGA"},
+      {"name": "LEKH RAJ KUKKAR AND SONS", "territory": "BATHINDA"},
+      {"name": "ROSHAN LAL TREHAN & SONS", "territory": "AMRITSAR"},
+      {"name": "NEW SHERE PUNJAB PESTICIDES", "territory": "BATHINDA"},
+      {"name": "PANKAJ PESTICIDES", "territory": "SANGRUR"},
+      {"name": "YAMEEN SEED AND PESTICIDES STORE", "territory": "PATIALA"},
+      {"name": "KISSAN KHETIBARI CENTRE", "territory": "PATIALA"},
+      {"name": "HARRY AGRO CENTRE", "territory": "PATIALA"},
+      {"name": "NARANJAN DASS SANJEEV KUMAR", "territory": "SANGRUR"},
+      {"name": "D N B PUNJAB PESTICIDES", "territory": "SANGRUR"},
+      {"name": "JASSAR KHETI SEWA CENTRE", "territory": "PATIALA"},
+      {"name": "MORINDA AGRO CENTRE", "territory": "PATIALA"},
+      {"name": "OM SEED STORE", "territory": "AMRITSAR"},
+      {"name": "SATGURU PESTICIDES", "territory": "AMRITSAR"},
+      {"name": "LEKH RAJ & GRAND SONS", "territory": "BATHINDA"},
+      {"name": "DEEP TRADERS", "territory": "BATHINDA"},
+      {"name": "ANAND PESTICIDES", "territory": "MOGA"},
+      {"name": "CHIRAG PESTICIDES & FERTILIZERS", "territory": "BATHINDA"},
+      {"name": "ZIMIDAR KHETI SEWA CENTER", "territory": "SANGRUR"},
+      {"name": "DAMODAR DASS JAI CHAND AGGARWAL", "territory": "AMRITSAR"},
+      {"name": "BANSAL AGRICULTURE STORE", "territory": "BATHINDA"},
+      {"name": "BANSAL PESTICIDE STORE", "territory": "BATHINDA"},
+      {"name": "JAGDISH OIL COMPANY", "territory": "SANGRUR"},
+      {"name": "SARWAN TRADERS", "territory": "MOGA"},
+      {"name": "PANDTAN DI HATTI", "territory": "JALANDHAR"},
+      {"name": "JAI SHREE AGRO CHEMICALS", "territory": "BATHINDA"},
+      {"name": "SURKHAB AGRO CHEMICALS", "territory": "BATHINDA"},
+      {"name": "BABA DEEP SINGH JI KHETI STORE", "territory": "AMRITSAR"},
+      {"name": "KISAN SEED COMPANY", "territory": "JALANDHAR"},
+      {"name": "TIMMY TRADING CO.", "territory": "JALANDHAR"},
+      {"name": "BATRA PESTCIDES & FERTILIZER", "territory": "MOGA"},
+      {"name": "SRI KRISHNA TRADERS", "territory": "BATHINDA"},
+      {"name": "SUSHIL TRADING CO", "territory": "BATHINDA"},
+      {"name": "KISAN SEED STORE", "territory": "PATIALA"}
+    ];
+
+    const defaultAvatars = {
+      "Yuvinder Kumar (Manager)": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80",
+      "Pardeep Kumar (Amritsar & Jalandhar)": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80",
+      "Niteesh Kumar (Moga)": "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=150&q=80",
+      "Jagdish Kumar (Bathinda)": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&q=80",
+      "Abadhesh Kumar (Patiala)": "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=150&q=80",
+      "Vivek (Sangrur)": "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=150&q=80"
+    };
+
+    function getOffsetDateString(daysOffset) {
+      const d = new Date();
+      d.setDate(d.getDate() + daysOffset);
+      return d.toISOString().split('T')[0];
+    }
+
+    const initialSeedTasks = [];
+
+    const AUTH_KEY = "natco_logged_user_v31_newurl";
+    const TASKS_KEY = "natco_tasks_v31_newurl";
+    const PARTIES_KEY = "natco_parties_list_v31_newurl";
+    const AVATAR_KEY = "natco_user_avatars_v31_newurl";
+    const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbyCZdLq6y2R45BVnsYmlal0j3jsOaEenuGsosxjZ2bCEXdnESdqh3GcndQlu5v4jmNd/exec";
+
+    let currentUser = localStorage.getItem(AUTH_KEY) || "";
+    let parties = JSON.parse(localStorage.getItem(PARTIES_KEY)) || masterPunjabParties;
+    let tasks = JSON.parse(localStorage.getItem(TASKS_KEY)) || initialSeedTasks;
+    let userCustomAvatars = JSON.parse(localStorage.getItem(AVATAR_KEY)) || {};
+
+    let currentNavMode = "REACHED_PARTY";
+    let selectedPartyName = "";
+    let activeSourceFilter = "ALL";
+
+    let formStep1Type = "PARTY";
+    let formFrequency = "ONE_TIME";
+    let formPriority = "HIGH";
+
+    window.onload = function() {
+      runLiquidationReportAutomation();
+      if (!currentUser) {
+        showScreen('loginScreen');
+      } else {
+        checkDueDateRemindersOnLoad();
+      }
+    };
+
+    function runLiquidationReportAutomation() {
+      const now = new Date();
+      const dayOfWeek = now.getDay(); 
+      const hours = now.getHours();
+      const reportTitle = "Liquidation report from team";
+
+      const existingLiquidation = tasks.find(t => t.title === reportTitle);
+
+      if (dayOfWeek === 0) {
+        if (!existingLiquidation) {
+          const reps = allPersonsList.filter(p => !p.includes("Manager"));
+          reps.forEach(rep => {
+            tasks.unshift({
+              id: Date.now() + Math.random(),
+              title: reportTitle,
+              type: "PERSON",
+              target: rep,
+              territory: "HQ",
+              assignedTo: rep,
+              assignedBy: "Yuvinder Kumar (Manager)",
+              frequency: "REPEATED",
+              priority: "HIGH",
+              completed: false,
+              date: getOffsetDateString(0),
+              dueDate: getOffsetDateString(1), 
+              isAutoLiquidation: true
+            });
+          });
+          localStorage.setItem(TASKS_KEY, JSON.stringify(tasks));
+        }
+      } else if (dayOfWeek === 1 && hours >= 14) {
+        if (existingLiquidation) {
+          tasks = tasks.filter(t => t.title !== reportTitle);
+          localStorage.setItem(TASKS_KEY, JSON.stringify(tasks));
+        }
+      }
+    }
+
+    function showScreen(screenId) {
+      document.getElementById('loginScreen').classList.remove('active');
+      document.getElementById('mainScreen').classList.remove('active');
+      document.getElementById(screenId).classList.add('active');
+    }
+
+    function attemptLogin() {
+      const chosenUser = document.getElementById('loginUserSelect').value;
+      const enteredPass = document.getElementById('loginPasswordInput').value.trim();
+
+      if (userPasswords[chosenUser] === enteredPass) {
+        currentUser = chosenUser;
+        localStorage.setItem(AUTH_KEY, currentUser);
+        document.getElementById('loginPasswordInput').value = '';
+        checkDueDateRemindersOnLoad();
+      } else {
+        alert("Incorrect password! Please check and try again.");
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem(AUTH_KEY);
+      currentUser = "";
+      document.getElementById('loginPasswordInput').value = '';
+      showScreen('loginScreen');
+    }
+
+    function checkDueDateRemindersOnLoad() {
+      if (!currentUser) {
+        showScreen('loginScreen');
+        return;
+      }
+      
+      const today = new Date();
+      today.setHours(0,0,0,0);
+
+      const matchingTask = tasks.find(t => {
+        if (t.completed) return false;
+        const isForUser = (t.assignedTo === currentUser) || (currentUser.includes("Manager") && t.assignedBy === currentUser);
+        if (!isForUser) return false;
+        if (!t.dueDate) return false;
+
+        const due = new Date(t.dueDate + "T00:00:00");
+        const diffTime = due - today;
+        const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+        return diffDays === 2;
+      });
+
+      if (matchingTask) {
+        const warningText = `Task: "${matchingTask.title}" is pending and the last date is ${matchingTask.dueDate} (Only 2 days left!).`;
+        document.getElementById('dueDateWarningText').textContent = warningText;
+        document.getElementById('dueDateWarningModal').style.display = 'flex';
+      } else {
+        proceedToMainScreen();
+      }
+    }
+
+    function confirmAndEnterApp() {
+      document.getElementById('dueDateWarningModal').style.display = 'none';
+      proceedToMainScreen();
+    }
+
+    function proceedToMainScreen() {
+      showScreen('mainScreen');
+      loadMainScreen();
+    }
+
+    function loadMainScreen() {
+      document.getElementById('userNameText').textContent = currentUser.split(' ')[0];
+      document.getElementById('taskDueDateInput').value = "";
+
+      renderAvatar();
+      populateReachedParties();
+      setStep1Type("PARTY");
+      setFrequency("ONE_TIME");
+      setPriority("HIGH");
+      switchNavMode("REACHED_PARTY");
+      updateNotificationButton();
+    }
+
+    function switchNavMode(mode) {
+      currentNavMode = mode;
+      
+      document.getElementById('tabReachedParty').className = 'nav-tab-btn-3' + (mode === 'REACHED_PARTY' ? ' active-party' : '');
+      document.getElementById('tabAssignTask').className = 'nav-tab-btn-3' + (mode === 'ASSIGN_TASK' ? ' active-assign' : '');
+      document.getElementById('tabMyWork').className = 'nav-tab-btn-3' + (mode === 'MY_WORK' ? ' active-mywork' : '');
+
+      document.getElementById('viewReachedPartyMode').style.display = (mode === 'REACHED_PARTY') ? 'block' : 'none';
+      document.getElementById('viewAssignTaskMode').style.display = (mode === 'ASSIGN_TASK') ? 'block' : 'none';
+      document.getElementById('viewMyWorkMode').style.display = (mode === 'MY_WORK') ? 'block' : 'none';
+
+      if (mode === 'REACHED_PARTY') {
+        renderPartyTasks();
+      } else if (mode === 'ASSIGN_TASK') {
+        renderAllDispatchedTasks();
+      } else if (mode === 'MY_WORK') {
+        renderMyWorkTasks();
+      }
+    }
+
+    function renderAvatar() {
+      const img = document.getElementById('userPhotoImg');
+      img.src = userCustomAvatars[currentUser] || defaultAvatars[currentUser] || defaultAvatars["Yuvinder Kumar (Manager)"];
+    }
+
+    function triggerPhotoUpload() {
+      document.getElementById('filePhotoInput').click();
+    }
+
+    function handlePhotoUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const base64Photo = e.target.result;
+        userCustomAvatars[currentUser] = base64Photo;
+        localStorage.setItem(AVATAR_KEY, JSON.stringify(userCustomAvatars));
+        renderAvatar();
+
+        fetch(GOOGLE_SHEET_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "updatePhoto",
+            user: currentUser,
+            photoUrl: base64Photo
+          })
+        }).catch(err => console.log("Photo sync error: ", err));
+
+        alert("Photo updated and shared successfully!");
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function requestNotificationPermission() {
+      if (!("Notification" in window)) {
+        alert("Notifications are not supported in this browser.");
+        return;
+      }
+      Notification.requestPermission().then(permission => {
+        if (permission === "granted") {
+          triggerMobileNotification("Natco Tasker Active", "Alerts enabled for tasks!");
+        }
+        updateNotificationButton();
+      });
+    }
+
+    function updateNotificationButton() {
+      const btn = document.getElementById('btnNotify');
+      if ("Notification" in window && Notification.permission === "granted") {
+        btn.textContent = "🔔 Active";
+        btn.style.background = "#ecfdf5";
+        btn.style.color = "#047857";
+        btn.style.borderColor = "#a7f3d0";
+      } else {
+        btn.textContent = "🔔 Alerts";
+      }
+    }
+
+    function triggerMobileNotification(title, body) {
+      if ("Notification" in window && Notification.permission === "granted") {
+        try {
+          new Notification(title, { body: body });
+        } catch(e) {}
+      }
+    }
+
+    function populateReachedParties() {
+      const sel = document.getElementById('reachedPartyDropdown');
+      sel.innerHTML = '<option value="">-- Tap to Select Party You Reached --</option>';
+
+      let myParties = parties;
+      if (!currentUser.includes("Manager")) {
+        const allowedTerritories = userTerritories[currentUser] || [];
+        myParties = parties.filter(p => allowedTerritories.includes(p.territory));
+      }
+
+      document.getElementById('reachedPartyCountBadge').textContent = `${myParties.length} Parties`;
+
+      myParties.sort((a,b) => a.name.localeCompare(b.name)).forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p.name;
+        opt.textContent = `${p.name} (${p.territory})`;
+        sel.appendChild(opt);
+      });
+
+      if (selectedPartyName && myParties.some(p => p.name === selectedPartyName)) {
+        sel.value = selectedPartyName;
+      } else if (myParties.length > 0) {
+        selectedPartyName = myParties[0].name;
+        sel.value = selectedPartyName;
+      }
+    }
+
+    function onReachedPartySelected(val) {
+      selectedPartyName = val;
+      renderPartyTasks();
+    }
+
+    function setSourceFilter(src) {
+      activeSourceFilter = src;
+      document.getElementById('srcAll').classList.toggle('active', src === 'ALL');
+      document.getElementById('srcMgr').classList.toggle('active', src === 'MGR');
+      document.getElementById('srcSelf').classList.toggle('active', src === 'SELF');
+      document.getElementById('srcOther').classList.toggle('active', src === 'OTHER');
+      renderPartyTasks();
+    }
+
+    function calculateDaysPassed(dateStr) {
+      if (!dateStr) return {"text": "Assigned Today", "cls": "today"};
+      const assigned = new Date(dateStr + "T00:00:00");
+      const today = new Date();
+      today.setHours(0,0,0,0);
+      
+      const diffTime = today - assigned;
+      const days = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+      if (days <= 0) return {"text": "Assigned Today", "cls": "today"};
+      if (days === 1) return {"text": "1 day passed", "cls": "warning"};
+      if (days === 2) return {"text": "2 days passed", "cls": "warning"};
+      return {"text": `${days} days passed (Delayed)`, "cls": "delayed"};
+    }
+
+    function renderPartyTasks() {
+      const container = document.getElementById('partyTasksList');
+      const heading = document.getElementById('partyHeadingText');
+      const counter = document.getElementById('partyTaskCounter');
+
+      if (!selectedPartyName) {
+        heading.textContent = "Please select a party from above";
+        counter.textContent = "0 tasks";
+        container.innerHTML = '<div class="empty-state">Select a customer above to see all pending work.</div>';
+        return;
+      }
+
+      heading.textContent = `Pending Tasks for: ${selectedPartyName}`;
+
+      let partyTasks = tasks.filter(t => t.type === 'PARTY' && t.target === selectedPartyName);
+      
+      if (!currentUser.includes("Manager")) {
+        partyTasks = partyTasks.filter(t => t.assignedTo === currentUser);
+      }
+
+      if (activeSourceFilter === 'MGR') {
+        partyTasks = partyTasks.filter(t => t.assignedBy.includes("Manager"));
+      } else if (activeSourceFilter === 'SELF') {
+        partyTasks = partyTasks.filter(t => t.assignedBy === currentUser);
+      } else if (activeSourceFilter === 'OTHER') {
+        partyTasks = partyTasks.filter(t => !t.assignedBy.includes("Manager") && t.assignedBy !== currentUser);
+      }
+
+      const priorityWeight = { "HIGH": 1, "MED": 2, "LOW": 3 };
+      partyTasks.sort((a, b) => {
+        if (a.completed !== b.completed) return a.completed ? 1 : -1;
+        return priorityWeight[a.priority] - priorityWeight[b.priority];
+      });
+
+      counter.textContent = `${partyTasks.filter(t => !t.completed).length} pending`;
+
+      if (partyTasks.length === 0) {
+        container.innerHTML = `<div class="empty-state">No pending tasks for you at <b>${selectedPartyName}</b>. 👍</div>`;
+        return;
+      }
+
+      container.innerHTML = partyTasks.map(t => {
+        const isMgr = t.assignedBy.includes("Manager");
+        const isSelf = t.assignedBy === currentUser;
+        
+        let sourceBadge = '';
+        if (isMgr) {
+          sourceBadge = '<span class="badge mgr-source">👔 BY MANAGER</span>';
+        } else if (isSelf) {
+          sourceBadge = '<span class="badge self-source">👤 BY SELF</span>';
+        } else {
+          sourceBadge = `<span class="badge other-source">👥 BY ${escapeHtml(t.assignedBy.split(' ')[0])}</span>`;
+        }
+
+        const isHigh = t.priority === 'HIGH';
+        const isMed = t.priority === 'MED';
+        const prioClass = isHigh ? 'prio-high' : (isMed ? 'prio-med' : 'prio-low');
+        const prioBadge = isHigh ? '<span class="badge high">🔴 HIGH</span>' : (isMed ? '<span class="badge med">🟡 MED</span>' : '<span class="badge low">🟢 LOW</span>');
+        const freqBadge = t.frequency === 'REPEATED' ? '<span class="badge rep">🔁 REPEATED</span>' : '<span class="badge dest">⚡ ONE-TIME</span>';
+        const aging = calculateDaysPassed(t.date);
+        const dueText = t.dueDate ? `Due: ${t.dueDate}` : 'No deadline';
+
+        return `
+          <div class="task-card ${prioClass} ${t.completed ? 'completed' : ''}">
+            <input 
+              type="checkbox" 
+              class="task-check" 
+              ${t.completed ? 'checked' : ''} 
+              onchange="toggleTask(${t.id})"
+              title="Mark complete"
+            />
+            <div class="task-info">
+              <div class="task-text">${escapeHtml(t.title)}</div>
+              
+              <div class="task-tags-row">
+                ${prioBadge}
+                ${sourceBadge}
+                ${freqBadge}
+              </div>
+
+              <div style="margin-bottom: 6px; display:flex; gap:8px; flex-wrap:wrap;">
+                <span class="aging-tag ${aging.cls}">
+                  ⏱️ ${aging.text} &bull; 📅 ${t.date}
+                </span>
+                <span class="aging-tag warning" style="background:#eef2ff; color:#3730a3;">
+                  ⏳ ${dueText}
+                </span>
+              </div>
+
+              <div class="task-bottom">
+                <span>Assigned By: <b>${escapeHtml(t.assignedBy)}</b></span>
+                <button class="btn-trash" onclick="deleteTask(${t.id})" title="Delete">✕</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openAddPartyModal() {
+      const allowed = userTerritories[currentUser];
+      if (allowed && allowed.length > 0) {
+        document.getElementById('newPartyTerritorySelect').value = allowed[0];
+      }
+      document.getElementById('newPartyNameInput').value = '';
+      document.getElementById('addPartyModal').style.display = 'flex';
+      document.getElementById('newPartyNameInput').focus();
+    }
+
+    function closeAddPartyModal() {
+      document.getElementById('addPartyModal').style.display = 'none';
+      document.getElementById('newPartyNameInput').value = '';
+    }
+
+    function saveNewParty() {
+      const name = document.getElementById('newPartyNameInput').value.trim();
+      const terr = document.getElementById('newPartyTerritorySelect').value;
+
+      if (!name) {
+        alert("Please enter a customer / party name.");
+        return;
+      }
+
+      if (parties.some(p => p.name.toUpperCase() === name.toUpperCase())) {
+        alert("This party is already registered in the system.");
+        return;
+      }
+
+      const newPartyObj = { name: name.toUpperCase(), territory: terr };
+      parties.push(newPartyObj);
+      localStorage.setItem(PARTIES_KEY, JSON.stringify(parties));
+
+      closeAddPartyModal();
+      populateReachedParties();
+      selectedPartyName = newPartyObj.name;
+      document.getElementById('reachedPartyDropdown').value = newPartyObj.name;
+
+      setStep1Type(formStep1Type);
+      renderPartyTasks();
+
+      alert(`Success! "${newPartyObj.name}" (${terr}) has been added to the system.`);
+    }
+
+    function setStep1Type(type) {
+      formStep1Type = type;
+      document.getElementById('tileParty').classList.toggle('active', type === 'PARTY');
+      document.getElementById('tilePerson').classList.toggle('active', type === 'PERSON');
+      document.getElementById('tileBulk').classList.toggle('active', type === 'BULK');
+
+      const label = document.getElementById('step2Label');
+      const dropdown = document.getElementById('step2Dropdown');
+      const quickAddBtn = document.getElementById('btnQuickAddParty');
+      dropdown.innerHTML = '';
+
+      if (type === 'PARTY') {
+        label.innerHTML = '<span class="step-badge">2</span> Choose Party / Customer';
+        quickAddBtn.style.display = 'inline-block';
+
+        let myParties = parties;
+        if (!currentUser.includes("Manager")) {
+          const allowedTerritories = userTerritories[currentUser] || [];
+          myParties = parties.filter(p => allowedTerritories.includes(p.territory));
+        }
+
+        myParties.sort((a,b) => a.name.localeCompare(b.name)).forEach(p => {
+          const opt = document.createElement('option');
+          opt.value = p.name;
+          opt.textContent = `${p.name} (${p.territory})`;
+          dropdown.appendChild(opt);
+        });
+      } else if (type === 'PERSON') {
+        label.innerHTML = '<span class="step-badge">2</span> Choose Person';
+        quickAddBtn.style.display = 'none';
+
+        allPersonsList.forEach(person => {
+          const opt = document.createElement('option');
+          opt.value = person;
+          opt.textContent = person;
+          if (person === currentUser) opt.textContent += " (Myself)";
+          dropdown.appendChild(opt);
+        });
+      } else if (type === 'BULK') {
+        label.innerHTML = '<span class="step-badge">2</span> Choose Bulk Destination';
+        quickAddBtn.style.display = 'none';
+
+        const opt1 = document.createElement('option');
+        opt1.value = "ALL_PUNJAB_PARTIES";
+        opt1.textContent = "⚡ All Punjab Parties (1 task per party for territory rep)";
+        dropdown.appendChild(opt1);
+
+        const opt2 = document.createElement('option');
+        opt2.value = "WHOLE_TEAM";
+        opt2.textContent = "👥 Whole Team (All 5 Field Reps)";
+        dropdown.appendChild(opt2);
+
+        const territories = ["AMRITSAR", "JALANDHAR", "BATHINDA", "MOGA", "PATIALA", "SANGRUR"];
+        territories.forEach(terr => {
+          const opt = document.createElement('option');
+          opt.value = "TERRITORY_" + terr;
+          opt.textContent = `📍 All Parties in ${terr} (${territoryOwners[terr].split(' ')[0]})`;
+          dropdown.appendChild(opt);
+        });
+      }
+    }
+
+    function setFrequency(freq) {
+      formFrequency = freq;
+      document.getElementById('btnFreqOnce').classList.toggle('active', freq === 'ONE_TIME');
+      document.getElementById('btnFreqRepeat').classList.toggle('active', freq === 'REPEATED');
+    }
+
+    function setPriority(prio) {
+      formPriority = prio;
+      const bHigh = document.getElementById('prioHigh');
+      const bMed = document.getElementById('prioMed');
+      const bLow = document.getElementById('prioLow');
+
+      bHigh.className = 'prio-pill' + (prio === 'HIGH' ? ' active-high' : '');
+      bMed.className = 'prio-pill' + (prio === 'MED' ? ' active-med' : '');
+      bLow.className = 'prio-pill' + (prio === 'LOW' ? ' active-low' : '');
+    }
+
+    function saveAndAssignTask() {
+      const desc = document.getElementById('taskInputText').value.trim();
+      const targetVal = document.getElementById('step2Dropdown').value;
+      const dueDateVal = document.getElementById('taskDueDateInput').value;
+      const todayDate = new Date().toISOString().split('T')[0];
+
+      if (!desc) {
+        alert("Please enter: What is the task?");
+        return;
+      }
+      if (!targetVal) {
+        alert("Please select a target.");
+        return;
+      }
+
+      let createdCount = 0;
+      let tasksPayloadToSync = [];
+
+      if (formStep1Type === 'PARTY') {
+        const pObj = parties.find(p => p.name === targetVal);
+        const terr = pObj ? pObj.territory : "PUNJAB";
+        const rep = territoryOwners[terr] || "Yuvinder Kumar (Manager)";
+
+        const newTask = {
+          id: Date.now() + Math.random(),
+          title: desc,
+          type: "PARTY",
+          target: targetVal,
+          territory: terr,
+          assignedTo: rep,
+          assignedBy: currentUser,
+          frequency: formFrequency,
+          priority: formPriority,
+          completed: false,
+          date: todayDate,
+          dueDate: dueDateVal,
+          status: "Pending"
+        };
+        tasks.unshift(newTask);
+        tasksPayloadToSync.push(newTask);
+        createdCount++;
+      } else if (formStep1Type === 'PERSON') {
+        const newTask = {
+          id: Date.now() + Math.random(),
+          title: desc,
+          type: "PERSON",
+          target: targetVal,
+          territory: "HQ",
+          assignedTo: targetVal,
+          assignedBy: currentUser,
+          frequency: formFrequency,
+          priority: formPriority,
+          completed: false,
+          date: todayDate,
+          dueDate: dueDateVal,
+          status: "Pending"
+        };
+        tasks.unshift(newTask);
+        tasksPayloadToSync.push(newTask);
+        createdCount++;
+      } else if (formStep1Type === 'BULK') {
+        if (targetVal === 'WHOLE_TEAM') {
+          const reps = allPersonsList.filter(p => !p.includes("Manager"));
+          reps.forEach(rep => {
+            const newTask = {
+              id: Date.now() + Math.random(),
+              title: desc,
+              type: "PERSON",
+              target: rep,
+              territory: "HQ",
+              assignedTo: rep,
+              assignedBy: currentUser,
+              frequency: formFrequency,
+              priority: formPriority,
+              completed: false,
+              date: todayDate,
+              dueDate: dueDateVal,
+              status: "Pending"
+            };
+            tasks.unshift(newTask);
+            tasksPayloadToSync.push(newTask);
+            createdCount++;
+          });
+        } else if (targetVal === 'ALL_PUNJAB_PARTIES') {
+          parties.forEach(p => {
+            const newTask = {
+              id: Date.now() + Math.random(),
+              title: desc,
+              type: "PARTY",
+              target: p.name,
+              territory: p.territory,
+              assignedTo: territoryOwners[p.territory],
+              assignedBy: currentUser,
+              frequency: formFrequency,
+              priority: formPriority,
+              completed: false,
+              date: todayDate,
+              dueDate: dueDateVal,
+              status: "Pending"
+            };
+            tasks.unshift(newTask);
+            tasksPayloadToSync.push(newTask);
+            createdCount++;
+          });
+        } else if (targetVal.startsWith("TERRITORY_")) {
+          const terr = targetVal.replace("TERRITORY_", "");
+          const partiesInTerr = parties.filter(p => p.territory === terr);
+          partiesInTerr.forEach(p => {
+            const newTask = {
+              id: Date.now() + Math.random(),
+              title: desc,
+              type: "PARTY",
+              target: p.name,
+              territory: p.territory,
+              assignedTo: territoryOwners[terr],
+              assignedBy: currentUser,
+              frequency: formFrequency,
+              priority: formPriority,
+              completed: false,
+              date: todayDate,
+              dueDate: dueDateVal,
+              status: "Pending"
+            };
+            tasks.unshift(newTask);
+            tasksPayloadToSync.push(newTask);
+            createdCount++;
+          });
+        }
+      }
+
+      localStorage.setItem(TASKS_KEY, JSON.stringify(tasks));
+      document.getElementById('taskInputText').value = '';
+      document.getElementById('taskDueDateInput').value = '';
+
+      tasksPayloadToSync.forEach(t => {
+        fetch(GOOGLE_SHEET_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            date: t.date,
+            title: t.title,
+            type: t.type,
+            target: t.target,
+            territory: t.territory,
+            assignedTo: t.assignedTo,
+            assignedBy: t.assignedBy,
+            priority: t.priority,
+            dueDate: t.dueDate,
+            status: t.status
+          })
+        }).catch(err => console.log("Sheet sync error: ", err));
+      });
+      
+      triggerMobileNotification("Natco Task Dispatched", `${desc} (Priority: ${formPriority})`);
+      alert(`Success! Created ${createdCount} task(s) and synced to Google Sheet.`);
+
+      renderAllDispatchedTasks();
+      renderPartyTasks();
+      renderMyWorkTasks();
+    }
+
+    function renderAllDispatchedTasks() {
+      const container = document.getElementById('allDispatchedTasksList');
+      if (!container) return;
+
+      let listTasks = tasks.filter(t => t.assignedBy === currentUser && t.assignedTo !== currentUser);
+
+      const priorityWeight = { "HIGH": 1, "MED": 2, "LOW": 3 };
+      let sorted = [...listTasks].sort((a, b) => {
+        if (a.completed !== b.completed) return a.completed ? 1 : -1;
+        return priorityWeight[a.priority] - priorityWeight[b.priority];
+      });
+
+      if (sorted.length === 0) {
+        container.innerHTML = '<div class="empty-state">No dispatched tasks sent to others.</div>';
+        return;
+      }
+
+      container.innerHTML = sorted.map(t => {
+        const isHigh = t.priority === 'HIGH';
+        const isMed = t.priority === 'MED';
+        const prioClass = isHigh ? 'prio-high' : (isMed ? 'prio-med' : 'prio-low');
+        const prioBadge = isHigh ? '<span class="badge high">🔴 HIGH</span>' : (isMed ? '<span class="badge med">🟡 MED</span>' : '<span class="badge low">🟢 LOW</span>');
+        const aging = calculateDaysPassed(t.date);
+        const dueText = t.dueDate ? `Due: ${t.dueDate}` : 'No deadline';
+
+        return `
+          <div class="task-card ${prioClass} ${t.completed ? 'completed' : ''}">
+            <input type="checkbox" class="task-check" ${t.completed ? 'checked' : ''} onchange="toggleTask(${t.id})" />
+            <div class="task-info">
+              <div class="task-text">${escapeHtml(t.title)}</div>
+              <div class="task-tags-row">
+                ${prioBadge}
+                <span class="badge dest">${t.type === 'PARTY' ? '🏪 ' + escapeHtml(t.target) : '👤 ' + escapeHtml(t.target)}</span>
+              </div>
+              <div style="margin-bottom: 6px; display:flex; gap:8px; flex-wrap:wrap;">
+                <span class="aging-tag ${aging.cls}">⏱️ ${aging.text} &bull; 📅 ${t.date}</span>
+                <span class="aging-tag warning" style="background:#eef2ff; color:#3730a3;">⏳ ${dueText}</span>
+              </div>
+              <div class="task-bottom">
+                <span>By: <b>${escapeHtml(t.assignedBy.split(' ')[0])}</b> ➜ For: <b>${escapeHtml(t.assignedTo.split(' ')[0])}</b></span>
+                <button class="btn-trash" onclick="deleteTask(${t.id})">✕</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderMyWorkTasks() {
+      const container = document.getElementById('myWorkTasksList');
+      if (!container) return;
+
+      let myWorkTasks = [];
+      if (currentUser.includes("Manager")) {
+        myWorkTasks = tasks;
+      } else {
+        const allowedTerritories = userTerritories[currentUser] || [];
+        myWorkTasks = tasks.filter(t => {
+          if (t.type === 'PERSON' && t.target === currentUser) return true;
+          if (t.type === 'PARTY' && allowedTerritories.includes(t.territory)) return true;
+          if (t.assignedTo === currentUser) return true;
+          return false;
+        });
+      }
+
+      const priorityWeight = { "HIGH": 1, "MED": 2, "LOW": 3 };
+      myWorkTasks.sort((a, b) => {
+        if (a.completed !== b.completed) return a.completed ? 1 : -1;
+        return priorityWeight[a.priority] - priorityWeight[b.priority];
+      });
+
+      if (myWorkTasks.length === 0) {
+        container.innerHTML = '<div class="empty-state">No pending work assigned to you or your territory. 👍</div>';
+        return;
+      }
+
+      container.innerHTML = myWorkTasks.map(t => {
+        const isMgr = t.assignedBy.includes("Manager");
+        const sourceBadge = isMgr ? '<span class="badge mgr-source">👔 BY MANAGER</span>' : `<span class="badge other-source">👥 BY ${escapeHtml(t.assignedBy.split(' ')[0])}</span>`;
+        
+        const isHigh = t.priority === 'HIGH';
+        const isMed = t.priority === 'MED';
+        const prioClass = isHigh ? 'prio-high' : (isMed ? 'prio-med' : 'prio-low');
+        const prioBadge = isHigh ? '<span class="badge high">🔴 HIGH</span>' : (isMed ? '<span class="badge med">🟡 MED</span>' : '<span class="badge low">🟢 LOW</span>');
+        const freqBadge = t.frequency === 'REPEATED' ? '<span class="badge rep">🔁 REPEATED</span>' : '<span class="badge dest">⚡ ONE-TIME</span>';
+        const aging = calculateDaysPassed(t.date);
+        const dueText = t.dueDate ? `Due: ${t.dueDate}` : 'No deadline';
+
+        return `
+          <div class="task-card ${prioClass} ${t.completed ? 'completed' : ''}">
+            <input type="checkbox" class="task-check" ${t.completed ? 'checked' : ''} onchange="toggleTask(${t.id})" />
+            <div class="task-info">
+              <div class="task-text">${escapeHtml(t.title)}</div>
+              <div class="task-tags-row">
+                ${prioBadge}
+                ${sourceBadge}
+                <span class="badge dest">${t.type === 'PARTY' ? '🏪 ' + escapeHtml(t.target) : '👤 ' + escapeHtml(t.target)}</span>
+                ${freqBadge}
+              </div>
+              <div style="margin-bottom: 6px; display:flex; gap:8px; flex-wrap:wrap;">
+                <span class="aging-tag ${aging.cls}">⏱️ ${aging.text} &bull; 📅 ${t.date}</span>
+                <span class="aging-tag warning" style="background:#eef2ff; color:#3730a3;">⏳ ${dueText}</span>
+              </div>
+              <div class="task-bottom">
+                <span>Assigned By: <b>${escapeHtml(t.assignedBy)}</b></span>
+                <button class="btn-trash" onclick="deleteTask(${t.id})">✕</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function toggleTask(id) {
+      let targetTask = null;
+      tasks = tasks.map(t => {
+        if (t.id === id) {
+          const updated = { ...t, completed: !t.completed, status: (!t.completed ? "Completed" : "Pending") };
+          targetTask = updated;
+          return updated;
+        }
+        return t;
+      });
+      localStorage.setItem(TASKS_KEY, JSON.stringify(tasks));
+
+      if (targetTask) {
+        fetch(GOOGLE_SHEET_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            date: targetTask.date,
+            title: targetTask.title + " [Status: " + targetTask.status + "]",
+            type: targetTask.type,
+            target: targetTask.target,
+            territory: targetTask.territory,
+            assignedTo: targetTask.assignedTo,
+            assignedBy: targetTask.assignedBy,
+            priority: targetTask.priority,
+            dueDate: targetTask.dueDate,
+            status: targetTask.status
+          })
+        }).catch(err => console.log("Sheet sync error: ", err));
+      }
+
+      renderPartyTasks();
+      renderAllDispatchedTasks();
+      renderMyWorkTasks();
+    }
+
+    function deleteTask(id) {
+      if (confirm("Delete this task?")) {
+        let deletedTask = tasks.find(t => t.id === id);
+        tasks = tasks.filter(t => t.id !== id);
+        localStorage.setItem(TASKS_KEY, JSON.stringify(tasks));
+
+        if (deletedTask) {
+          fetch(GOOGLE_SHEET_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              date: deletedTask.date,
+              title: deletedTask.title + " [DELETED]",
+              type: deletedTask.type,
+              target: deletedTask.target,
+              territory: deletedTask.territory,
+              assignedTo: deletedTask.assignedTo,
+              assignedBy: deletedTask.assignedBy,
+              priority: deletedTask.priority,
+              dueDate: deletedTask.dueDate,
+              status: "Deleted"
+            })
+          }).catch(err => console.log("Sheet sync error: ", err));
+        }
+
+        renderPartyTasks();
+        renderAllDispatchedTasks();
+        renderMyWorkTasks();
+      }
+    }
+
+    function escapeHtml(str) {
+      const d = document.createElement('div');
+      d.textContent = str;
+      return d.innerHTML;
+    }
+  </script>
+</body>
+</html>
