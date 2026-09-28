@@ -166,6 +166,28 @@ table th:nth-child(4), table td:nth-child(4){width:20%}
   .product-qty-panel table th:nth-child(2),
   .product-qty-panel table td:nth-child(2){width:32%}
 }
+
+/* Product x Territory quantity summary */
+.product-territory-panel{border-color:#CBD5E1}
+.product-territory-panel .section-head{background:linear-gradient(135deg,#334155,#475569)}
+.product-territory-panel .scroll{border:1px solid #CBD5E1;max-height:520px}
+.product-territory-panel table{min-width:760px}
+.product-territory-panel table thead th{background:#475569}
+.product-territory-panel table tbody td{border-bottom:1px solid #E2E8F0}
+.product-territory-panel table tbody tr:nth-child(even) td{background:#F8FAFC}
+.product-territory-panel table tbody tr:hover td{background:#F1F5F9}
+.product-territory-panel table th:first-child,
+.product-territory-panel table td:first-child{width:24%;text-align:left;font-weight:800;position:sticky;left:0;z-index:1;background:#fff}
+.product-territory-panel table thead th:first-child{z-index:3;background:#475569}
+.product-territory-panel table th:not(:first-child),
+.product-territory-panel table td:not(:first-child){width:auto;text-align:right}
+.product-territory-panel .unit-note{font-size:11px;font-weight:700;color:#64748B;margin:7px 0 0}
+@media(max-width:700px){
+  .product-territory-panel table{min-width:680px}
+  .product-territory-panel table th:first-child,
+  .product-territory-panel table td:first-child{width:28%;font-size:11px}
+}
+
 </style>
 </head>
 <body>
@@ -270,6 +292,17 @@ table th:nth-child(4), table td:nth-child(4){width:20%}
           <thead><tr><th>Payer Name</th><th>Quantity (Kg/Ltrs)</th><th>Total Reward Points</th></tr></thead>
           <tbody id="partyPointsBody"></tbody>
         </table></div>
+      </div>
+
+      <div class="panel product-territory-panel">
+        <div class="section-head">Product-wise Territory Billing Quantity</div>
+        <div class="scroll">
+          <table>
+            <thead id="productTerritoryHead"></thead>
+            <tbody id="productTerritoryBody"></tbody>
+          </table>
+        </div>
+        <div class="unit-note">All products are shown in Kg/Ltr. NATDUO and NATERRA are shown in MT.</div>
       </div>
     </main>
   </div>
@@ -560,6 +593,47 @@ function render(){
   $("productQtyBody").innerHTML=pqa.map(([x,v])=>
     `<tr><td title="${esc(x||'(Blank)')}">${esc(x||"(Blank)")}</td><td>${qf(v.q)}</td><td>${v.rate.toLocaleString("en-IN",{minimumFractionDigits:1,maximumFractionDigits:1})}</td><td>${v.pts.toLocaleString("en-IN",{minimumFractionDigits:1,maximumFractionDigits:1})}</td></tr>`
   ).join("")||'<tr><td colspan=4>No product data</td></tr>';
+
+  // Product x Territory quantity summary (new section only)
+  const PT={};
+  const territories=[...new Set(f.map(r=>String(r.territory||"").trim()).filter(Boolean))]
+    .sort((a,b)=>a.localeCompare(b,undefined,{numeric:true,sensitivity:"base"}));
+
+  f.forEach(r=>{
+    const product=String(r.strength||"").trim()||"(Blank)";
+    const territory=String(r.territory||"").trim()||"(Blank)";
+    PT[product]??={};
+    PT[product][territory]=(PT[product][territory]||0)+r.qty;
+  });
+
+  const productRows=Object.entries(PT).sort((a,b)=>{
+    const ta=Object.values(a[1]).reduce((x,y)=>x+y,0);
+    const tb=Object.values(b[1]).reduce((x,y)=>x+y,0);
+    return tb-ta || a[0].localeCompare(b[0],undefined,{sensitivity:"base"});
+  });
+
+  const ptHead=$("productTerritoryHead");
+  const ptBody=$("productTerritoryBody");
+
+  if(!territories.length || !productRows.length){
+    ptHead.innerHTML='<tr><th>Product</th><th>Qty</th></tr>';
+    ptBody.innerHTML='<tr><td colspan="2">No billing data</td></tr>';
+  }else{
+    ptHead.innerHTML=`<tr><th>Product</th>${territories.map(t=>`<th>${esc(t)}</th>`).join("")}<th>Total</th></tr>`;
+
+    ptBody.innerHTML=productRows.map(([product,vals])=>{
+      const isMT=/^(NATDUO|NATERRA)$/.test(norm(product));
+      const divisor=isMT?1000:1;
+      const decimals=isMT?3:0;
+      const fmt=v=>Number(v/divisor).toLocaleString("en-IN",{minimumFractionDigits:0,maximumFractionDigits:decimals});
+      const total=Object.values(vals).reduce((x,y)=>x+y,0);
+      return `<tr>
+        <td title="${esc(product)}">${esc(product)} <span style="font-size:10px;color:#64748B">(${isMT?"MT":"Kg/Ltr"})</span></td>
+        ${territories.map(t=>`<td>${fmt(vals[t]||0)}</td>`).join("")}
+        <td><b>${fmt(total)}</b></td>
+      </tr>`;
+    }).join("");
+  }
 
   let ta=Object.entries(T).sort((a,b)=>b[1].d-a[1].d),
       pieTotal=ta.reduce((s,[x,v])=>s+v.d,0);
