@@ -1,0 +1,543 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Punjab Integrated Sales & Target Dashboard — FY 2026-27</title>
+<style>
+:root{--navy:#101a33;--blue:#2563eb;--green:#059669;--orange:#ea580c;--red:#b91c1c;--bg:#f8fafc;--card:#fff;--line:#e2e8f0;--muted:#64748b;--text:#0f172a;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif;}
+.wrap{max-width:1600px;margin:auto;padding:16px}
+.header{background:linear-gradient(135deg,#0f172a,#1e293b 48%,#0f172a);color:#fff;padding:22px 24px;border-radius:12px;box-shadow:0 8px 25px rgba(15,23,42,0.15);margin-bottom:16px;}
+.header h1{margin:0;font-size:clamp(21px,3vw,28px);font-weight:800;letter-spacing:.2px}
+.header p{margin:6px 0 0;opacity:.9;font-size:13px;color:#cbd5e1}
+
+.dashboard-grid{display:grid;grid-template-columns:260px 1fr;gap:16px;align-items:start}
+.sidebar{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;position:sticky;top:12px;box-shadow:0 4px 12px rgba(0,0,0,0.03)}
+.side-title{font-weight:900;color:var(--navy);font-size:14px;margin-bottom:14px;text-transform:uppercase;letter-spacing:.5px}
+.filters{display:flex;flex-direction:column;gap:14px}
+.filter label{display:block;color:var(--muted);font-size:11px;font-weight:800;margin-bottom:4px;text-transform:uppercase}
+.filter span.hint{font-size:9px;color:var(--blue);font-weight:600;text-transform:none}
+
+select{width:100%;height:40px;border:1px solid var(--line);border-radius:6px;background:#f8fafc;color:var(--text);padding:0 12px;font-weight:700;font-size:13px;cursor:pointer;outline:none}
+select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(37,99,235,0.15)}
+
+/* Custom Multi-Select Dropdown */
+.multi-select{position:relative;user-select:none;}
+.ms-header{background:#f8fafc;border:1px solid var(--line);padding:10px 12px;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;display:flex;justify-content:space-between;align-items:center;color:var(--text);}
+.ms-header::after{content:"▼";font-size:10px;color:var(--navy);}
+.ms-options{display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid var(--line);border-radius:6px;z-index:999;margin-top:4px;box-shadow:0 10px 25px rgba(0,0,0,0.1);max-height:260px;overflow-y:auto;padding:6px;}
+.ms-options.open{display:block;}
+.ms-options label{display:flex;align-items:center;padding:8px;font-size:13px;font-weight:600;color:var(--navy);cursor:pointer;border-radius:4px;}
+.ms-options label:hover{background:#f1f5f9;}
+.ms-options input{margin-right:10px;cursor:pointer;width:15px;height:15px;accent-color:var(--blue);}
+
+.reset-btn{width:100%;height:38px;border:1px solid var(--red);border-radius:6px;background:#fff;color:var(--red);font-weight:800;cursor:pointer;margin-top:8px;font-size:12px}
+.reset-btn:hover{background:var(--red);color:#fff}
+
+/* 4 Tiles Layout */
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+@media(max-width:1100px){.tiles{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.tiles{grid-template-columns:1fr}}
+.tile{color:#fff;border-radius:12px;padding:20px;min-height:120px;box-shadow:0 4px 12px rgba(0,0,0,0.06);display:flex;flex-direction:column;justify-content:center;}
+.tile:nth-child(1){background:linear-gradient(135deg,#64748b,#475569)}
+.tile:nth-child(2){background:linear-gradient(135deg,#2563eb,#1d4ed8)}
+.tile:nth-child(3){background:linear-gradient(135deg,#10b981,#059669)}
+.tile:nth-child(4){background:linear-gradient(135deg,#8b5cf6,#6d28d9)}
+.tile .label{font-size:12px;font-weight:800;letter-spacing:.5px;opacity:.9;text-transform:uppercase}
+.tile .value{font-size:28px;font-weight:900;margin-top:6px}
+.tile .sub{font-size:11px;opacity:.8;margin-top:4px}
+.tile .pos-growth{color:#a7f3d0;}
+.tile .neg-growth{color:#fecaca;}
+
+.panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:16px;box-shadow:0 4px 12px rgba(0,0,0,0.03);}
+.panel h2{font-size:17px;margin:0 0 6px;color:var(--navy);font-weight:800}
+.panel .hint{font-size:12px;color:var(--muted);margin-bottom:16px;font-weight:600}
+
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:8px;max-height:500px}
+table{border-collapse:separate;border-spacing:0;width:100%;min-width:800px;font-size:13px}
+th,td{padding:12px 14px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left;position:sticky;left:0;z-index:2;background:#fff}
+thead th{background:#f1f5f9;color:var(--navy);font-weight:800;position:sticky;top:0;z-index:3;border-bottom:2px solid #cbd5e1}
+thead th:first-child{z-index:4;background:#f1f5f9}
+tbody tr:nth-child(even) td{background:#f8fafc}
+tbody tr:hover td{background:#f1f5f9!important}
+.total-row td{font-weight:900;background:#e8f7f1!important;color:#075b43}
+
+.zero{color:#94a3b8;font-weight:400}
+td.pos-growth{color:#059669;font-weight:800;}
+td.neg-growth{color:#b91c1c;font-weight:800;}
+
+.live-status{display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:700;color:var(--navy);margin-bottom:16px;background:#e2e8f0;padding:12px 16px;border-radius:8px;border-left:4px solid var(--blue)}
+@media(max-width:1100px){.dashboard-grid{grid-template-columns:1fr}.sidebar{position:static}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <h1>Punjab Integrated Sales & Target Dashboard</h1>
+    <p>Complete Reconciliation: FY27 Targets vs. Current Live Actuals vs. FY26 Last Year Actuals</p>
+  </div>
+
+  <div class="live-status">
+    <span id="syncStatus">⏳ Processing Data Matrix...</span>
+    <span><b>Product Table:</b> Quantity (Kg/Ltrs/MT) &nbsp;|&nbsp; <b>Territory Table & Tiles:</b> Value (₹ Crore) &nbsp;|&nbsp; <b>CY:</b> FY 2026-27</span>
+  </div>
+
+  <div class="dashboard-grid">
+    <aside class="sidebar">
+      <div class="side-title">Global Filters</div>
+      <div class="filters">
+        <div class="filter"><label>Product</label><select id="fProduct"><option value="ALL">All Products</option></select></div>
+        
+        <div class="filter">
+          <label>Period / Month</label>
+          <div class="multi-select" id="monthDropdown">
+            <div class="ms-header" id="monthHdr" onclick="toggleMS()">All Months (FY)</div>
+            <div class="ms-options" id="monthOpts">
+              <label><input type="checkbox" value="ALL" checked onchange="handleMS(this)"> All Months (FY)</label>
+              <label><input type="checkbox" value="Apr" onchange="handleMS(this)"> April</label>
+              <label><input type="checkbox" value="May" onchange="handleMS(this)"> May</label>
+              <label><input type="checkbox" value="Jun" onchange="handleMS(this)"> June</label>
+              <label><input type="checkbox" value="Jul" onchange="handleMS(this)"> July</label>
+              <label><input type="checkbox" value="Aug" onchange="handleMS(this)"> August</label>
+              <label><input type="checkbox" value="Sep" onchange="handleMS(this)"> September</label>
+              <label><input type="checkbox" value="Oct" onchange="handleMS(this)"> October</label>
+              <label><input type="checkbox" value="Nov" onchange="handleMS(this)"> November</label>
+              <label><input type="checkbox" value="Dec" onchange="handleMS(this)"> December</label>
+              <label><input type="checkbox" value="Jan" onchange="handleMS(this)"> January</label>
+              <label><input type="checkbox" value="Feb" onchange="handleMS(this)"> February</label>
+              <label><input type="checkbox" value="Mar" onchange="handleMS(this)"> March</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="filter"><label>Territory</label><select id="fTerritory"><option value="ALL">All Territories</option><option value="Amritsar">Amritsar</option><option value="Bathinda">Bathinda</option><option value="Jalandhar">Jalandhar</option><option value="Moga">Moga</option><option value="Patiala">Patiala</option><option value="Sangrur">Sangrur</option></select></div>
+        <button class="reset-btn" onclick="resetFilters()">Clear Filters</button>
+      </div>
+    </aside>
+
+    <main>
+      <!-- 4 Value Tiles -->
+      <div class="tiles">
+        <div class="tile"><div class="label">LY Actual 2025-26</div><div class="value" id="tLastVal">₹0.00 Cr</div><div class="sub">Historical Taxable Amount</div></div>
+        <div class="tile"><div class="label">CY 2026-27 Target on NDP</div><div class="value" id="tTargetNDP">₹0.00 Cr</div><div class="sub">Planned CY Target Value</div></div>
+        <div class="tile"><div class="label">Actual 2026-27 on NDP</div><div class="value" id="tCurrNDP">₹0.00 Cr</div><div class="sub">Live Actual Value</div></div>
+        <div class="tile"><div class="label">Growth Over Last Year</div><div class="value" id="tGOLY">0%</div><div class="sub">Actual NDP vs FY26 Value</div></div>
+      </div>
+
+      <!-- Table 1: Products (Qty in Kg/Ltr/MT) -->
+      <div class="panel">
+        <h2>Product-Wise Quantitative Comparison</h2>
+        <div class="hint">Physical Quantities displayed in Kg/Ltr. <b>NATERRA and NATDUO are displayed in MT.</b> Unsold products correctly report 0.</div>
+        <div class="table-wrap">
+          <table id="prodTable">
+            <thead>
+              <tr><th>Product Name</th><th>LY Actual 2025-26</th><th>CY 2026-27 Targets</th><th>Actual 2026-27</th><th>Growth over last year (%)</th></tr>
+            </thead>
+            <tbody id="prodTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Table 2: Territory (Value in ₹ Crore) -->
+      <div class="panel">
+        <h2>Territory-Wise Value Comparison (₹ Crore)</h2>
+        <div class="hint">Financial performance by region evaluated in ₹ Crore (Target and Actual computed on NDP).</div>
+        <div class="table-wrap">
+          <table id="terrTable">
+            <thead>
+              <tr><th>Territory / HQ</th><th>LY Actual 2025-26 (₹ Cr)</th><th>CY 2026-27 Targets (₹ Cr)</th><th>Actual 2026-27 (₹ Cr)</th><th>Growth over last year (%)</th></tr>
+            </thead>
+            <tbody id="terrTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+// --- UI CONTROLS & CHECKBOX DROPDOWN ---
+function toggleMS() {
+    document.getElementById('monthOpts').classList.toggle('open');
+}
+
+document.addEventListener('click', e => {
+    if(!e.target.closest('.multi-select')) {
+        document.getElementById('monthOpts').classList.remove('open');
+    }
+});
+
+let selectedMonths = new Set(["ALL"]);
+
+function handleMS(cb) {
+    if (cb.value === "ALL") {
+        if (cb.checked) {
+            selectedMonths.clear();
+            selectedMonths.add("ALL");
+            document.querySelectorAll('#monthOpts input').forEach(i => { if(i.value !== "ALL") i.checked = false; });
+        } else {
+            cb.checked = true;
+        }
+    } else {
+        document.querySelector('#monthOpts input[value="ALL"]').checked = false;
+        selectedMonths.delete("ALL");
+        if (cb.checked) selectedMonths.add(cb.value);
+        else selectedMonths.delete(cb.value);
+        
+        if (selectedMonths.size === 0) {
+            selectedMonths.add("ALL");
+            document.querySelector('#monthOpts input[value="ALL"]').checked = true;
+        }
+    }
+    
+    let hdr = document.getElementById('monthHdr');
+    if (selectedMonths.has("ALL")) {
+        hdr.textContent = "All Months (FY)";
+    } else {
+        let arr = Array.from(selectedMonths);
+        hdr.textContent = arr.length <= 3 ? arr.join(", ") : `${arr.length} Months Selected`;
+    }
+    calculateDashboard();
+}
+
+// --- DATA STRUCTURES ---
+const PRODUCTS = ["ASTOR", "ATMOS", "BOSNATE", "CYANAT", "DEXARON", "DI-FORCE", "GLACPOT", "GLANZ", "HATRIK", "NATCORE", "NATCRUSH", "NATDUO", "NATERRA", "NATGEN", "NATGEN PRO", "NATJEWEL FS", "NATLAM", "NATLIGO", "NATLIKA", "NATNEXT", "NATPEARL", "NATVOL", "NATWEEZ", "NATZOATE", "OMNINAT", "PAMUK", "PRIDONAT", "SCRIPTOR", "SLAYDEN", "SPIROVANTA", "TOPRASURE", "VECTRA", "VINASAK", "XYMEN"];
+const TERRITORIES = ["Amritsar", "Bathinda", "Jalandhar", "Moga", "Patiala", "Sangrur"];
+const MONTHS = ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar"];
+const JS_MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+// Format: [NRV, NDP]
+const RATES = {"ASTOR":[10872,13590],"ATMOS":[3200,4463],"BOSNATE":[3321,3907],"CYANAT":[3902,4590],"DEXARON":[1698,1998],"DI-FORCE":[1779,2093],"GLACPOT":[546,682],"GLANZ":[3427,4032],"HATRIK":[1189,1321],"NATCORE":[950,1117],"NATCRUSH":[3000,3600],"NATDUO":[113,145],"NATERRA":[76,85],"NATGEN":[2020,3672],"NATGEN PRO":[9257,10890],"NATJEWEL FS":[597,702],"NATLAM":[375,390],"NATLIGO":[2081,2601],"NATLIKA":[876,1095],"NATNEXT":[2115,2643],"NATPEARL":[1353,1591],"NATVOL":[2732,3215],"NATWEEZ":[830,1036],"NATZOATE":[998,1124],"OMNINAT":[1265,1488],"PAMUK":[4950,6188],"PRIDONAT":[2500,2950],"SCRIPTOR":[16575,19500],"SLAYDEN":[1150,1692],"SPIROVANTA":[2513,2956],"TOPRASURE":[20585,22700],"VECTRA":[1688,1986],"VINASAK":[1327,1561],"XYMEN":[8325,12167]};
+const pMap = { "BOSNAT": "BOSNATE", "NATJEWEL": "NATJEWEL FS", "DIFORCE": "DI-FORCE", "GLAYCPOT": "GLACPOT" };
+
+function getStandardProduct(raw) {
+    if(!raw) return null;
+    let s = String(raw).trim().replace(/\s+/g, " ").toUpperCase();
+    if(pMap[s]) return pMap[s];
+    let matched = PRODUCTS.find(p => p === s || s.startsWith(p));
+    return matched || s;
+}
+
+const prodSel = document.getElementById('fProduct');
+PRODUCTS.forEach(p => { let opt = document.createElement('option'); opt.value = p; opt.textContent = p; prodSel.appendChild(opt); });
+
+// TARGET DATA (n = NDP rate)
+const TARGETS = [{"r":"Moga","p":"ASTOR","n":13590,"v":10872,"m":{"Apr":2,"Jun":3,"Jul":6,"Aug":20,"Feb":9}},{"r":"Moga","p":"ATMOS","n":4462.5,"v":3200,"m":{"Aug":95,"Jan":5}},{"r":"Moga","p":"BOSNATE","n":3907,"v":3320.95,"m":{"Jun":6,"Aug":10,"Mar":4}},{"r":"Moga","p":"CYANAT","n":4590,"v":3901.5,"m":{"May":50,"Jun":25,"Sep":15,"Oct":10}},{"r":"Moga","p":"DEXARON","n":1997.98,"v":1698.28,"m":{"May":95,"Jun":95,"Aug":10}},{"r":"Moga","p":"DI-FORCE","n":2093,"v":1779.05,"m":{"Jun":100}},{"r":"Moga","p":"GLACPOT","n":682.27,"v":545.81,"m":{"May":700,"Jun":740,"Aug":560}},{"r":"Moga","p":"GLANZ","n":4032,"v":3427.2,"m":{"May":1,"Aug":751}},{"r":"Moga","p":"HATRIK","n":1320.9,"v":1188.81,"m":{"Sep":4}},{"r":"Moga","p":"NATCORE","n":1117.2,"v":949.62,"m":{"May":535,"Jun":300,"Jul":30,"Sep":85}},{"r":"Moga","p":"NATDUO","n":145,"v":113.3,"m":{"Apr":2000}},{"r":"Moga","p":"NATERRA","n":84.8,"v":76,"m":{"Apr":425,"May":5,"Jun":24570}},{"r":"Moga","p":"NATGEN","n":3672.31,"v":2019.77,"m":{"Jun":150}},{"r":"Moga","p":"NATGEN PRO","n":10890,"v":9256.5,"m":{"Jun":150}},{"r":"Moga","p":"NATJEWEL FS","n":702,"v":597,"m":{"Aug":145,"Sep":55}},{"r":"Moga","p":"NATLAM","n":390,"v":375,"m":{"Apr":20,"May":2,"Jul":5,"Aug":20,"Jan":3}},{"r":"Moga","p":"NATLIGO","n":2601,"v":2080.8,"m":{"Jun":632,"Jul":3,"Aug":155,"Sep":200,"Nov":20,"Dec":30,"Jan":10}},{"r":"Moga","p":"NATLIKA","n":1095.15,"v":876.12,"m":{"Jul":15,"Mar":35}},{"r":"Moga","p":"NATNEXT","n":2643.2,"v":2114.56,"m":{"Apr":10,"Jun":10,"Mar":10}},{"r":"Moga","p":"NATPEARL","n":1591.2,"v":1352.52,"m":{"Jun":400,"Jul":420,"Aug":500,"Sep":230,"Jan":50}},{"r":"Moga","p":"NATWEEZ","n":1035.5,"v":830,"m":{"May":100,"Jun":50,"Jul":50}},{"r":"Moga","p":"NATZOATE","n":1124,"v":998.4,"m":{"May":70,"Aug":14}},{"r":"Moga","p":"OMNINAT","n":1487.85,"v":1264.67,"m":{"Apr":88,"May":387,"Jul":25}},{"r":"Moga","p":"PAMUK","n":6187.5,"v":4950,"m":{"Oct":2}},{"r":"Moga","p":"PRIDONAT","n":2950,"v":2500,"m":{"Jan":35}},{"r":"Moga","p":"SCRIPTOR","n":19500,"v":16575,"m":{"Mar":3}},{"r":"Moga","p":"SLAYDEN","n":1692,"v":1150,"m":{"Sep":3000}},{"r":"Moga","p":"SPIROVANTA","n":2956.4,"v":2512.94,"m":{"Jul":20}},{"r":"Moga","p":"TOPRASURE","n":22700,"v":20585,"m":{"Apr":200,"Jul":50}},{"r":"Moga","p":"VECTRA","n":1985.94,"v":1688.04,"m":{"May":50}},{"r":"Moga","p":"VINASAK","n":1561.35,"v":1327.14,"m":{"May":150,"Jun":105,"Aug":200,"Sep":145}},{"r":"Moga","p":"XYMEN","n":12167,"v":8325,"m":{"Sep":200}},{"r":"Bathinda","p":"ASTOR","n":13590,"v":10872,"m":{"May":15,"Feb":5}},{"r":"Bathinda","p":"ATMOS","n":4462.5,"v":3200,"m":{"Jun":97,"Jan":3}},{"r":"Bathinda","p":"BOSNATE","n":3907,"v":3320.95,"m":{"Jun":10,"Feb":10}},{"r":"Bathinda","p":"CYANAT","n":4590,"v":3901.5,"m":{"May":5,"Jun":145,"Jul":5,"Sep":35,"Nov":10}},{"r":"Bathinda","p":"DEXARON","n":1997.98,"v":1698.28,"m":{"Jun":15,"Aug":35}},{"r":"Bathinda","p":"DI-FORCE","n":2093,"v":1779.05,"m":{"Jun":50}},{"r":"Bathinda","p":"GLACPOT","n":682.27,"v":545.81,"m":{"May":1000}},{"r":"Bathinda","p":"GLANZ","n":4032,"v":3427.2,"m":{"Jul":397,"Sep":323,"Feb":50}},{"r":"Bathinda","p":"HATRIK","n":1320.9,"v":1188.81,"m":{"Jul":5,"Sep":10}},{"r":"Bathinda","p":"NATCORE","n":1117.2,"v":949.62,"m":{"Jun":950}},{"r":"Bathinda","p":"NATCRUSH","n":3600,"v":3000,"m":{"May":10,"Jun":50,"Feb":20}},{"r":"Bathinda","p":"NATDUO","n":145,"v":113.3,"m":{"Jun":2000}},{"r":"Bathinda","p":"NATERRA","n":84.8,"v":76,"m":{"May":30560,"Jun":2440}},{"r":"Bathinda","p":"NATGEN","n":3672.31,"v":2019.77,"m":{"May":90,"Jun":160}},{"r":"Bathinda","p":"NATGEN PRO","n":10890,"v":9256.5,"m":{"Apr":5,"Jul":180,"Mar":15}},{"r":"Bathinda","p":"NATJEWEL FS","n":702,"v":597,"m":{"May":305,"Jun":405,"Jul":150,"Jan":15,"Mar":25}},{"r":"Bathinda","p":"NATLAM","n":390,"v":375,"m":{"Apr":10,"May":93,"Jun":225,"Jan":42}},{"r":"Bathinda","p":"NATLIGO","n":2601,"v":2080.8,"m":{"Apr":20,"Jun":1342,"Aug":30,"Oct":5,"Mar":3}},{"r":"Bathinda","p":"NATLIKA","n":1095.15,"v":876.12,"m":{"May":100,"Jun":245,"Sep":5,"Feb":50}},{"r":"Bathinda","p":"NATPEARL","n":1591.2,"v":1352.52,"m":{"Jun":1100}},{"r":"Bathinda","p":"NATWEEZ","n":1035.5,"v":830,"m":{"Jun":400}},{"r":"Bathinda","p":"NATZOATE","n":1124,"v":998.4,"m":{"Apr":50,"Jun":5,"Jul":100,"Sep":5}},{"r":"Bathinda","p":"OMNINAT","n":1487.85,"v":1264.67,"m":{"Jun":450}},{"r":"Bathinda","p":"PAMUK","n":6187.5,"v":4950,"m":{"Jun":300,"Jul":20,"Aug":39,"Sep":1,"Oct":4,"Mar":20}},{"r":"Bathinda","p":"PRIDONAT","n":2950,"v":2500,"m":{"May":93,"Jan":5}},{"r":"Bathinda","p":"SCRIPTOR","n":19500,"v":16575,"m":{"Jun":100,"Mar":17}},{"r":"Bathinda","p":"SLAYDEN","n":1692,"v":1150,"m":{"Sep":6500}},{"r":"Bathinda","p":"SPIROVANTA","n":2956.4,"v":2512.94,"m":{"Aug":10}},{"r":"Bathinda","p":"TOPRASURE","n":22700,"v":20585,"m":{"May":50}},{"r":"Bathinda","p":"VECTRA","n":1985.94,"v":1688.04,"m":{"May":50}},{"r":"Bathinda","p":"VINASAK","n":1561.35,"v":1327.14,"m":{"Jun":563,"Jul":27,"Mar":10}},{"r":"Bathinda","p":"XYMEN","n":12167,"v":8325,"m":{"Sep":100}},{"r":"Amritsar","p":"ASTOR","n":13590,"v":10872,"m":{"May":1,"Jul":29}},{"r":"Amritsar","p":"ATMOS","n":4462.5,"v":3200,"m":{"Jun":95,"Aug":5}},{"r":"Amritsar","p":"BOSNATE","n":3907,"v":3320.95,"m":{"Jun":7,"Jul":3,"Aug":10,"Jan":10}},{"r":"Amritsar","p":"CYANAT","n":4590,"v":3901.5,"m":{"May":35,"Jun":30,"Jul":35}},{"r":"Amritsar","p":"DEXARON","n":1997.98,"v":1698.28,"m":{"Jun":350,"Aug":50,"Sep":100}},{"r":"Amritsar","p":"DI-FORCE","n":2093,"v":1779.05,"m":{"May":175,"Sep":65,"Mar":10}},{"r":"Amritsar","p":"GLACPOT","n":682.27,"v":545.81,"m":{"Jun":1500}},{"r":"Amritsar","p":"GLANZ","n":4032,"v":3427.2,"m":{"Jun":518,"Aug":227}},{"r":"Amritsar","p":"HATRIK","n":1320.9,"v":1188.81,"m":{"Jun":100}},{"r":"Amritsar","p":"NATCORE","n":1117.2,"v":949.62,"m":{"May":150,"Jun":50,"Jul":300}},{"r":"Amritsar","p":"NATCRUSH","n":3600,"v":3000,"m":{"Jun":40}},{"r":"Amritsar","p":"NATDUO","n":145,"v":113.3,"m":{"Apr":1500,"May":1000}},{"r":"Amritsar","p":"NATERRA","n":84.8,"v":76,"m":{"Apr":10,"Jun":22990}},{"r":"Amritsar","p":"NATGEN","n":3672.31,"v":2019.77,"m":{"Apr":120,"May":80}},{"r":"Amritsar","p":"NATGEN PRO","n":10890,"v":9256.5,"m":{"Apr":10,"Jun":60,"Aug":80}},{"r":"Amritsar","p":"NATJEWEL FS","n":702,"v":597,"m":{"Jun":175,"Mar":25}},{"r":"Amritsar","p":"NATLAM","n":390,"v":375,"m":{"May":5,"Jun":25}},{"r":"Amritsar","p":"NATLIGO","n":2601,"v":2080.8,"m":{"May":25,"Jun":495,"Aug":215,"Oct":15}},{"r":"Amritsar","p":"NATLIKA","n":1095.15,"v":876.12,"m":{"Jun":45,"Mar":5}},{"r":"Amritsar","p":"NATPEARL","n":1591.2,"v":1352.52,"m":{"Jun":600}},{"r":"Amritsar","p":"NATVOL","n":3214.65,"v":2732.45,"m":{"Jun":30,"Feb":10,"Mar":10}},{"r":"Amritsar","p":"NATWEEZ","n":1035.5,"v":830,"m":{"Apr":100,"Jun":100}},{"r":"Amritsar","p":"NATZOATE","n":1124,"v":998.4,"m":{"Aug":78,"Sep":20}},{"r":"Amritsar","p":"OMNINAT","n":1487.85,"v":1264.67,"m":{"Jun":350}},{"r":"Amritsar","p":"PAMUK","n":6187.5,"v":4950,"m":{"May":40,"Sep":99}},{"r":"Amritsar","p":"SCRIPTOR","n":19500,"v":16575,"m":{"Feb":50,"Mar":13}},{"r":"Amritsar","p":"SLAYDEN","n":1692,"v":1150,"m":{"Sep":3000}},{"r":"Amritsar","p":"SPIROVANTA","n":2956.4,"v":2512.94,"m":{"May":6,"Jun":9}},{"r":"Amritsar","p":"TOPRASURE","n":22700,"v":20585,"m":{"Apr":68,"May":32}},{"r":"Amritsar","p":"VECTRA","n":1985.94,"v":1688.04,"m":{"Jun":50}},{"r":"Amritsar","p":"VINASAK","n":1561.35,"v":1327.14,"m":{"Jun":347,"Jul":73,"Mar":30}},{"r":"Amritsar","p":"XYMEN","n":12167,"v":8325,"m":{"Sep":200,"Jan":150}},{"r":"Jalandhar","p":"ASTOR","n":13590,"v":10872,"m":{"Apr":8,"Feb":5,"Mar":17}},{"r":"Jalandhar","p":"ATMOS","n":4462.5,"v":3200,"m":{"Jun":100}},{"r":"Jalandhar","p":"BOSNATE","n":3907,"v":3320.95,"m":{"Jun":27,"Mar":3}},{"r":"Jalandhar","p":"CYANAT","n":4590,"v":3901.5,"m":{"Jun":50}},{"r":"Jalandhar","p":"DEXARON","n":1997.98,"v":1698.28,"m":{"Jun":100}},{"r":"Jalandhar","p":"DI-FORCE","n":2093,"v":1779.05,"m":{"May":55,"Jun":35,"Mar":10}},{"r":"Jalandhar","p":"GLACPOT","n":682.27,"v":545.81,"m":{"Jun":1000}},{"r":"Jalandhar","p":"GLANZ","n":4032,"v":3427.2,"m":{"Jun":242,"Jul":17,"Sep":77}},{"r":"Jalandhar","p":"HATRIK","n":1320.9,"v":1188.81,"m":{"Apr":140,"May":100,"Sep":5}},{"r":"Jalandhar","p":"NATCORE","n":1117.2,"v":949.62,"m":{"Jul":170,"Aug":10,"Dec":20,"Feb":50,"Mar":50}},{"r":"Jalandhar","p":"NATDUO","n":145,"v":113.3,"m":{"Jun":1000}},{"r":"Jalandhar","p":"NATERRA","n":84.8,"v":76,"m":{"Apr":10565,"May":1945,"Mar":490}},{"r":"Jalandhar","p":"NATGEN","n":3672.31,"v":2019.77,"m":{"Jul":190,"Mar":10}},{"r":"Jalandhar","p":"NATGEN PRO","n":10890,"v":9256.5,"m":{"Apr":45,"Mar":5}},{"r":"Jalandhar","p":"NATJEWEL FS","n":702,"v":597,"m":{"Jun":120,"Sep":165,"Oct":10,"Jan":5}},{"r":"Jalandhar","p":"NATLAM","n":390,"v":375,"m":{"Jul":25,"Sep":25}},{"r":"Jalandhar","p":"NATLIGO","n":2601,"v":2080.8,"m":{"Apr":30,"May":475,"Jun":20,"Jul":155,"Feb":20}},{"r":"Jalandhar","p":"NATPEARL","n":1591.2,"v":1352.52,"m":{"May":400,"Jun":350}},{"r":"Jalandhar","p":"NATVOL","n":3214.65,"v":2732.45,"m":{"Mar":10}},{"r":"Jalandhar","p":"NATWEEZ","n":1035.5,"v":830,"m":{"Jun":150}},{"r":"Jalandhar","p":"NATZOATE","n":1124,"v":998.4,"m":{"May":3,"Jun":5}},{"r":"Jalandhar","p":"OMNINAT","n":1487.85,"v":1264.67,"m":{"May":200}},{"r":"Jalandhar","p":"PRIDONAT","n":2950,"v":2500,"m":{"May":7,"Dec":6}},{"r":"Jalandhar","p":"SCRIPTOR","n":19500,"v":16575,"m":{"Jul":30}},{"r":"Jalandhar","p":"SLAYDEN","n":1692,"v":1150,"m":{"Sep":720,"Nov":253,"Dec":780,"Jan":247}},{"r":"Jalandhar","p":"SPIROVANTA","n":2956.4,"v":2512.94,"m":{"Jul":7}},{"r":"Jalandhar","p":"TOPRASURE","n":22700,"v":20585,"m":{"Apr":52,"May":98,"Jun":50}},{"r":"Jalandhar","p":"VECTRA","n":1985.94,"v":1688.04,"m":{"Jun":50}},{"r":"Jalandhar","p":"VINASAK","n":1561.35,"v":1327.14,"m":{"Jun":240,"Mar":10}},{"r":"Jalandhar","p":"XYMEN","n":12167,"v":8325,"m":{"Jan":200}},{"r":"Patiala","p":"ASTOR","n":13590,"v":10872,"m":{"May":4,"Jun":17,"Feb":1,"Mar":8}},{"r":"Patiala","p":"ATMOS","n":4462.5,"v":3200,"m":{"Jun":29,"Jul":25,"Nov":9,"Jan":2,"Feb":13,"Mar":22}},{"r":"Patiala","p":"BOSNATE","n":3907,"v":3320.95,"m":{"Jun":80}},{"r":"Patiala","p":"CYANAT","n":4590,"v":3901.5,"m":{"May":40,"Jul":60,"Aug":100}},{"r":"Patiala","p":"DEXARON","n":1997.98,"v":1698.28,"m":{"Jun":5,"Jul":190,"Aug":105}},{"r":"Patiala","p":"DI-FORCE","n":2093,"v":1779.05,"m":{"Jun":115,"Jul":100,"Aug":50,"Sep":35}},{"r":"Patiala","p":"GLACPOT","n":682.27,"v":545.81,"m":{"Jun":260,"Jul":500,"Aug":40,"Sep":200}},{"r":"Patiala","p":"GLANZ","n":4032,"v":3427.2,"m":{"Jun":240,"Jul":250,"Aug":522,"Mar":50}},{"r":"Patiala","p":"NATCORE","n":1117.2,"v":949.62,"m":{"Jun":100,"Aug":490,"Sep":60}},{"r":"Patiala","p":"NATDUO","n":145,"v":113.3,"m":{"Apr":1500,"Jun":4200,"Jul":800}},{"r":"Patiala","p":"NATERRA","n":84.8,"v":76,"m":{"May":13490,"Jul":10000,"Mar":510}},{"r":"Patiala","p":"NATGEN","n":3672.31,"v":2019.77,"m":{"Jun":100}},{"r":"Patiala","p":"NATGEN PRO","n":10890,"v":9256.5,"m":{"May":20,"Jul":10,"Aug":20}},{"r":"Patiala","p":"NATJEWEL FS","n":702,"v":597,"m":{"May":95,"Jul":50,"Aug":105,"Feb":50}},{"r":"Patiala","p":"NATLAM","n":390,"v":375,"m":{"Aug":30,"Sep":15,"Jan":5}},{"r":"Patiala","p":"NATLIGO","n":2601,"v":2080.8,"m":{"Jun":111,"Jul":342,"Aug":220,"Mar":27}},{"r":"Patiala","p":"NATLIKA","n":1095.15,"v":876.12,"m":{"Aug":30}},{"r":"Patiala","p":"NATNEXT","n":2643.2,"v":2114.56,"m":{"Jun":10}},{"r":"Patiala","p":"NATPEARL","n":1591.2,"v":1352.52,"m":{"Jun":480,"Sep":320}},{"r":"Patiala","p":"NATVOL","n":3214.65,"v":2732.45,"m":{"Aug":10}},{"r":"Patiala","p":"NATWEEZ","n":1035.5,"v":830,"m":{"Jun":150}},{"r":"Patiala","p":"NATZOATE","n":1124,"v":998.4,"m":{"May":47,"Jun":100,"Aug":7,"Sep":20}},{"r":"Patiala","p":"OMNINAT","n":1487.85,"v":1264.67,"m":{"Apr":212,"Jul":88}},{"r":"Patiala","p":"PRIDONAT","n":2950,"v":2500,"m":{"Jun":100,"Nov":10,"Feb":20}},{"r":"Patiala","p":"SCRIPTOR","n":19500,"v":16575,"m":{"May":50,"Mar":14}},{"r":"Patiala","p":"SLAYDEN","n":1692,"v":1150,"m":{"Sep":1280,"Dec":720}},{"r":"Patiala","p":"SPIROVANTA","n":2956.4,"v":2512.94,"m":{"Jun":191}},{"r":"Patiala","p":"TOPRASURE","n":22700,"v":20585,"m":{"Apr":80,"May":20}},{"r":"Patiala","p":"VECTRA","n":1985.94,"v":1688.04,"m":{"Jun":50}},{"r":"Patiala","p":"VINASAK","n":1561.35,"v":1327.14,"m":{"Jun":345,"Sep":55}},{"r":"Patiala","p":"XYMEN","n":12167,"v":8325,"m":{"Jan":250}},{"r":"Sangrur","p":"ASTOR","n":13590,"v":10872,"m":{"Jun":50,"Jul":15,"Mar":15}},{"r":"Sangrur","p":"ATMOS","n":4462.5,"v":3200,"m":{"May":50,"Jun":29,"Jul":5,"Nov":1,"Feb":7,"Mar":8}},{"r":"Sangrur","p":"BOSNATE","n":3907,"v":3320.95,"m":{"Jul":7,"Oct":10,"Mar":3}},{"r":"Sangrur","p":"CYANAT","n":4590,"v":3901.5,"m":{"Jun":50}},{"r":"Sangrur","p":"DEXARON","n":1997.98,"v":1698.28,"m":{"May":5,"Jun":35,"Jul":110}},{"r":"Sangrur","p":"DI-FORCE","n":2093,"v":1779.05,"m":{"Jun":400}},{"r":"Sangrur","p":"GLACPOT","n":682.27,"v":545.81,"m":{"Jun":1500}},{"r":"Sangrur","p":"GLANZ","n":4032,"v":3427.2,"m":{"May":499,"Jul":336}},{"r":"Sangrur","p":"HATRIK","n":1320.9,"v":1188.81,"m":{"Jul":25,"Aug":30,"Sep":1}},{"r":"Sangrur","p":"NATCORE","n":1117.2,"v":949.62,"m":{"May":315,"Jun":330,"Sep":5}},{"r":"Sangrur","p":"NATDUO","n":145,"v":113.3,"m":{"May":600,"Jun":800,"Jul":700}},{"r":"Sangrur","p":"NATERRA","n":84.8,"v":76,"m":{"May":32000}},{"r":"Sangrur","p":"NATGEN","n":3672.31,"v":2019.77,"m":{"Jun":90,"Jul":10}},{"r":"Sangrur","p":"NATGEN PRO","n":10890,"v":9256.5,"m":{"Jun":240,"Jul":10}},{"r":"Sangrur","p":"NATJEWEL FS","n":702,"v":597,"m":{"May":100}},{"r":"Sangrur","p":"NATLIGO","n":2601,"v":2080.8,"m":{"Jun":900}},{"r":"Sangrur","p":"NATLIKA","n":1095.15,"v":876.12,"m":{"Jul":5,"Sep":5,"Mar":10}},{"r":"Sangrur","p":"NATPEARL","n":1591.2,"v":1352.52,"m":{"Jun":70,"Jul":580}},{"r":"Sangrur","p":"NATWEEZ","n":1035.5,"v":830,"m":{"May":200}},{"r":"Sangrur","p":"NATZOATE","n":1124,"v":998.4,"m":{"Jun":390,"Aug":1,"Sep":55}},{"r":"Sangrur","p":"OMNINAT","n":1487.85,"v":1264.67,"m":{"May":13,"Jul":287}},{"r":"Sangrur","p":"PAMUK","n":6187.5,"v":4950,"m":{"Aug":161,"Oct":14}},{"r":"Sangrur","p":"PRIDONAT","n":2950,"v":2500,"m":{"Dec":4}},{"r":"Sangrur","p":"SCRIPTOR","n":19500,"v":16575,"m":{"Mar":3}},{"r":"Sangrur","p":"SLAYDEN","n":1692,"v":1150,"m":{"Nov":747,"Jan":2253}},{"r":"Sangrur","p":"SPIROVANTA","n":2956.4,"v":2512.94,"m":{"May":294,"Jul":63}},{"r":"Sangrur","p":"TOPRASURE","n":22700,"v":20585,"m":{"Mar":50}},{"r":"Sangrur","p":"VECTRA","n":1985.94,"v":1688.04,"m":{"Jun":50}},{"r":"Sangrur","p":"VINASAK","n":1561.35,"v":1327.14,"m":{"Jun":400}},{"r":"Sangrur","p":"XYMEN","n":12167,"v":8325,"m":{"Jan":300}}];
+
+// LY ACTUAL DATA (Source 3)
+const LAST_YEAR_ROWS = [{"m":"Apr","t":"AMRITSAR","s":"NATDUO","k":560.0,"n":81200.0},{"m":"Apr","t":"MOGA","s":"NATLIGO","k":20.0,"n":61200.0},{"m":"Apr","t":"MOGA","s":"NATWEEZ","k":16.0,"n":14082.8},{"m":"Apr","t":"PATIALA","s":"NATGEN PRO","k":-20.4,"n":-360622.87},{"m":"Apr","t":"PATIALA","s":"NATPEARL","k":-10.0,"n":-18000.0},{"m":"Aug","t":"AMRITSAR","s":"GLANZ","k":104.0,"n":525470.4},{"m":"Aug","t":"AMRITSAR","s":"NATGEN","k":18.0,"n":75282.3},{"m":"Aug","t":"AMRITSAR","s":"NATGEN PRO","k":3.4,"n":32089.2},{"m":"Aug","t":"AMRITSAR","s":"NATLIGO","k":20.0,"n":61200.0},{"m":"Aug","t":"AMRITSAR","s":"OMNINAT","k":5.0,"n":8855.0},{"m":"Aug","t":"AMRITSAR","s":"VINASAK","k":71.0,"n":106362.77},{"m":"Aug","t":"BATHINDA","s":"GLANZ","k":310.0,"n":1565172.0},{"m":"Aug","t":"BATHINDA","s":"NATCORE","k":50.0,"n":53412.8},{"m":"Aug","t":"BATHINDA","s":"NATGEN","k":6.0,"n":25426.47},{"m":"Aug","t":"BATHINDA","s":"NATGEN PRO","k":34.0,"n":320892.0},{"m":"Aug","t":"BATHINDA","s":"NATLIGO","k":62.0,"n":189120.0},{"m":"Aug","t":"BATHINDA","s":"VINASAK","k":252.0,"n":376739.14},{"m":"Aug","t":"JALANDHAR","s":"GLANZ","k":40.0,"n":202104.0},{"m":"Aug","t":"JALANDHAR","s":"NATGEN","k":30.0,"n":125138.13},{"m":"Aug","t":"JALANDHAR","s":"NATJEWEL","k":30.0,"n":21411.0},{"m":"Aug","t":"JALANDHAR","s":"NATLIGO","k":10.0,"n":30600.0},{"m":"Aug","t":"JALANDHAR","s":"VINASAK","k":12.0,"n":20244.0},{"m":"Aug","t":"MOGA","s":"BOSNAT","k":9.6,"n":37511.42},{"m":"Aug","t":"MOGA","s":"GLANZ","k":474.0,"n":2394302.4},{"m":"Aug","t":"MOGA","s":"NATCORE","k":40.0,"n":42772.8},{"m":"Aug","t":"MOGA","s":"NATGEN","k":12.0,"n":49855.83},{"m":"Aug","t":"MOGA","s":"NATGEN PRO","k":6.8,"n":65141.08},{"m":"Aug","t":"MOGA","s":"NATJEWEL","k":20.0,"n":14391.0},{"m":"Aug","t":"MOGA","s":"NATLIGO","k":50.0,"n":151200.0},{"m":"Aug","t":"MOGA","s":"NATPEARL","k":140.0,"n":249623.36},{"m":"Aug","t":"MOGA","s":"NATZOATE","k":30.0,"n":33989.8},{"m":"Aug","t":"MOGA","s":"VINASAK","k":224.0,"n":356723.17},{"m":"Aug","t":"PATIALA","s":"ATMOS","k":10.0,"n":43750.0},{"m":"Aug","t":"PATIALA","s":"CYANAT","k":6.0,"n":32400.0},{"m":"Aug","t":"PATIALA","s":"GLANZ","k":410.0,"n":2069928.0},{"m":"Aug","t":"PATIALA","s":"NATCORE","k":50.0,"n":53625.6},{"m":"Aug","t":"PATIALA","s":"NATGEN","k":18.0,"n":76279.41},{"m":"Aug","t":"PATIALA","s":"NATJEWEL","k":50.0,"n":35591.4},{"m":"Aug","t":"PATIALA","s":"NATPEARL","k":60.0,"n":107308.48},{"m":"Aug","t":"PATIALA","s":"NATZOATE","k":40.0,"n":45079.95},{"m":"Aug","t":"PATIALA","s":"VINASAK","k":59.0,"n":100733.19},{"m":"Aug","t":"SANGRUR","s":"ATMOS","k":30.0,"n":131250.0},{"m":"Aug","t":"SANGRUR","s":"CYANAT","k":18.0,"n":97200.0},{"m":"Aug","t":"SANGRUR","s":"GLANZ","k":342.0,"n":1729375.2},{"m":"Aug","t":"SANGRUR","s":"NATCORE","k":150.0,"n":160025.6},{"m":"Aug","t":"SANGRUR","s":"NATERRA","k":264.0,"n":23730.96},{"m":"Aug","t":"SANGRUR","s":"NATGEN","k":12.0,"n":51294.27},{"m":"Aug","t":"SANGRUR","s":"NATGEN PRO","k":17.0,"n":160446.0},{"m":"Aug","t":"SANGRUR","s":"NATJEWEL","k":50.0,"n":35240.4},{"m":"Aug","t":"SANGRUR","s":"NATLIGO","k":29.0,"n":88860.0},{"m":"Aug","t":"SANGRUR","s":"NATPEARL","k":40.0,"n":71427.2},{"m":"Aug","t":"SANGRUR","s":"NATZOATE","k":5.0,"n":5620.0},{"m":"Aug","t":"SANGRUR","s":"OMNINAT","k":5.0,"n":8855.0},{"m":"Aug","t":"SANGRUR","s":"VINASAK","k":375.0,"n":586903.96},{"m":"Dec","t":"AMRITSAR","s":"SLAYDEN","k":776.0,"n":1272056.0},{"m":"Dec","t":"BATHINDA","s":"NATJEWEL","k":10.0,"n":7020.0},{"m":"Dec","t":"BATHINDA","s":"SLAYDEN","k":744.0,"n":1172328.0},{"m":"Dec","t":"BATHINDA","s":"XYMEN","k":1.5,"n":18250.01},{"m":"Dec","t":"JALANDHAR","s":"SLAYDEN","k":152.0,"n":236336.0},{"m":"Dec","t":"MOGA","s":"SLAYDEN","k":656.0,"n":1015832.0},{"m":"Dec","t":"PATIALA","s":"SLAYDEN","k":88.0,"n":144824.0},{"m":"Dec","t":"SANGRUR","s":"NATERRA","k":984.0,"n":66338.82},{"m":"Dec","t":"SANGRUR","s":"SLAYDEN","k":504.0,"n":836528.0},{"m":"Dec","t":"SANGRUR","s":"XYMEN","k":16.5,"n":200750.11},{"m":"Feb","t":"AMRITSAR","s":"NATJEWEL","k":10.0,"n":7160.4},{"m":"Feb","t":"AMRITSAR","s":"NATPEARL","k":50.0,"n":89628.48},{"m":"Feb","t":"AMRITSAR","s":"TOPRASURE","k":2.4,"n":69939.6},{"m":"Feb","t":"AMRITSAR","s":"XYMEN","k":-76.5,"n":-930750.44},{"m":"Feb","t":"BATHINDA","s":"GLANZ","k":44.0,"n":223322.4},{"m":"Feb","t":"BATHINDA","s":"NATCORE","k":280.0,"n":298345.6},{"m":"Feb","t":"BATHINDA","s":"NATGEN PRO","k":1.7,"n":24684.0},{"m":"Feb","t":"BATHINDA","s":"NATLIGO","k":30.0,"n":67500.0},{"m":"Feb","t":"BATHINDA","s":"NATLIKA","k":30.0,"n":30375.0},{"m":"Feb","t":"BATHINDA","s":"NATPEARL","k":20.0,"n":35360.0},{"m":"Feb","t":"BATHINDA","s":"NATZOATE","k":70.0,"n":78680.0},{"m":"Feb","t":"BATHINDA","s":"XYMEN","k":-34.5,"n":-419750.2},{"m":"Feb","t":"JALANDHAR","s":"GLANZ","k":-20.0,"n":-103220.0},{"m":"Feb","t":"JALANDHAR","s":"NATCORE","k":-30.0,"n":-32993.1},{"m":"Feb","t":"JALANDHAR","s":"NATERRA","k":-1800.0,"n":-180000.0},{"m":"Feb","t":"JALANDHAR","s":"PRIDONAT","k":-20.0,"n":-64000.0},{"m":"Feb","t":"JALANDHAR","s":"SLAYDEN","k":0.0,"n":-2080.0},{"m":"Feb","t":"JALANDHAR","s":"TOPRASURE","k":14.4,"n":417326.4},{"m":"Feb","t":"JALANDHAR","s":"XYMEN","k":-13.5,"n":-164250.09},{"m":"Feb","t":"MOGA","s":"ASTOR","k":4.0,"n":54360.0},{"m":"Feb","t":"MOGA","s":"ATMOS","k":10.0,"n":44625.0},{"m":"Feb","t":"MOGA","s":"GLANZ","k":8.0,"n":40924.8},{"m":"Feb","t":"MOGA","s":"NATCORE","k":50.0,"n":53732.0},{"m":"Feb","t":"MOGA","s":"NATGEN PRO","k":3.4,"n":49368.0},{"m":"Feb","t":"MOGA","s":"NATJEWEL","k":30.0,"n":21411.0},{"m":"Feb","t":"MOGA","s":"NATZOATE","k":70.0,"n":74616.0},{"m":"Feb","t":"MOGA","s":"SLAYDEN","k":0.0,"n":-3120.0},{"m":"Feb","t":"MOGA","s":"TOPRASURE","k":9.0,"n":261021.6},{"m":"Feb","t":"MOGA","s":"XYMEN","k":-3.0,"n":-36500.02},{"m":"Feb","t":"PATIALA","s":"GLANZ","k":4.0,"n":20462.4},{"m":"Feb","t":"PATIALA","s":"XYMEN","k":-6.0,"n":-73000.02},{"m":"Feb","t":"SANGRUR","s":"XYMEN","k":-25.5,"n":-310250.15},{"m":"Jan","t":"AMRITSAR","s":"NATCORE","k":20.0,"n":21280.0},{"m":"Jan","t":"AMRITSAR","s":"NATJEWEL","k":10.0,"n":7020.0},{"m":"Jan","t":"AMRITSAR","s":"SLAYDEN","k":80.0,"n":124960.0},{"m":"Jan","t":"AMRITSAR","s":"TOPRASURE","k":1.2,"n":34777.2},{"m":"Jan","t":"BATHINDA","s":"GLANZ","k":50.0,"n":252756.0},{"m":"Jan","t":"BATHINDA","s":"NATJEWEL","k":60.0,"n":42260.4},{"m":"Jan","t":"BATHINDA","s":"NATZOATE","k":10.0,"n":11240.0},{"m":"Jan","t":"BATHINDA","s":"SLAYDEN","k":104.0,"n":161632.0},{"m":"Jan","t":"JALANDHAR","s":"NATCORE","k":60.0,"n":64052.8},{"m":"Jan","t":"JALANDHAR","s":"NATJEWEL","k":20.0,"n":14180.4},{"m":"Jan","t":"JALANDHAR","s":"SLAYDEN","k":64.0,"n":99560.0},{"m":"Jan","t":"MOGA","s":"GLANZ","k":44.0,"n":222314.4},{"m":"Jan","t":"MOGA","s":"NATCORE","k":70.0,"n":75012.0},{"m":"Jan","t":"MOGA","s":"NATPEARL","k":50.0,"n":89274.88},{"m":"Jan","t":"MOGA","s":"SLAYDEN","k":48.0,"n":74296.0},{"m":"Jan","t":"MOGA","s":"VINASAK","k":4.0,"n":4787.2},{"m":"Jan","t":"PATIALA","s":"SLAYDEN","k":16.0,"n":24992.0},{"m":"Jan","t":"SANGRUR","s":"SLAYDEN","k":344.0,"n":533656.0},{"m":"Jan","t":"SANGRUR","s":"XYMEN","k":0.0,"n":0.06},{"m":"Jul","t":"AMRITSAR","s":"GLANZ","k":4.0,"n":20462.4},{"m":"Jul","t":"AMRITSAR","s":"NATCORE","k":150.0,"n":160664.0},{"m":"Jul","t":"AMRITSAR","s":"NATERRA","k":-4008.0,"n":-360279.12},{"m":"Jul","t":"AMRITSAR","s":"NATGEN","k":54.0,"n":229279.56},{"m":"Jul","t":"AMRITSAR","s":"NATGEN PRO","k":3.4,"n":32089.2},{"m":"Jul","t":"AMRITSAR","s":"NATLIGO","k":68.0,"n":206520.0},{"m":"Jul","t":"AMRITSAR","s":"NATPEARL","k":110.0,"n":195540.8},{"m":"Jul","t":"AMRITSAR","s":"OMNINAT","k":5.0,"n":8855.0},{"m":"Jul","t":"AMRITSAR","s":"VINASAK","k":103.0,"n":185104.54},{"m":"Jul","t":"BATHINDA","s":"GLANZ","k":10.0,"n":50904.0},{"m":"Jul","t":"BATHINDA","s":"NATCORE","k":450.0,"n":480289.6},{"m":"Jul","t":"BATHINDA","s":"NATERRA","k":3240.0,"n":291243.6},{"m":"Jul","t":"BATHINDA","s":"NATGEN","k":108.0,"n":454129.35},{"m":"Jul","t":"BATHINDA","s":"NATGEN PRO","k":78.2,"n":841724.4},{"m":"Jul","t":"BATHINDA","s":"NATLIGO","k":60.0,"n":181200.0},{"m":"Jul","t":"BATHINDA","s":"NATPEARL","k":300.0,"n":531107.2},{"m":"Jul","t":"BATHINDA","s":"PRIDONAT","k":10.0,"n":29500.0},{"m":"Jul","t":"JALANDHAR","s":"NATCORE","k":30.0,"n":31920.0},{"m":"Jul","t":"JALANDHAR","s":"NATGEN PRO","k":3.4,"n":37026.0},{"m":"Jul","t":"JALANDHAR","s":"NATLIGO","k":80.0,"n":197400.0},{"m":"Jul","t":"MOGA","s":"GLANZ","k":20.0,"n":101808.0},{"m":"Jul","t":"MOGA","s":"NATCORE","k":180.0,"n":192052.0},{"m":"Jul","t":"MOGA","s":"NATERRA","k":504.0,"n":45304.56},{"m":"Jul","t":"MOGA","s":"NATGEN","k":18.0,"n":75282.3},{"m":"Jul","t":"MOGA","s":"NATGEN PRO","k":25.5,"n":266587.2},{"m":"Jul","t":"MOGA","s":"NATLIGO","k":60.0,"n":143100.0},{"m":"Jul","t":"MOGA","s":"NATPEARL","k":190.0,"n":338209.28},{"m":"Jul","t":"MOGA","s":"OMNINAT","k":10.5,"n":16667.5},{"m":"Jul","t":"PATIALA","s":"GLANZ","k":170.0,"n":862848.0},{"m":"Jul","t":"PATIALA","s":"NATERRA","k":240.0,"n":21573.6},{"m":"Jul","t":"PATIALA","s":"NATGEN","k":12.0,"n":51294.27},{"m":"Jul","t":"PATIALA","s":"NATJEWEL","k":60.0,"n":42611.4},{"m":"Jul","t":"PATIALA","s":"NATPEARL","k":130.0,"n":230547.2},{"m":"Jul","t":"PATIALA","s":"VINASAK","k":208.0,"n":373449.83},{"m":"Jul","t":"SANGRUR","s":"GLANZ","k":150.0,"n":758520.0},{"m":"Jul","t":"SANGRUR","s":"NATCORE","k":310.0,"n":331116.8},{"m":"Jul","t":"SANGRUR","s":"NATERRA","k":9768.0,"n":878045.52},{"m":"Jul","t":"SANGRUR","s":"NATGEN","k":30.0,"n":126135.24},{"m":"Jul","t":"SANGRUR","s":"NATGEN PRO","k":10.2,"n":101204.4},{"m":"Jul","t":"SANGRUR","s":"NATLIGO","k":21.0,"n":65580.0},{"m":"Jul","t":"SANGRUR","s":"NATPEARL","k":490.0,"n":838367.92},{"m":"Jul","t":"SANGRUR","s":"OMNINAT","k":5.0,"n":8855.0},{"m":"Jul","t":"SANGRUR","s":"PRIDONAT","k":-10.0,"n":-32000.0},{"m":"Jul","t":"SANGRUR","s":"VINASAK","k":88.0,"n":157771.54},{"m":"Jun","t":"AMRITSAR","s":"NATCORE","k":-50.0,"n":-54988.5},{"m":"Jun","t":"AMRITSAR","s":"NATERRA","k":504.0,"n":45304.56},{"m":"Jun","t":"AMRITSAR","s":"OMNINAT","k":4.0,"n":6120.0},{"m":"Jun","t":"BATHINDA","s":"GLANZ","k":100.0,"n":505008.0},{"m":"Jun","t":"BATHINDA","s":"NATCORE","k":450.0,"n":479864.0},{"m":"Jun","t":"BATHINDA","s":"NATERRA","k":2016.0,"n":181218.24},{"m":"Jun","t":"BATHINDA","s":"NATGEN","k":6.0,"n":25867.8},{"m":"Jun","t":"BATHINDA","s":"NATGEN PRO","k":57.8,"n":839256.0},{"m":"Jun","t":"BATHINDA","s":"NATPEARL","k":130.0,"n":229840.0},{"m":"Jun","t":"BATHINDA","s":"NATWEEZ","k":64.0,"n":66272.0},{"m":"Jun","t":"BATHINDA","s":"OMNINAT","k":100.0,"n":152832.0},{"m":"Jun","t":"JALANDHAR","s":"NATERRA","k":240.0,"n":21573.6},{"m":"Jun","t":"JALANDHAR","s":"OMNINAT","k":12.0,"n":18360.0},{"m":"Jun","t":"MOGA","s":"GLANZ","k":110.0,"n":556164.0},{"m":"Jun","t":"MOGA","s":"NATCORE","k":50.0,"n":53412.8},{"m":"Jun","t":"MOGA","s":"NATERRA","k":264.0,"n":23730.96},{"m":"Jun","t":"MOGA","s":"NATGEN","k":12.0,"n":51735.6},{"m":"Jun","t":"MOGA","s":"NATGEN PRO","k":3.4,"n":49368.0},{"m":"Jun","t":"MOGA","s":"NATLIGO","k":10.0,"n":30000.0},{"m":"Jun","t":"MOGA","s":"NATPEARL","k":230.0,"n":407347.2},{"m":"Jun","t":"MOGA","s":"OMNINAT","k":26.5,"n":41147.5},{"m":"Jun","t":"PATIALA","s":"NATERRA","k":4272.0,"n":384010.08},{"m":"Jun","t":"PATIALA","s":"NATGEN PRO","k":34.0,"n":370260.0},{"m":"Jun","t":"PATIALA","s":"NATLAM","k":50.0,"n":16559.7},{"m":"Jun","t":"PATIALA","s":"NATLIGO","k":200.0,"n":452250.0},{"m":"Jun","t":"PATIALA","s":"NATZOATE","k":5.0,"n":6054.95},{"m":"Jun","t":"PATIALA","s":"OMNINAT","k":8.0,"n":12240.0},{"m":"Jun","t":"SANGRUR","s":"GLANZ","k":110.0,"n":555660.0},{"m":"Jun","t":"SANGRUR","s":"NATCORE","k":160.0,"n":170878.4},{"m":"Jun","t":"SANGRUR","s":"NATERRA","k":1608.0,"n":144543.12},{"m":"Jun","t":"SANGRUR","s":"NATPEARL","k":100.0,"n":177153.6},{"m":"Jun","t":"SANGRUR","s":"NATWEEZ","k":24.0,"n":24852.0},{"m":"Jun","t":"SANGRUR","s":"OMNINAT","k":13.0,"n":21095.0},{"m":"Jun","t":"SANGRUR","s":"PRIDONAT","k":15.0,"n":44250.0},{"m":"Mar","t":"AMRITSAR","s":"NATDUO","k":240.0,"n":34800.0},{"m":"Mar","t":"AMRITSAR","s":"NATERRA","k":504.0,"n":33978.42},{"m":"Mar","t":"AMRITSAR","s":"NATGEN PRO","k":3.4,"n":37026.0},{"m":"Mar","t":"AMRITSAR","s":"NATJEWEL","k":30.0,"n":21411.0},{"m":"Mar","t":"AMRITSAR","s":"SLAYDEN","k":-808.0,"n":-1347848.0},{"m":"Mar","t":"AMRITSAR","s":"TOPRASURE","k":1.8,"n":41010.86},{"m":"Mar","t":"BATHINDA","s":"GLANZ","k":60.0,"n":302904.0},{"m":"Mar","t":"BATHINDA","s":"NATGEN","k":12.0,"n":50852.94},{"m":"Mar","t":"BATHINDA","s":"NATJEWEL","k":120.0,"n":84661.2},{"m":"Mar","t":"BATHINDA","s":"NATZOATE","k":65.0,"n":73090.0},{"m":"Mar","t":"BATHINDA","s":"SLAYDEN","k":-2056.0,"n":-3400752.0},{"m":"Mar","t":"BATHINDA","s":"TOPRASURE","k":4.2,"n":95340.0},{"m":"Mar","t":"JALANDHAR","s":"NATGEN","k":18.0,"n":75282.3},{"m":"Mar","t":"JALANDHAR","s":"NATZOATE","k":25.0,"n":28100.0},{"m":"Mar","t":"JALANDHAR","s":"SLAYDEN","k":-184.0,"n":-302280.0},{"m":"Mar","t":"MOGA","s":"ATMOS","k":10.0,"n":44625.0},{"m":"Mar","t":"MOGA","s":"GLANZ","k":8.0,"n":40924.8},{"m":"Mar","t":"MOGA","s":"NATJEWEL","k":10.0,"n":7300.8},{"m":"Mar","t":"MOGA","s":"NATLIGO","k":14.0,"n":42960.0},{"m":"Mar","t":"MOGA","s":"NATNEXT","k":5.0,"n":12885.6},{"m":"Mar","t":"MOGA","s":"NATZOATE","k":25.0,"n":28130.0},{"m":"Mar","t":"MOGA","s":"SLAYDEN","k":-440.0,"n":-708424.0},{"m":"Mar","t":"MOGA","s":"TOPRASURE","k":9.0,"n":155266.46},{"m":"Mar","t":"PATIALA","s":"ATMOS","k":10.0,"n":44625.0},{"m":"Mar","t":"PATIALA","s":"CYANAT","k":6.0,"n":29400.0},{"m":"Mar","t":"PATIALA","s":"GLANZ","k":8.0,"n":40924.8},{"m":"Mar","t":"PATIALA","s":"HATRIK","k":10.0,"n":15850.8},{"m":"Mar","t":"PATIALA","s":"SLAYDEN","k":-24.0,"n":-40608.0},{"m":"Mar","t":"PATIALA","s":"TOPRASURE","k":0.6,"n":13620.0},{"m":"Mar","t":"SANGRUR","s":"NATLIGO","k":80.0,"n":245400.0},{"m":"Mar","t":"SANGRUR","s":"NATWEEZ","k":24.0,"n":24852.0},{"m":"Mar","t":"SANGRUR","s":"SLAYDEN","k":-2096.0,"n":-3508984.0},{"m":"May","t":"AMRITSAR","s":"NATDUO","k":2480.0,"n":359600.0},{"m":"May","t":"AMRITSAR","s":"NATERRA","k":16224.0,"n":1458375.36},{"m":"May","t":"AMRITSAR","s":"NATGEN PRO","k":3.4,"n":37026.0},{"m":"May","t":"AMRITSAR","s":"NATWEEZ","k":24.0,"n":24852.0},{"m":"May","t":"BATHINDA","s":"GLANZ","k":-40.0,"n":-204776.0},{"m":"May","t":"BATHINDA","s":"NATDUO","k":1240.0,"n":179800.0},{"m":"May","t":"BATHINDA","s":"NATERRA","k":25296.0,"n":2273857.44},{"m":"May","t":"BATHINDA","s":"NATGEN PRO","k":3.4,"n":49368.0},{"m":"May","t":"BATHINDA","s":"NATLIGO","k":300.0,"n":905400.0},{"m":"May","t":"BATHINDA","s":"NATWEEZ","k":240.0,"n":248520.0},{"m":"May","t":"BATHINDA","s":"NATZOATE","k":-35.0,"n":-44196.1},{"m":"May","t":"BATHINDA","s":"PRIDONAT","k":10.0,"n":29500.0},{"m":"May","t":"BATHINDA","s":"TOPRASURE","k":1.8,"n":58465.8},{"m":"May","t":"JALANDHAR","s":"NATGEN PRO","k":-6.8,"n":-119000.0},{"m":"May","t":"MOGA","s":"GLANZ","k":-180.0,"n":-917980.0},{"m":"May","t":"MOGA","s":"NATDUO","k":6260.0,"n":907700.0},{"m":"May","t":"MOGA","s":"NATERRA","k":10512.0,"n":944923.68},{"m":"May","t":"MOGA","s":"NATGEN PRO","k":-5.1,"n":-94316.0},{"m":"May","t":"MOGA","s":"NATLIGO","k":288.0,"n":846840.0},{"m":"May","t":"MOGA","s":"NATNEXT","k":5.0,"n":17180.8},{"m":"May","t":"MOGA","s":"NATWEEZ","k":112.0,"n":115976.0},{"m":"May","t":"PATIALA","s":"NATERRA","k":1008.0,"n":90609.12},{"m":"May","t":"SANGRUR","s":"GLANZ","k":8.0,"n":30178.0},{"m":"May","t":"SANGRUR","s":"NATDUO","k":500.0,"n":72500.0},{"m":"May","t":"SANGRUR","s":"NATERRA","k":9816.0,"n":882360.24},{"m":"May","t":"SANGRUR","s":"NATLIGO","k":148.0,"n":440940.0},{"m":"May","t":"SANGRUR","s":"NATWEEZ","k":88.0,"n":86402.12},{"m":"May","t":"SANGRUR","s":"PRIDONAT","k":-50.0,"n":-160000.0},{"m":"Nov","t":"AMRITSAR","s":"SLAYDEN","k":624.0,"n":1048464.0},{"m":"Nov","t":"AMRITSAR","s":"XYMEN","k":24.0,"n":292000.16},{"m":"Nov","t":"BATHINDA","s":"NATGEN PRO","k":-3.4,"n":-49368.0},{"m":"Nov","t":"BATHINDA","s":"SLAYDEN","k":1960.0,"n":3304896.0},{"m":"Nov","t":"BATHINDA","s":"XYMEN","k":22.5,"n":273750.15},{"m":"Nov","t":"JALANDHAR","s":"NATZOATE","k":30.0,"n":33780.0},{"m":"Nov","t":"JALANDHAR","s":"SLAYDEN","k":336.0,"n":566064.0},{"m":"Nov","t":"JALANDHAR","s":"XYMEN","k":15.0,"n":182500.1},{"m":"Nov","t":"MOGA","s":"SLAYDEN","k":712.0,"n":1196272.0},{"m":"Nov","t":"PATIALA","s":"SLAYDEN","k":240.0,"n":406080.0},{"m":"Nov","t":"SANGRUR","s":"SLAYDEN","k":1296.0,"n":2187256.0},{"m":"Nov","t":"SANGRUR","s":"XYMEN","k":58.5,"n":711750.39},{"m":"Oct","t":"AMRITSAR","s":"GLANZ","k":-54.0,"n":-273218.4},{"m":"Oct","t":"AMRITSAR","s":"NATCORE","k":-150.0,"n":-160664.0},{"m":"Oct","t":"AMRITSAR","s":"NATDUO","k":-520.0,"n":-75400.0},{"m":"Oct","t":"AMRITSAR","s":"NATERRA","k":-3144.0,"n":-282614.16},{"m":"Oct","t":"AMRITSAR","s":"NATGEN","k":-24.0,"n":-100708.77},{"m":"Oct","t":"AMRITSAR","s":"NATPEARL","k":-110.0,"n":-195540.8},{"m":"Oct","t":"AMRITSAR","s":"SLAYDEN","k":424.0,"n":712240.0},{"m":"Oct","t":"AMRITSAR","s":"VINASAK","k":-47.0,"n":-70561.55},{"m":"Oct","t":"AMRITSAR","s":"XYMEN","k":82.5,"n":1003750.55},{"m":"Oct","t":"BATHINDA","s":"GLANZ","k":-150.0,"n":-756756.0},{"m":"Oct","t":"BATHINDA","s":"NATCORE","k":-90.0,"n":-95760.0},{"m":"Oct","t":"BATHINDA","s":"NATDUO","k":-600.0,"n":-87000.0},{"m":"Oct","t":"BATHINDA","s":"NATERRA","k":-2688.0,"n":-241624.32},{"m":"Oct","t":"BATHINDA","s":"NATGEN","k":-42.0,"n":-175991.07},{"m":"Oct","t":"BATHINDA","s":"NATGEN PRO","k":-1.7,"n":-24684.0},{"m":"Oct","t":"BATHINDA","s":"NATPEARL","k":-110.0,"n":-194833.6},{"m":"Oct","t":"BATHINDA","s":"NATWEEZ","k":-24.0,"n":-24852.0},{"m":"Oct","t":"BATHINDA","s":"OMNINAT","k":-24.0,"n":-36720.0},{"m":"Oct","t":"BATHINDA","s":"SLAYDEN","k":664.0,"n":1113152.0},{"m":"Oct","t":"BATHINDA","s":"VINASAK","k":-36.0,"n":-53607.48},{"m":"Oct","t":"BATHINDA","s":"XYMEN","k":49.5,"n":602250.33},{"m":"Oct","t":"JALANDHAR","s":"GLANZ","k":-10.0,"n":-50400.0},{"m":"Oct","t":"JALANDHAR","s":"SLAYDEN","k":32.0,"n":54144.0},{"m":"Oct","t":"JALANDHAR","s":"XYMEN","k":40.5,"n":492750.27},{"m":"Oct","t":"MOGA","s":"GLANZ","k":-200.0,"n":-1008756.0},{"m":"Oct","t":"MOGA","s":"NATDUO","k":-1520.0,"n":-220400.0},{"m":"Oct","t":"MOGA","s":"NATERRA","k":-2040.0,"n":-183375.6},{"m":"Oct","t":"MOGA","s":"NATPEARL","k":-40.0,"n":-70720.0},{"m":"Oct","t":"MOGA","s":"NATZOATE","k":10.0,"n":11390.0},{"m":"Oct","t":"MOGA","s":"SLAYDEN","k":648.0,"n":1085944.0},{"m":"Oct","t":"MOGA","s":"VINASAK","k":-88.0,"n":-139693.74},{"m":"Oct","t":"MOGA","s":"XYMEN","k":30.0,"n":365000.2},{"m":"Oct","t":"PATIALA","s":"ATMOS","k":-10.0,"n":-43750.0},{"m":"Oct","t":"PATIALA","s":"CYANAT","k":-6.0,"n":-32400.0},{"m":"Oct","t":"PATIALA","s":"GLANZ","k":-300.0,"n":-1517040.0},{"m":"Oct","t":"PATIALA","s":"NATERRA","k":-504.0,"n":-45304.56},{"m":"Oct","t":"PATIALA","s":"NATGEN","k":-54.0,"n":-228838.23},{"m":"Oct","t":"PATIALA","s":"NATPEARL","k":-60.0,"n":-106080.0},{"m":"Oct","t":"PATIALA","s":"OMNINAT","k":-4.0,"n":-6120.0},{"m":"Oct","t":"PATIALA","s":"VINASAK","k":-56.0,"n":-97801.96},{"m":"Oct","t":"PATIALA","s":"XYMEN","k":43.5,"n":529250.29},{"m":"Oct","t":"SANGRUR","s":"ATMOS","k":-30.0,"n":-131250.0},{"m":"Oct","t":"SANGRUR","s":"CYANAT","k":-18.0,"n":-97200.0},{"m":"Oct","t":"SANGRUR","s":"GLANZ","k":-240.0,"n":-1211616.0},{"m":"Oct","t":"SANGRUR","s":"NATCORE","k":-180.0,"n":-192158.4},{"m":"Oct","t":"SANGRUR","s":"NATDUO","k":-260.0,"n":-37700.0},{"m":"Oct","t":"SANGRUR","s":"NATERRA","k":-1584.0,"n":-142385.76},{"m":"Oct","t":"SANGRUR","s":"NATGEN","k":-54.0,"n":-227841.12},{"m":"Oct","t":"SANGRUR","s":"NATLIGO","k":-90.0,"n":-273600.0},{"m":"Oct","t":"SANGRUR","s":"NATPEARL","k":-110.0,"n":-195187.2},{"m":"Oct","t":"SANGRUR","s":"SLAYDEN","k":1376.0,"n":2308200.0},{"m":"Oct","t":"SANGRUR","s":"VINASAK","k":-223.0,"n":-347717.7},{"m":"Oct","t":"SANGRUR","s":"XYMEN","k":54.0,"n":657000.36},{"m":"Sep","t":"AMRITSAR","s":"GLANZ","k":20.0,"n":100800.0},{"m":"Sep","t":"AMRITSAR","s":"NATLIGO","k":-20.0,"n":-60000.0},{"m":"Sep","t":"AMRITSAR","s":"XYMEN","k":30.0,"n":365000.0},{"m":"Sep","t":"BATHINDA","s":"GLANZ","k":20.0,"n":100800.0},{"m":"Sep","t":"BATHINDA","s":"NATCORE","k":50.0,"n":53412.8},{"m":"Sep","t":"BATHINDA","s":"NATGEN","k":6.0,"n":25426.47},{"m":"Sep","t":"BATHINDA","s":"NATGEN PRO","k":10.2,"n":111078.0},{"m":"Sep","t":"BATHINDA","s":"NATLIGO","k":-50.0,"n":-149400.0},{"m":"Sep","t":"BATHINDA","s":"VINASAK","k":208.0,"n":309862.1},{"m":"Sep","t":"BATHINDA","s":"XYMEN","k":7.5,"n":91250.0},{"m":"Sep","t":"JALANDHAR","s":"GLANZ","k":80.0,"n":403956.0},{"m":"Sep","t":"JALANDHAR","s":"NATLIGO","k":30.0,"n":75600.0},{"m":"Sep","t":"JALANDHAR","s":"VINASAK","k":16.0,"n":23867.48},{"m":"Sep","t":"MOGA","s":"GLANZ","k":30.0,"n":151200.0},{"m":"Sep","t":"MOGA","s":"NATCORE","k":150.0,"n":160451.2},{"m":"Sep","t":"MOGA","s":"NATGEN","k":12.0,"n":51735.6},{"m":"Sep","t":"MOGA","s":"NATGEN PRO","k":18.7,"n":196719.14},{"m":"Sep","t":"MOGA","s":"NATJEWEL","k":40.0,"n":28360.8},{"m":"Sep","t":"MOGA","s":"NATLAM","k":120.0,"n":46145.6},{"m":"Sep","t":"MOGA","s":"NATLIGO","k":-60.0,"n":-179400.0},{"m":"Sep","t":"MOGA","s":"NATPEARL","k":150.0,"n":266968.0},{"m":"Sep","t":"MOGA","s":"NATZOATE","k":50.0,"n":56379.95},{"m":"Sep","t":"MOGA","s":"VINASAK","k":140.0,"n":208557.4},{"m":"Sep","t":"MOGA","s":"XYMEN","k":15.0,"n":182500.0},{"m":"Sep","t":"PATIALA","s":"GLANZ","k":10.0,"n":47607.24},{"m":"Sep","t":"PATIALA","s":"NATGEN","k":48.0,"n":203411.76},{"m":"Sep","t":"PATIALA","s":"NATPEARL","k":30.0,"n":53040.0},{"m":"Sep","t":"PATIALA","s":"XYMEN","k":30.0,"n":365000.0},{"m":"Sep","t":"SANGRUR","s":"NATGEN","k":42.0,"n":176988.18},{"m":"Sep","t":"SANGRUR","s":"NATLIGO","k":74.0,"n":225360.0},{"m":"Sep","t":"SANGRUR","s":"VINASAK","k":40.0,"n":59593.22},{"m":"Sep","t":"SANGRUR","s":"XYMEN","k":37.5,"n":456250.0}];
+
+let LIVE_DATA = [];
+
+function mapM(mStr) {
+    if (!mStr || !mStr.includes("-")) return mStr;
+    const mi = parseInt(mStr.split("-")[1], 10) - 1;
+    return JS_MONTHS[mi];
+}
+
+function toNumber(v) {
+    if (v === null || v === undefined || v === "") return 0;
+    if (typeof v === "number") return Number.isFinite(v) ? v : 0;
+    const n = parseFloat(String(v).replace(/,/g,"").replace(/[₹\s]/g,"").trim());
+    return Number.isFinite(n) ? n : 0;
+}
+
+function getFYMonth(raw) {
+    if (raw === null || raw === undefined || raw === "") return null;
+    const s = String(raw).trim();
+    let m = s.match(/^Date\((\d{4}),\s*(\d{1,2}),\s*(\d{1,2})/i);
+    if (m) {
+        const y = +m[1], mi = +m[2];
+        return {year:y, monthIndex:mi, month:JS_MONTHS[mi]};
+    }
+    m = s.match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);
+    if (m) {
+        const y = +m[1], mi = +m[2]-1;
+        return {year:y, monthIndex:mi, month:JS_MONTHS[mi]};
+    }
+    m = s.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/);
+    if (m) {
+        const y = +m[3], mi = +m[2]-1;
+        return {year:y, monthIndex:mi, month:JS_MONTHS[mi]};
+    }
+    const d = new Date(s);
+    if (!Number.isNaN(d.getTime())) {
+        const y = d.getFullYear(), mi = d.getMonth();
+        return {year:y, monthIndex:mi, month:JS_MONTHS[mi]};
+    }
+    return null;
+}
+
+function calculateDashboard() {
+    const sProd = document.getElementById('fProduct').value.toUpperCase();
+    const sTerr = document.getElementById('fTerritory').value.toUpperCase();
+    const isAllMonths = selectedMonths.has("ALL");
+
+    let a = { tNDP:0, cNDP:0, lVal:0, prod:{}, terr:{} };
+    PRODUCTS.forEach(p => a.prod[p] = { tQ:0, cQ:0, lQ:0 });
+    TERRITORIES.forEach(t => a.terr[t.toUpperCase()] = { tV:0, cV:0, lV:0, name:t });
+
+    // 1. Target processing
+    TARGETS.forEach(r => {
+        let p = getStandardProduct(r.p);
+        let t = (r.r || "").toUpperCase();
+        if(sProd !== 'ALL' && p !== sProd) return;
+        if(sTerr !== 'ALL' && t !== sTerr) return;
+
+        MONTHS.forEach(m => {
+            if(!isAllMonths && !selectedMonths.has(m)) return;
+            let qty = r.m[m] || 0;
+            if(qty !== 0) {
+                let ndpCr = (qty * r.n) / 10000000;
+                a.tNDP += ndpCr;
+                if(a.prod[p]) a.prod[p].tQ += qty;
+                if(a.terr[t]) a.terr[t].tV += ndpCr;
+            }
+        });
+    });
+
+    // 2. Live Actual Processing — FY 2026-27 ONLY
+    // Google Sheet columns: Strength, Territory Name, Invoice Date, KG/LTRS.
+    LIVE_DATA.forEach(r => {
+        const pRaw = String(r["Strength"] ?? r["Brand"] ?? "").trim();
+        const p = getStandardProduct(pRaw);
+        const tRaw = String(r["Territory Name"] ?? r["Territory"] ?? "").trim().toUpperCase();
+
+        if(!p || !tRaw) return;
+        if(sProd !== 'ALL' && p !== sProd) return;
+        if(sTerr !== 'ALL' && tRaw !== sTerr) return;
+
+        const rawDate = r["Invoice Date"] ?? r["Inv Date"] ?? r["Date"] ?? "";
+        const fy = getFYMonth(rawDate);
+        if(!fy) return;
+
+        // FY 2026-27 = Apr-Dec 2026 + Jan-Mar 2027.
+        const inFY = (fy.year === 2026 && fy.monthIndex >= 3) ||
+                     (fy.year === 2027 && fy.monthIndex <= 2);
+        if(!inFY) return;
+        if(!isAllMonths && !selectedMonths.has(fy.month)) return;
+
+        const qty = toNumber(r["KG/LTRS"] ?? r["Quantity"] ?? r["Qty"]);
+        if(!qty) return;
+
+        const rates = RATES[p];
+        if(!rates || !rates[1]) return;
+
+        // Actual NDP = live KG/LTRS × product NDP rate.
+        const ndpCr = (qty * Number(rates[1])) / 10000000;
+        a.cNDP += ndpCr;
+        if(a.prod[p]) a.prod[p].cQ += qty;
+        if(a.terr[tRaw]) a.terr[tRaw].cV += ndpCr;
+    });
+
+    // 3. LY Actual Processing
+    LAST_YEAR_ROWS.forEach(r => {
+        let p = getStandardProduct(r.s);
+        let t = (r.t || "").toUpperCase();
+        if(sProd !== 'ALL' && p !== sProd) return;
+        if(sTerr !== 'ALL' && t !== sTerr) return;
+
+        let mStr = mapM(r.m); 
+        if(!isAllMonths && (!mStr || !selectedMonths.has(mStr))) return;
+
+        let qty = parseFloat(r.k) || 0;
+        let valCr = (parseFloat(r.n) || 0) / 10000000;
+
+        if(qty !== 0 || valCr !== 0) {
+            a.lVal += valCr;
+            if(a.prod[p]) a.prod[p].lQ += qty;
+            if(a.terr[t]) a.terr[t].lV += valCr;
+        }
+    });
+
+    // UI UPDATES
+    const nf = (v) => v.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2});
+    const qf = (v, isMT=false) => {
+        if (v === 0) return `<span class="zero">0</span>`;
+        if (isMT) return (v/1000).toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2});
+        return v.toLocaleString('en-IN', {maximumFractionDigits:2});
+    };
+
+    document.getElementById('tLastVal').textContent = '₹' + nf(a.lVal) + ' Cr';
+    document.getElementById('tTargetNDP').textContent = '₹' + nf(a.tNDP) + ' Cr';
+    document.getElementById('tCurrNDP').textContent = '₹' + nf(a.cNDP) + ' Cr';
+    if (LIVE_DATA.length && a.cNDP === 0) {
+        document.getElementById('syncStatus').innerHTML +=
+            ' | ⚠️ Live rows loaded but CY NDP calculated as zero';
+    }
+
+    let goly = a.lVal === 0 ? (a.cNDP > 0 ? 100 : 0) : ((a.cNDP - a.lVal) / Math.abs(a.lVal)) * 100;
+    let golyStr = a.lVal === 0 && a.cNDP > 0 ? 'N/A' : (goly > 0 ? '+' : '') + goly.toFixed(1) + '%';
+    const golyEl = document.getElementById('tGOLY');
+    golyEl.textContent = golyStr;
+    golyEl.className = "value " + (goly >= 0 ? "pos-growth" : "neg-growth");
+
+    let pHTML = '', tpQ=0, tcQ=0, tlQ=0;
+    PRODUCTS.forEach(p => {
+        let o = a.prod[p];
+        if(sProd !== 'ALL' && p !== sProd) return;
+        if(o.tQ===0 && o.cQ===0 && o.lQ===0) return;
+        tpQ+=o.tQ; tcQ+=o.cQ; tlQ+=o.lQ;
+        let pgoly = o.lQ === 0 ? (o.cQ > 0 ? 100 : 0) : ((o.cQ - o.lQ) / Math.abs(o.lQ)) * 100;
+        let pgolyStr = o.lQ === 0 && o.cQ > 0 ? 'N/A' : (pgoly > 0 ? '+' : '') + pgoly.toFixed(1) + '%';
+        
+        let isMT = (p === 'NATERRA' || p === 'NATDUO');
+
+        pHTML += `<tr>
+            <td><b>${p}</b>${isMT ? ' <span style="font-size:10px;color:#64748b">(MT)</span>' : ''}</td>
+            <td>${qf(o.lQ, isMT)}</td>
+            <td>${qf(o.tQ, isMT)}</td>
+            <td>${qf(o.cQ, isMT)}</td>
+            <td class="${pgoly>=0?'pos-growth':'neg-growth'}">${pgolyStr}</td>
+        </tr>`;
+    });
+    let totProdGoly = tlQ === 0 ? (tcQ > 0 ? 100 : 0) : ((tcQ - tlQ) / Math.abs(tlQ)) * 100;
+    let totProdGolyStr = tlQ === 0 && tcQ > 0 ? 'N/A' : (totProdGoly > 0 ? '+' : '') + totProdGoly.toFixed(1) + '%';
+    pHTML += `<tr class="total-row"><td>Total Qty (Kg/Ltr)</td><td>${qf(tlQ, false)}</td><td>${qf(tpQ, false)}</td><td>${qf(tcQ, false)}</td><td class="${totProdGoly>=0?'pos-growth':'neg-growth'}">${totProdGolyStr}</td></tr>`;
+    document.getElementById('prodTableBody').innerHTML = pHTML;
+
+    let tHTML = '', ttV=0, ttcV=0, ttlV=0;
+    TERRITORIES.forEach(t => {
+        let o = a.terr[t.toUpperCase()];
+        if(sTerr !== 'ALL' && t.toUpperCase() !== sTerr) return;
+        if(o.tV===0 && o.cV===0 && o.lV===0) return;
+        ttV+=o.tV; ttcV+=o.cV; ttlV+=o.lV;
+        
+        let tgoly = o.lV === 0 ? (o.cV > 0 ? 100 : 0) : ((o.cV - o.lV) / Math.abs(o.lV)) * 100;
+        let tgolyStr = o.lV === 0 && o.cV > 0 ? 'N/A' : (tgoly > 0 ? '+' : '') + tgoly.toFixed(1) + '%';
+        
+        let tV_str = o.tV === 0 ? '<span class="zero">0.00</span>' : nf(o.tV);
+        let cV_str = o.cV === 0 ? '<span class="zero">0.00</span>' : nf(o.cV);
+        let lV_str = o.lV === 0 ? '<span class="zero">0.00</span>' : nf(o.lV);
+
+        tHTML += `<tr>
+            <td><b>${o.name}</b></td>
+            <td>${lV_str}</td>
+            <td>${tV_str}</td>
+            <td>${cV_str}</td>
+            <td class="${tgoly>=0?'pos-growth':'neg-growth'}">${tgolyStr}</td>
+        </tr>`;
+    });
+    let totTerrGoly = ttlV === 0 ? (ttcV > 0 ? 100 : 0) : ((ttcV - ttlV) / Math.abs(ttlV)) * 100;
+    let totTerrGolyStr = ttlV === 0 && ttcV > 0 ? 'N/A' : (totTerrGoly > 0 ? '+' : '') + totTerrGoly.toFixed(1) + '%';
+    tHTML += `<tr class="total-row"><td>Total Value (₹ Cr)</td><td>${nf(ttlV)}</td><td>${nf(ttV)}</td><td>${nf(ttcV)}</td><td class="${totTerrGoly>=0?'pos-growth':'neg-growth'}">${totTerrGolyStr}</td></tr>`;
+    document.getElementById('terrTableBody').innerHTML = tHTML;
+}
+
+function loadLiveGoogleSheet() {
+  const cb = "salesCb_" + Date.now();
+  const script = document.createElement("script");
+
+  // JSONP is used because this is a standalone HTML dashboard.
+  // Do NOT use fetch(): Google Sheets will block the cross-origin request.
+  window[cb] = function(resp) {
+      try {
+          if (!resp || !resp.table || !Array.isArray(resp.table.cols) || !Array.isArray(resp.table.rows)) {
+              throw new Error("Google Sheets returned no table");
+          }
+
+          const cols = resp.table.cols.map(c => String(c.label || c.id || "").trim());
+
+          LIVE_DATA = resp.table.rows.map(row => {
+              const obj = {};
+              cols.forEach((h, i) => {
+                  const cell = (row.c || [])[i];
+                  obj[h] = cell ? (cell.v !== undefined && cell.v !== null ? cell.v :
+                                   (cell.f !== undefined && cell.f !== null ? cell.f : "")) : "";
+              });
+              return obj;
+          });
+
+          // Check the exact columns supplied by the user.
+          const validRow = LIVE_DATA.find(r =>
+              String(r["Strength"] || "").trim() &&
+              String(r["Territory Name"] || "").trim() &&
+              String(r["Invoice Date"] || "").trim() &&
+              String(r["KG/LTRS"] || "").trim()
+          );
+
+          const missing = ["Strength","Territory Name","Invoice Date","KG/LTRS"]
+              .filter(h => !cols.includes(h));
+
+          if (missing.length) {
+              throw new Error("Missing columns: " + missing.join(", "));
+          }
+
+          if (!validRow) {
+              throw new Error("Sheet connected, but no usable sales row was returned");
+          }
+
+          // Show an auditable sample so a zero can never be silent.
+          const sampleProduct = String(validRow["Strength"]).trim().toUpperCase();
+          const sampleQty = toNumber(validRow["KG/LTRS"]);
+          const sampleRate = RATES[getStandardProduct(sampleProduct)] ?
+                             RATES[getStandardProduct(sampleProduct)][1] : 0;
+
+          document.getElementById('syncStatus').innerHTML =
+              `✅ LIVE SHEET: ${LIVE_DATA.length.toLocaleString('en-IN')} rows | ` +
+              `Sample: ${sampleProduct} × ${sampleQty} × NDP ₹${sampleRate}`;
+
+          calculateDashboard();
+
+          // If the calculation is still zero, expose the reason.
+          setTimeout(() => {
+              const tile = document.getElementById('tCurrNDP').textContent;
+              if (tile === "₹0.00 Cr") {
+                  document.getElementById('syncStatus').innerHTML +=
+                      ` | ⚠️ No FY27 rows matched. Check Invoice Date / FY filter.`;
+              }
+          }, 50);
+
+      } catch(err) {
+          LIVE_DATA = [];
+          document.getElementById('syncStatus').innerHTML =
+              `❌ GOOGLE SHEET ERROR: ${err.message}`;
+          calculateDashboard();
+      }
+
+      try { delete window[cb]; } catch(e) {}
+  };
+
+  // Keep the callback parameter unescaped. This is the most compatible
+  // Google Visualization JSONP form for a local standalone HTML file.
+  const url =
+      "https://docs.google.com/spreadsheets/d/1qJ26wtwGwwqY-SQ_2IALBnn4VE7aE7E0ALIYOLykW0A/gviz/tq" +
+      "?gid=1419900136" +
+      "&tqx=out:json;responseHandler:" + cb;
+
+  script.src = url;
+  script.async = true;
+
+  script.onerror = function() {
+      LIVE_DATA = [];
+      document.getElementById('syncStatus').innerHTML =
+          "❌ GOOGLE SHEET CONNECTION FAILED — the Sheet/tab is not accessible to this HTML.";
+      calculateDashboard();
+      try { delete window[cb]; } catch(e) {}
+  };
+
+  document.head.appendChild(script);
+}
+function resetFilters() {
+  document.getElementById('fProduct').value = 'ALL';
+  selectedMonths.clear();
+  selectedMonths.add("ALL");
+  document.querySelectorAll('#monthOpts input').forEach(i => i.checked = (i.value === "ALL"));
+  document.getElementById('monthHdr').textContent = "All Months (FY)";
+  document.getElementById('fTerritory').value = 'ALL';
+  calculateDashboard();
+}
+
+function initApp() {
+    calculateDashboard();
+    loadLiveGoogleSheet();
+}
+
+['fProduct', 'fTerritory'].forEach(id => { document.getElementById(id).addEventListener('change', calculateDashboard); });
+window.addEventListener('load', initApp);
+</script>
+</body>
+</html>
