@@ -62,7 +62,7 @@ body{background:var(--bg);color:var(--text);padding:12px;max-width:600px;margin:
 .tile-button .tile-ico{font-size:1.25rem}.tile-button.active{background:var(--natco-green-dark);border-color:var(--natco-green-dark);color:#fff}
 .form-dropdown,.form-input{width:100%;padding:10px 12px;border-radius:8px;border:1.5px solid var(--border);font-size:.9rem;font-weight:600;color:var(--text);background:#fff;outline:none}
 .form-dropdown:focus,.form-input:focus{border-color:var(--natco-blue)}
-.segmented-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.seg-pill{padding:9px 8px;border:1.5px solid var(--border);border-radius:8px;background:#f8fafc;font-size:.84rem;font-weight:700;cursor:pointer;color:var(--text)}
+.segmented-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.seg-pill{padding:9px 8px;border:1.5px solid var(--border);border-radius:8px;background:#f8fafc;font-size:.84rem;font-weight:700;cursor:pointer;color:var(--text);text-align:center;}
 .seg-pill.active{background:var(--natco-green-dark);border-color:var(--natco-green-dark);color:#fff}
 .priority-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}.prio-pill{padding:9px 6px;border:1.5px solid var(--border);border-radius:8px;font-size:.82rem;font-weight:800;cursor:pointer;text-align:center;background:#f8fafc;color:var(--text)}
 .active-high{background:#ef4444!important;border-color:#ef4444!important;color:#fff!important}.active-med{background:#f59e0b!important;border-color:#f59e0b!important;color:#fff!important}.active-low{background:#10b981!important;border-color:#10b981!important;color:#fff!important}
@@ -145,7 +145,7 @@ body{background:var(--bg);color:var(--text);padding:12px;max-width:600px;margin:
 </header>
 
 <div class="sync-bar">
-  <span id="syncStatus">Connecting to Google Sheet...</span>
+  <span id="syncStatus">Refreshing...</span>
   <span id="lastSync"></span>
 </div>
 
@@ -246,13 +246,19 @@ body{background:var(--bg);color:var(--text);padding:12px;max-width:600px;margin:
   </div>
 
   <div>
-    <h3 style="font-size:.95rem;font-weight:800;margin-bottom:8px;color:var(--text)">📋 Tasks created by you</h3>
+    <h3 style="font-size:.95rem;font-weight:800;margin-bottom:8px;color:var(--text)">📋 Tasks recently created by you</h3>
     <div id="allDispatchedTasksList"></div>
   </div>
 </div>
 
 <!-- MY WORK -->
 <div id="viewMyWorkMode" style="display:none">
+  
+  <div class="segmented-grid" style="margin-bottom:12px;">
+    <button type="button" class="seg-pill active" id="btnWorkToMe" onclick="setMyWorkTab('TO_ME')">📥 Assigned To Me</button>
+    <button type="button" class="seg-pill" id="btnWorkByMe" onclick="setMyWorkTab('BY_ME')">📤 Assigned By Me</button>
+  </div>
+
   <div class="app-card" style="padding:0;background:transparent;border:none;box-shadow:none">
     <div id="myWorkTasksList"></div>
   </div>
@@ -289,7 +295,7 @@ body{background:var(--bg);color:var(--text);padding:12px;max-width:600px;margin:
 <!-- WARNING -->
 <div class="modal-backdrop" id="dueDateWarningModal">
   <div class="modal-box" style="text-align:center">
-    <div style="font-size:2.2rem;margin-bottom:8px">⚠️</div>
+    <div style="font-size:2.2rem;margin-bottom:8px">⚠</div>
     <h3 style="justify-content:center;color:var(--natco-red)">Pending Task Reminder!</h3>
     <p id="dueDateWarningText" style="font-size:.9rem;color:var(--text);margin-bottom:16px;font-weight:600"></p>
     <button type="button" class="btn-submit-task" style="background:var(--natco-blue)" onclick="confirmAndEnterApp()">OK / Agree</button>
@@ -461,6 +467,7 @@ let formStep1Type = "PARTY";
 let formFrequency = "ONE_TIME";
 let formPriority = "HIGH";
 let isLoadingTasks = false;
+let myWorkTab = "TO_ME"; 
 
 /* ============================================================
    STARTUP
@@ -529,14 +536,14 @@ function loadMainScreen(){
 }
 
 /* ============================================================
-   GOOGLE SHEET - MASTER TASK LOAD
+   MASTER TASK LOAD
 ============================================================ */
 
 async function loadTasksFromSheet(showAlert){
   if(isLoadingTasks) return;
 
   isLoadingTasks = true;
-  setSyncStatus("Loading tasks from Google Sheet...","busy");
+  setSyncStatus("Refreshing...","busy");
 
   try{
     const url = GOOGLE_SHEET_URL + "?t=" + Date.now();
@@ -553,12 +560,12 @@ async function loadTasksFromSheet(showAlert){
     const data = await response.json();
 
     if(!data.success){
-      throw new Error(data.error || "Google Sheet returned an error.");
+      throw new Error(data.error || "Server returned an error.");
     }
 
     tasks = Array.isArray(data.tasks) ? data.tasks.map(normalizeTask) : [];
 
-    setSyncStatus("✓ Synced with Google Sheet","ok");
+    setSyncStatus("✓ Refreshed successfully","ok");
     document.getElementById("lastSync").textContent =
       new Date().toLocaleTimeString([],{
         hour:"2-digit",minute:"2-digit"
@@ -571,15 +578,15 @@ async function loadTasksFromSheet(showAlert){
     renderMyWorkTasks();
 
     if(showAlert){
-      alert("Tasks refreshed from Google Sheet.");
+      alert("Tasks refreshed.");
     }
 
   }catch(err){
     console.error("Task load error:",err);
-    setSyncStatus("⚠ Google Sheet sync failed","error");
+    setSyncStatus("⚠ Refresh failed","error");
 
     if(showAlert){
-      alert("Unable to load tasks from Google Sheet.\n\n" + err.message);
+      alert("Unable to refresh tasks.\n\n" + err.message);
     }
 
   }finally{
@@ -601,7 +608,7 @@ function normalizeTask(t){
     assignedTo:String(t.assignedTo || ""),
     assignedBy:assignedBy,
     priority:String(t.priority || "HIGH").toUpperCase(),
-    frequency:String(t.frequency || "ONE_TIME").toUpperCase(), // ADDED: Ensures frequency persists
+    frequency:String(t.frequency || "ONE_TIME").toUpperCase(),
     dueDate:String(t.dueDate || ""),
     status:String(t.status || "Pending"),
     completed:String(t.status || "").toLowerCase() === "completed"
@@ -819,7 +826,7 @@ function renderPartyTasks(){
   );
 
   if(!currentUser.includes("Manager")){
-    list=list.filter(t=>t.assignedTo===currentUser);
+    list=list.filter(t=>sameUser(t.assignedTo, currentUser));
   }
 
   if(activeSourceFilter==="MGR"){
@@ -850,7 +857,7 @@ function renderPartyTasks(){
     return;
   }
 
-  container.innerHTML=list.map(taskCardHtml).join("");
+  container.innerHTML=list.map(t => taskCardHtml(t)).join("");
 }
 
 /* ============================================================
@@ -863,7 +870,7 @@ function renderAllDispatchedTasks(){
 
   let list=tasks.filter(t=>
     sameUser(t.assignedBy,currentUser) &&
-    t.assignedTo!==currentUser
+    !sameUser(t.assignedTo,currentUser)
   );
 
   const priorityWeight={HIGH:1,MED:2,LOW:3};
@@ -876,7 +883,7 @@ function renderAllDispatchedTasks(){
 
   if(!list.length){
     container.innerHTML=
-      '<div class="empty-state">No tasks created by you yet.</div>';
+      '<div class="empty-state">No tasks recently created by you.</div>';
     return;
   }
 
@@ -884,8 +891,15 @@ function renderAllDispatchedTasks(){
 }
 
 /* ============================================================
-   MY WORK
+   MY WORK (2 TILES)
 ============================================================ */
+
+function setMyWorkTab(tab) {
+  myWorkTab = tab;
+  document.getElementById("btnWorkToMe").classList.toggle("active", tab === "TO_ME");
+  document.getElementById("btnWorkByMe").classList.toggle("active", tab === "BY_ME");
+  renderMyWorkTasks();
+}
 
 function renderMyWorkTasks(){
   const container=document.getElementById("myWorkTasksList");
@@ -893,16 +907,10 @@ function renderMyWorkTasks(){
 
   let list=[];
 
-  if(currentUser.includes("Manager")){
-    list=tasks.slice();
-  }else{
-    const allowed=userTerritories[currentUser]||[];
-    list=tasks.filter(t=>{
-      if(t.assignedTo===currentUser)return true;
-      if(t.type==="PARTY" && allowed.includes(t.territory))return true;
-      if(t.type==="PERSON" && t.target===currentUser)return true;
-      return false;
-    });
+  if (myWorkTab === "TO_ME") {
+    list = tasks.filter(t => sameUser(t.assignedTo, currentUser));
+  } else if (myWorkTab === "BY_ME") {
+    list = tasks.filter(t => sameUser(t.assignedBy, currentUser));
   }
 
   const priorityWeight={HIGH:1,MED:2,LOW:3};
@@ -915,11 +923,11 @@ function renderMyWorkTasks(){
 
   if(!list.length){
     container.innerHTML=
-      '<div class="empty-state">No pending work available. 👍</div>';
+      '<div class="empty-state">No pending work found in this category. 👍</div>';
     return;
   }
 
-  container.innerHTML=list.map(t=>taskCardHtml(t)).join("");
+  container.innerHTML=list.map(t=>taskCardHtml(t, true)).join("");
 }
 
 /* ============================================================
@@ -1016,8 +1024,8 @@ function taskCardHtml(t,showDestination=false){
 
         <span>
           By:
-          <b>${escapeHtml(t.assignedBy)}</b>
-          ${t.assignedTo ? " ➜ For: <b>"+escapeHtml(t.assignedTo)+"</b>" : ""}
+          <b>${escapeHtml(firstName(t.assignedBy) || "Manager")}</b>
+          ${t.assignedTo ? " ➜ For: <b>"+escapeHtml(firstName(t.assignedTo) || "Team")+"</b>" : ""}
         </span>
 
         <button
@@ -1145,20 +1153,18 @@ async function saveAndAssignTask(){
 
   const btn=document.getElementById("saveTaskButton");
   btn.disabled=true;
-  btn.textContent="Saving...";
+  btn.textContent="Preparing tasks...";
 
   try{
-
     const payloads=[];
 
     if(formStep1Type==="PARTY"){
-
       const party=parties.find(p=>p.name===targetVal);
       const territory=party?party.territory:"PUNJAB";
       const assignedTo=territoryOwners[territory]||"Yuvinder Kumar (Manager)";
 
       payloads.push({
-        action: "addTask", // ADDED: Required for Apps Script backend
+        action: "addTask",
         date:todayString(),
         title:desc,
         type:"PARTY",
@@ -1167,56 +1173,56 @@ async function saveAndAssignTask(){
         assignedTo:assignedTo,
         assignedBy:currentUser,
         priority:formPriority,
-        frequency:formFrequency, // ADDED: Was missing
         dueDate:dueDate,
-        status:"Pending"
+        status:"Pending",
+        frequency:formFrequency
       });
 
     }else if(formStep1Type==="PERSON"){
+      const personTerritory = userTerritories[targetVal] ? userTerritories[targetVal].join(" & ") : "HQ";
 
       payloads.push({
-        action: "addTask", // ADDED: Required for Apps Script backend
+        action: "addTask",
         date:todayString(),
         title:desc,
         type:"PERSON",
         target:targetVal,
-        territory:"HQ",
+        territory:personTerritory, 
         assignedTo:targetVal,
         assignedBy:currentUser,
         priority:formPriority,
-        frequency:formFrequency, // ADDED: Was missing
         dueDate:dueDate,
-        status:"Pending"
+        status:"Pending",
+        frequency:formFrequency
       });
 
     }else{
-
       if(targetVal==="WHOLE_TEAM"){
-
         allPersonsList
           .filter(p=>!p.includes("Manager"))
           .forEach(rep=>{
+            const repTerritory = userTerritories[rep] ? userTerritories[rep].join(" & ") : "HQ";
+
             payloads.push({
-              action: "addTask", // ADDED: Required for Apps Script backend
+              action: "addTask",
               date:todayString(),
               title:desc,
               type:"PERSON",
               target:rep,
-              territory:"HQ",
+              territory:repTerritory, 
               assignedTo:rep,
               assignedBy:currentUser,
               priority:formPriority,
-              frequency:formFrequency, // ADDED: Was missing
               dueDate:dueDate,
-              status:"Pending"
+              status:"Pending",
+              frequency:formFrequency
             });
           });
 
       }else if(targetVal==="ALL_PUNJAB_PARTIES"){
-
         parties.forEach(p=>{
           payloads.push({
-            action: "addTask", // ADDED: Required for Apps Script backend
+            action: "addTask", 
             date:todayString(),
             title:desc,
             type:"PARTY",
@@ -1225,20 +1231,19 @@ async function saveAndAssignTask(){
             assignedTo:territoryOwners[p.territory],
             assignedBy:currentUser,
             priority:formPriority,
-            frequency:formFrequency, // ADDED: Was missing
             dueDate:dueDate,
-            status:"Pending"
+            status:"Pending",
+            frequency:formFrequency
           });
         });
 
       }else if(targetVal.startsWith("TERRITORY_")){
-
         const terr=targetVal.replace("TERRITORY_","");
         parties
           .filter(p=>p.territory===terr)
           .forEach(p=>{
             payloads.push({
-              action: "addTask", // ADDED: Required for Apps Script backend
+              action: "addTask", 
               date:todayString(),
               title:desc,
               type:"PARTY",
@@ -1247,9 +1252,9 @@ async function saveAndAssignTask(){
               assignedTo:territoryOwners[terr],
               assignedBy:currentUser,
               priority:formPriority,
-              frequency:formFrequency, // ADDED: Was missing
               dueDate:dueDate,
-              status:"Pending"
+              status:"Pending",
+              frequency:formFrequency
             });
           });
       }
@@ -1259,9 +1264,22 @@ async function saveAndAssignTask(){
       throw new Error("No task was generated.");
     }
 
-    for(const payload of payloads){
-      await postToSheet(payload);
+    // BATcH SENDING TO BACKEND
+    let completedCount = 0;
+    const total = payloads.length;
+    const BATCH_SIZE = 5; 
+
+    for (let i = 0; i < total; i += BATCH_SIZE) {
+      const batch = payloads.slice(i, i + BATCH_SIZE);
+      
+      btn.textContent = `Saving ${completedCount + 1} to ${Math.min(completedCount + BATCH_SIZE, total)} of ${total}...`;
+      
+      await Promise.all(batch.map(p => postToSheet(p)));
+      
+      completedCount += batch.length;
     }
+
+    btn.textContent = "Refreshing list...";
 
     document.getElementById("taskInputText").value="";
     document.getElementById("taskDueDateInput").value="";
@@ -1273,25 +1291,19 @@ async function saveAndAssignTask(){
       `${desc} (Priority: ${formPriority})`
     );
 
-    alert(
-      `Success! ${payloads.length} task(s) saved to Google Sheet.`
-    );
+    alert(`Success! ${total} task(s) saved.`);
 
   }catch(err){
-
     console.error(err);
-
     alert(
       "Task could not be saved.\n\n"+
-      "Please check the Google Apps Script deployment and Sheet connection.\n\n"+
+      "Please check the network connection.\n\n"+
       err.message
     );
 
   }finally{
-
     btn.disabled=false;
     btn.textContent="Save & Dispatch Task";
-
   }
 }
 
@@ -1475,7 +1487,7 @@ function checkDueDateRemindersOnLoad(){
     if(!t.dueDate)return false;
 
     if(!currentUser.includes("Manager") &&
-       t.assignedTo!==currentUser){
+       !sameUser(t.assignedTo, currentUser)){
       return false;
     }
 
@@ -1547,29 +1559,24 @@ function calculateDaysPassed(dateStr){
 }
 
 function isManagerUser(name){
-
   const n=String(name||"").trim().toLowerCase();
-
-  return n.includes("yuvinder") ||
-         n.includes("(manager)") ||
-         n==="manager";
+  return n.includes("yuvinder") || n.includes("(manager)") || n==="manager";
 }
 
 function sameUser(a,b){
-
   const x=String(a||"").trim().toLowerCase();
   const y=String(b||"").trim().toLowerCase();
+  
+  if(!x && !y) return true;
+  if(!x || !y) return false;
+  if(x===y) return true;
 
-  if(x===y)return true;
+  if(isManagerUser(x) && isManagerUser(y)) return true;
 
-  if(
-    (x==="yuvinder kumar" &&
-     y==="yuvinder kumar (manager)") ||
-    (y==="yuvinder kumar" &&
-     x==="yuvinder kumar (manager)")
-  ){
-    return true;
-  }
+  const baseX = x.split("(")[0].trim();
+  const baseY = y.split("(")[0].trim();
+
+  if(baseX && baseY && baseX === baseY) return true;
 
   return false;
 }
@@ -1579,7 +1586,6 @@ function firstName(name){
 }
 
 function escapeHtml(value){
-
   const d=document.createElement("div");
   d.textContent=String(value??"");
   return d.innerHTML;
