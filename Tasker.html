@@ -532,79 +532,170 @@ function loadMainScreen(){
    GOOGLE SHEET - MASTER TASK LOAD
 ============================================================ */
 
-async function loadTasksFromSheet(showAlert){
-  if(isLoadingTasks) return;
+let jsonpCounter = 0;
 
-  isLoadingTasks = true;
-  setSyncStatus("Loading tasks from Google Sheet...","busy");
+/* ============================================================
+   GOOGLE SHEET - MASTER TASK LOAD
+   Uses JSONP instead of fetch(GET), so the app also works when
+   the HTML is opened from a local file or another domain.
+============================================================ */
 
-  try{
-    const url = GOOGLE_SHEET_URL + "?t=" + Date.now();
+function loadTasksFromSheet(showAlert){
+  return new Promise(function(resolve, reject){
 
-    const response = await fetch(url,{
-      method:"GET",
-      cache:"no-store"
-    });
-
-    if(!response.ok){
-      throw new Error("HTTP " + response.status);
+    if(isLoadingTasks){
+      resolve(false);
+      return;
     }
 
-    const data = await response.json();
+    isLoadingTasks = true;
+    setSyncStatus("Loading tasks from Google Sheet...","busy");
 
-    if(!data.success){
-      throw new Error(data.error || "Google Sheet returned an error.");
-    }
+    const callbackName =
+      "natcoTaskCallback_" +
+      Date.now() + "_" +
+      (++jsonpCounter);
 
-    tasks = Array.isArray(data.tasks) ? data.tasks.map(normalizeTask) : [];
+    const script = document.createElement("script");
+    let finished = false;
 
-    setSyncStatus("✓ Synced with Google Sheet","ok");
-    document.getElementById("lastSync").textContent =
-      new Date().toLocaleTimeString([],{
-        hour:"2-digit",minute:"2-digit"
-      });
+    const cleanup = function(){
+      finished = true;
+      if(script.parentNode){
+        script.parentNode.removeChild(script);
+      }
+      try{
+        delete window[callbackName];
+      }catch(e){
+        window[callbackName] = undefined;
+      }
+      isLoadingTasks = false;
+    };
 
-    populateReachedParties();
+    const timer = setTimeout(function(){
+      if(finished) return;
+      cleanup();
+      setSyncStatus("⚠ Google Sheet connection timed out","error");
+      if(showAlert){
+        alert("Google Sheet did not respond within 15 seconds.\n\nPlease check the Apps Script deployment and access setting.");
+      }
+      reject(new Error("Google Sheet connection timed out."));
+    },15000);
 
-    renderPartyTasks();
-    renderAllDispatchedTasks();
-    renderMyWorkTasks();
+    window[callbackName] = function(result){
+      clearTimeout(timer);
+      if(finished) return;
 
-    if(showAlert){
-      alert("Tasks refreshed from Google Sheet.");
-    }
+      try{
+        if(!result || !result.success){
+          throw new Error(
+            (result && result.error) ||
+            "Google Sheet returned an invalid response."
+          );
+        }
 
-  }catch(err){
-    console.error("Task load error:",err);
-    setSyncStatus("⚠ Google Sheet sync failed","error");
+        tasks = Array.isArray(result.tasks)
+          ? result.tasks.map(normalizeTask)
+          : [];
 
-    if(showAlert){
-      alert("Unable to load tasks from Google Sheet.\n\n" + err.message);
-    }
+        setSyncStatus(
+          "✓ Synced with Google Sheet • " + tasks.length + " tasks",
+          "ok"
+        );
 
-  }finally{
-    isLoadingTasks = false;
-  }
+        document.getElementById("lastSync").textContent =
+          new Date().toLocaleTimeString([],{
+            hour:"2-digit",
+            minute:"2-digit"
+          });
+
+        populateReachedParties();
+        renderPartyTasks();
+        renderAllDispatchedTasks();
+        renderMyWorkTasks();
+
+        cleanup();
+
+        if(showAlert){
+          alert("Tasks refreshed from Google Sheet.\n\n" + tasks.length + " task(s) loaded.");
+        }
+
+        resolve(true);
+
+      }catch(err){
+        cleanup();
+        setSyncStatus("⚠ Google Sheet data error","error");
+        if(showAlert){
+          alert("Unable to read tasks from Google Sheet.\n\n" + err.message);
+        }
+        reject(err);
+      }
+    };
+
+    script.onerror = function(){
+      clearTimeout(timer);
+      if(finished) return;
+      cleanup();
+      setSyncStatus("⚠ Google Sheet connection failed","error");
+      const err = new Error(
+        "Could not connect to Google Apps Script. Make sure the Web App is deployed as 'Anyone'."
+      );
+      if(showAlert){
+        alert(err.message);
+      }
+      reject(err);
+    };
+
+    script.src =
+      GOOGLE_SHEET_URL +
+      "?action=getTasks" +
+      "&callback=" + encodeURIComponent(callbackName) +
+      "&ts=" + Date.now();
+
+    document.head.appendChild(script);
+  });
 }
 
 function normalizeTask(t){
-  const assignedBy = String(t.assignedBy || "").trim();
-
+  const status = String(t.status || "Pending").trim();
   return {
-    rowNumber:Number(t.rowNumber || 0),
-    id:Number(t.rowNumber || 0),
-    date:String(t.date || ""),
-    title:String(t.title || ""),
-    type:String(t.type || "").toUpperCase(),
-    target:String(t.target || ""),
-    territory:String(t.territory || ""),
-    assignedTo:String(t.assignedTo || ""),
-    assignedBy:assignedBy,
-    priority:String(t.priority || "HIGH").toUpperCase(),
-    dueDate:String(t.dueDate || ""),
-    status:String(t.status || "Pending"),
-    completed:String(t.status || "").toLowerCase() === "completed"
+    rowNumber: Number(t.rowNumber || 0),
+    id: Number(t.rowNumber || 0),
+    date: normalizeDateValue(t.date),
+    title: String(t.title || "").trim(),
+    type: String(t.type || "").trim().toUpperCase(),
+    target: String(t.target || "").trim(),
+    territory: String(t.territory || "").trim().toUpperCase(),
+    assignedTo: String(t.assignedTo || "").trim(),
+    assignedBy: String(t.assignedBy || "").trim(),
+    priority: String(t.priority || "HIGH").trim().toUpperCase(),
+    dueDate: normalizeDateValue(t.dueDate),
+    status: status,
+    completed: status.toLowerCase() === "completed",
+    frequency: String(t.frequency || "ONE_TIME").trim().toUpperCase()
   };
+}
+
+function normalizeDateValue(value){
+  if(value === null || value === undefined || value === "") return "";
+
+  const s = String(value).trim();
+
+  if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+
+  let m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if(m){
+    return m[3] + "-" + String(m[2]).padStart(2,"0") + "-" + String(m[1]).padStart(2,"0");
+  }
+
+  const d = new Date(s);
+  if(!isNaN(d.getTime())){
+    return d.getFullYear() + "-" +
+      String(d.getMonth()+1).padStart(2,"0") + "-" +
+      String(d.getDate()).padStart(2,"0");
+  }
+
+  return s;
 }
 
 function setSyncStatus(text,cls){
@@ -651,6 +742,13 @@ function switchNavMode(mode){
   if(mode==="REACHED_PARTY") renderPartyTasks();
   if(mode==="ASSIGN_TASK") renderAllDispatchedTasks();
   if(mode==="MY_WORK") renderMyWorkTasks();
+
+  /* Always request the latest central list when changing tabs. */
+  if(currentUser){
+    loadTasksFromSheet(false).catch(function(err){
+      console.error("Tab refresh error:", err);
+    });
+  }
 }
 
 /* ============================================================
@@ -1413,7 +1511,6 @@ async function deleteTask(rowNumber){
 ============================================================ */
 
 function postToSheet(payload){
-
   return fetch(GOOGLE_SHEET_URL,{
     method:"POST",
     mode:"no-cors",
@@ -1421,12 +1518,9 @@ function postToSheet(payload){
       "Content-Type":"text/plain;charset=utf-8"
     },
     body:JSON.stringify(payload)
-  }).then(()=>{
-    /*
-     * no-cors responses cannot be read.
-     * The following GET verifies the actual Sheet state.
-     */
-    return new Promise(resolve=>setTimeout(resolve,700));
+  }).then(function(){
+    /* Give Apps Script a moment to commit the row before JSONP reload. */
+    return new Promise(function(resolve){setTimeout(resolve,1000);});
   });
 }
 
