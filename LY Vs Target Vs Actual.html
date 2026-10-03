@@ -82,6 +82,12 @@ tbody tr:hover td{background:#f1f5f9!important}
 td.pos-growth{color:#059669;font-weight:800;}
 td.neg-growth{color:#b91c1c;font-weight:800;}
 
+/* Sortable header */
+th.sortable{cursor:pointer;user-select:none;position:relative;padding-right:16px;}
+th.sortable::after{content:"⇅";position:absolute;right:2px;top:50%;transform:translateY(-50%);font-size:10px;opacity:0.4;}
+th.sortable.asc::after{content:"▲";opacity:1;color:var(--blue);}
+th.sortable.desc::after{content:"▼";opacity:1;color:var(--blue);}
+
 .live-status{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--navy);margin-bottom:16px;background:#e2e8f0;padding:12px 16px;border-radius:8px;border-left:4px solid var(--blue)}
 .dev-credit{color: var(--blue); font-weight: 900;}
 @media(max-width:900px){
@@ -168,16 +174,16 @@ td.neg-growth{color:#b91c1c;font-weight:800;}
       <!-- Table 1: Products -->
       <div class="panel">
         <h2>Product-Wise Comparison (Quantity)</h2>
-        <div class="hint">Quantities in Kg/Ltr. <b>NATERRA & NATDUO in MT.</b></div>
+        <div class="hint">Quantities in Kg/Ltr. <b>NATERRA & NATDUO in MT.</b> Click column headers to sort.</div>
         <div class="table-wrap">
           <table id="prodTable">
             <thead>
               <tr>
                 <th>Product Name</th>
-                <th>LY Actual<br>25-26</th>
-                <th>CY 26-27<br>Targets</th>
-                <th>Actual<br>26-27</th>
-                <th>Growth<br>over LY (%)</th>
+                <th class="sortable" data-table="prod" data-key="lQ">LY Actual<br>25-26</th>
+                <th class="sortable" data-table="prod" data-key="tQ">CY 26-27<br>Targets</th>
+                <th class="sortable" data-table="prod" data-key="cQ">Actual<br>26-27</th>
+                <th class="sortable" data-table="prod" data-key="goly">Growth<br>over LY (%)</th>
               </tr>
             </thead>
             <tbody id="prodTableBody"></tbody>
@@ -188,16 +194,16 @@ td.neg-growth{color:#b91c1c;font-weight:800;}
       <!-- Table 2: Territory -->
       <div class="panel">
         <h2>Territory-Wise Comparison (₹ Crore)</h2>
-        <div class="hint">Financial performance by region evaluated in ₹ Crore (NDP).</div>
+        <div class="hint">Financial performance by region evaluated in ₹ Crore (NDP). Click column headers to sort.</div>
         <div class="table-wrap">
           <table id="terrTable">
             <thead>
               <tr>
                 <th>Territory / HQ</th>
-                <th>LY Actual<br>25-26</th>
-                <th>CY 26-27<br>Targets</th>
-                <th>Actual<br>26-27</th>
-                <th>Growth<br>over LY (%)</th>
+                <th class="sortable" data-table="terr" data-key="lV">LY Actual<br>25-26</th>
+                <th class="sortable" data-table="terr" data-key="tV">CY 26-27<br>Targets</th>
+                <th class="sortable" data-table="terr" data-key="cV">Actual<br>26-27</th>
+                <th class="sortable" data-table="terr" data-key="goly">Growth<br>over LY (%)</th>
               </tr>
             </thead>
             <tbody id="terrTableBody"></tbody>
@@ -208,7 +214,7 @@ td.neg-growth{color:#b91c1c;font-weight:800;}
       <!-- NEW TABLE 3: Party-Wise -->
       <div class="panel" id="partyPanel">
         <h2 id="partyTableTitle">Party-Wise Comparison (₹ Lacs)</h2>
-        <div class="hint" id="partyTableHint">Financial performance by party evaluated on Taxable Amount in ₹ Lacs. Targets are zero as they are not mapped by party.</div>
+        <div class="hint" id="partyTableHint">Financial performance by party evaluated on Taxable Amount in ₹ Lacs. Targets are zero as they are not mapped by party. Click column headers to sort.</div>
         <div class="table-wrap">
           <table id="partyTable">
             <thead id="partyTableHead">
@@ -296,6 +302,9 @@ const LAST_YEAR_ROWS = [{"m":"Apr","t":"AMRITSAR","s":"NATDUO","party":"S.K. COM
 
 let LIVE_DATA = [];
 
+// Sort state
+let sortState = { table: null, key: null, dir: 'asc' };
+
 function mapM(mStr) {
     if (!mStr || !mStr.includes("-")) return mStr;
     const mi = parseInt(mStr.split("-")[1], 10) - 1;
@@ -326,6 +335,48 @@ function getFYMonth(raw) {
     if (!Number.isNaN(d.getTime())) return {year:d.getFullYear(), monthIndex:d.getMonth()};
     return null;
 }
+
+// Sorting helper
+function applySort(arr, key, dir) {
+    if (!key) return arr;
+    return arr.slice().sort((a, b) => {
+        let va = a[key], vb = b[key];
+        if (typeof va === 'string' && typeof vb === 'string') {
+            return dir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
+        }
+        va = Number(va) || 0;
+        vb = Number(vb) || 0;
+        return dir === 'asc' ? va - vb : vb - va;
+    });
+}
+
+function updateSortUI() {
+    document.querySelectorAll('th.sortable').forEach(th => {
+        th.classList.remove('asc', 'desc');
+        if (th.dataset.table === sortState.table && th.dataset.key === sortState.key) {
+            th.classList.add(sortState.dir);
+        }
+    });
+}
+
+function handleSort(table, key) {
+    if (sortState.table === table && sortState.key === key) {
+        sortState.dir = sortState.dir === 'asc' ? 'desc' : 'asc';
+    } else {
+        sortState.table = table;
+        sortState.key = key;
+        sortState.dir = 'desc'; // default: high-to-low
+    }
+    updateSortUI();
+    calculateDashboard();
+}
+
+document.addEventListener('click', e => {
+    const th = e.target.closest('th.sortable');
+    if (th) {
+        handleSort(th.dataset.table, th.dataset.key);
+    }
+});
 
 function calculateDashboard() {
     const sProd = document.getElementById('fProduct').value.toUpperCase();
@@ -434,16 +485,15 @@ function calculateDashboard() {
         let valCr = (parseFloat(r.n) || 0) / 10000000;
         let valLacs = (parseFloat(r.n) || 0) / 100000;
 
-        // Populate Table 3 Party Data (Ignores global filters to build total party view)
+        // Populate Table 3 Party Data (respects all filters)
+        if(sProd !== 'ALL' && p !== sProd) return;
+        if(sTerr !== 'ALL' && t !== sTerr) return;
+        if(sParty !== 'ALL' && party !== sParty) return;
+
         if(!partyStats[party]) partyStats[party] = { cV: 0, lV: 0, prod: {} };
         if(!partyStats[party].prod[p]) partyStats[party].prod[p] = { cQ: 0, lQ: 0 };
         partyStats[party].lV += valLacs;
         partyStats[party].prod[p].lQ += qty;
-
-        // Apply Product, Territory & Party filters for Global Dashboard
-        if(sProd !== 'ALL' && p !== sProd) return;
-        if(sTerr !== 'ALL' && t !== sTerr) return;
-        if(sParty !== 'ALL' && party !== sParty) return;
 
         if(qty !== 0 || valCr !== 0) {
             a.lVal += valCr;
@@ -473,23 +523,29 @@ function calculateDashboard() {
     golyEl.textContent = golyStr;
     golyEl.className = "value " + (goly >= 0 ? "pos-growth" : "neg-growth");
 
-    let pHTML = '', tpQ=0, tcQ=0, tlQ=0;
+    // --- TABLE 1: Products (with sorting) ---
+    let pRows = [];
     PRODUCTS.forEach(p => {
         let o = a.prod[p];
         if(sProd !== 'ALL' && p !== sProd) return;
         if(o.tQ===0 && o.cQ===0 && o.lQ===0) return;
-        tpQ+=o.tQ; tcQ+=o.cQ; tlQ+=o.lQ;
         let pgoly = o.lQ === 0 ? (o.cQ > 0 ? 100 : 0) : ((o.cQ - o.lQ) / Math.abs(o.lQ)) * 100;
-        let pgolyStr = o.lQ === 0 && o.cQ > 0 ? 'N/A' : (pgoly > 0 ? '+' : '') + pgoly.toFixed(1) + '%';
-        
-        let isMT = (p === 'NATERRA' || p === 'NATDUO');
-
+        pRows.push({ name: p, tQ: o.tQ, cQ: o.cQ, lQ: o.lQ, goly: pgoly });
+    });
+    if (sortState.table === 'prod' && sortState.key) {
+        pRows = applySort(pRows, sortState.key, sortState.dir);
+    }
+    let pHTML = '', tpQ=0, tcQ=0, tlQ=0;
+    pRows.forEach(r => {
+        tpQ+=r.tQ; tcQ+=r.cQ; tlQ+=r.lQ;
+        let pgolyStr = r.lQ === 0 && r.cQ > 0 ? 'N/A' : (r.goly > 0 ? '+' : '') + r.goly.toFixed(1) + '%';
+        let isMT = (r.name === 'NATERRA' || r.name === 'NATDUO');
         pHTML += `<tr>
-            <td><b>${p}</b>${isMT ? ' <span style="font-size:10px;color:#64748b">(MT)</span>' : ''}</td>
-            <td>${qf(o.lQ, isMT)}</td>
-            <td>${qf(o.tQ, isMT)}</td>
-            <td>${qf(o.cQ, isMT)}</td>
-            <td class="${pgoly>=0?'pos-growth':'neg-growth'}">${pgolyStr}</td>
+            <td><b>${r.name}</b>${isMT ? ' <span style="font-size:10px;color:#64748b">(MT)</span>' : ''}</td>
+            <td>${qf(r.lQ, isMT)}</td>
+            <td>${qf(r.tQ, isMT)}</td>
+            <td>${qf(r.cQ, isMT)}</td>
+            <td class="${r.goly>=0?'pos-growth':'neg-growth'}">${pgolyStr}</td>
         </tr>`;
     });
     let totProdGoly = tlQ === 0 ? (tcQ > 0 ? 100 : 0) : ((tcQ - tlQ) / Math.abs(tlQ)) * 100;
@@ -497,26 +553,31 @@ function calculateDashboard() {
     pHTML += `<tr class="total-row"><td>Total Qty (Kg/Ltr)</td><td>${qf(tlQ, false)}</td><td>${qf(tpQ, false)}</td><td>${qf(tcQ, false)}</td><td class="${totProdGoly>=0?'pos-growth':'neg-growth'}">${totProdGolyStr}</td></tr>`;
     document.getElementById('prodTableBody').innerHTML = pHTML;
 
-    let tHTML = '', ttV=0, ttcV=0, ttlV=0;
+    // --- TABLE 2: Territory (with sorting) ---
+    let tRows = [];
     TERRITORIES.forEach(t => {
         let o = a.terr[t.toUpperCase()];
         if(sTerr !== 'ALL' && t.toUpperCase() !== sTerr) return;
         if(o.tV===0 && o.cV===0 && o.lV===0) return;
-        ttV+=o.tV; ttcV+=o.cV; ttlV+=o.lV;
-        
         let tgoly = o.lV === 0 ? (o.cV > 0 ? 100 : 0) : ((o.cV - o.lV) / Math.abs(o.lV)) * 100;
-        let tgolyStr = o.lV === 0 && o.cV > 0 ? 'N/A' : (tgoly > 0 ? '+' : '') + tgoly.toFixed(1) + '%';
-        
-        let tV_str = o.tV === 0 ? '<span class="zero">0.00</span>' : nf(o.tV);
-        let cV_str = o.cV === 0 ? '<span class="zero">0.00</span>' : nf(o.cV);
-        let lV_str = o.lV === 0 ? '<span class="zero">0.00</span>' : nf(o.lV);
-
+        tRows.push({ name: o.name, tV: o.tV, cV: o.cV, lV: o.lV, goly: tgoly });
+    });
+    if (sortState.table === 'terr' && sortState.key) {
+        tRows = applySort(tRows, sortState.key, sortState.dir);
+    }
+    let tHTML = '', ttV=0, ttcV=0, ttlV=0;
+    tRows.forEach(r => {
+        ttV+=r.tV; ttcV+=r.cV; ttlV+=r.lV;
+        let tgolyStr = r.lV === 0 && r.cV > 0 ? 'N/A' : (r.goly > 0 ? '+' : '') + r.goly.toFixed(1) + '%';
+        let tV_str = r.tV === 0 ? '<span class="zero">0.00</span>' : nf(r.tV);
+        let cV_str = r.cV === 0 ? '<span class="zero">0.00</span>' : nf(r.cV);
+        let lV_str = r.lV === 0 ? '<span class="zero">0.00</span>' : nf(r.lV);
         tHTML += `<tr>
-            <td><b>${o.name}</b></td>
+            <td><b>${r.name}</b></td>
             <td>${lV_str}</td>
             <td>${tV_str}</td>
             <td>${cV_str}</td>
-            <td class="${tgoly>=0?'pos-growth':'neg-growth'}">${tgolyStr}</td>
+            <td class="${r.goly>=0?'pos-growth':'neg-growth'}">${tgolyStr}</td>
         </tr>`;
     });
     let totTerrGoly = ttlV === 0 ? (ttcV > 0 ? 100 : 0) : ((ttcV - ttlV) / Math.abs(ttlV)) * 100;
@@ -524,85 +585,92 @@ function calculateDashboard() {
     tHTML += `<tr class="total-row"><td>Total Value (₹ Cr)</td><td>${nf(ttlV)}</td><td>${nf(ttV)}</td><td>${nf(ttcV)}</td><td class="${totTerrGoly>=0?'pos-growth':'neg-growth'}">${totTerrGolyStr}</td></tr>`;
     document.getElementById('terrTableBody').innerHTML = tHTML;
 
-    // --- TABLE 3: Party & Product Analysis ---
+    // --- TABLE 3: Party & Product Analysis (with sorting & respecting filters) ---
     let p3HTML = '';
     
     if (sParty === 'ALL') {
         document.getElementById('partyTableTitle').textContent = "Party-Wise Comparison (₹ Lacs)";
-        document.getElementById('partyTableHint').innerHTML = "Financial performance by party evaluated on Taxable Amount in ₹ Lacs. Targets are zero as they are not mapped by party.";
+        document.getElementById('partyTableHint').innerHTML = "Financial performance by party evaluated on Taxable Amount in ₹ Lacs. Targets are zero as they are not mapped by party. Click column headers to sort.";
         document.getElementById('partyTableHead').innerHTML = `
             <tr>
                 <th>Party Name</th>
-                <th>LY Actual<br>25-26</th>
-                <th>CY 26-27<br>Targets</th>
-                <th>Actual<br>26-27</th>
-                <th>Growth<br>over LY (%)</th>
+                <th class="sortable" data-table="party" data-key="lV">LY Actual<br>25-26</th>
+                <th class="sortable" data-table="party" data-key="tV">CY 26-27<br>Targets</th>
+                <th class="sortable" data-table="party" data-key="cV">Actual<br>26-27</th>
+                <th class="sortable" data-table="party" data-key="goly">Growth<br>over LY (%)</th>
             </tr>`;
 
-        let tot_cV = 0, tot_lV = 0;
-        Object.keys(partyStats).sort().forEach(p => {
+        let pRows3 = [];
+        Object.keys(partyStats).forEach(p => {
             let cV = partyStats[p].cV;
             let lV = partyStats[p].lV;
             if (cV === 0 && lV === 0) return;
-            tot_cV += cV;
-            tot_lV += lV;
-            
             let goly = lV === 0 ? (cV > 0 ? 100 : 0) : ((cV - lV) / Math.abs(lV)) * 100;
-            let golyStr = lV === 0 && cV > 0 ? 'N/A' : (goly > 0 ? '+' : '') + goly.toFixed(1) + '%';
-            
+            pRows3.push({ name: p, cV: cV, lV: lV, goly: goly });
+        });
+        if (sortState.table === 'party' && sortState.key) {
+            pRows3 = applySort(pRows3, sortState.key, sortState.dir);
+        }
+        let tot_cV = 0, tot_lV = 0;
+        pRows3.forEach(r => {
+            tot_cV += r.cV;
+            tot_lV += r.lV;
+            let golyStr = r.lV === 0 && r.cV > 0 ? 'N/A' : (r.goly > 0 ? '+' : '') + r.goly.toFixed(1) + '%';
             p3HTML += `<tr>
-                <td><b>${p}</b></td>
-                <td>${lV === 0 ? '<span class="zero">0.00</span>' : nf(lV)}</td>
+                <td><b>${r.name}</b></td>
+                <td>${r.lV === 0 ? '<span class="zero">0.00</span>' : nf(r.lV)}</td>
                 <td><span class="zero">0.00</span></td>
-                <td>${cV === 0 ? '<span class="zero">0.00</span>' : nf(cV)}</td>
-                <td class="${goly>=0?'pos-growth':'neg-growth'}">${golyStr}</td>
+                <td>${r.cV === 0 ? '<span class="zero">0.00</span>' : nf(r.cV)}</td>
+                <td class="${r.goly>=0?'pos-growth':'neg-growth'}">${golyStr}</td>
             </tr>`;
         });
-        
         let totGoly = tot_lV === 0 ? (tot_cV > 0 ? 100 : 0) : ((tot_cV - tot_lV) / Math.abs(tot_lV)) * 100;
         let totGolyStr = tot_lV === 0 && tot_cV > 0 ? 'N/A' : (totGoly > 0 ? '+' : '') + totGoly.toFixed(1) + '%';
-
         p3HTML += `<tr class="total-row"><td>Total Value (₹ Lacs)</td><td>${tot_lV === 0 ? '0.00' : nf(tot_lV)}</td><td>0.00</td><td>${nf(tot_cV)}</td><td class="${totGoly>=0?'pos-growth':'neg-growth'}">${totGolyStr}</td></tr>`;
     } else {
         document.getElementById('partyTableTitle').textContent = `Product-Wise Volume for ${sParty}`;
-        document.getElementById('partyTableHint').innerHTML = "Quantities in Kg/Ltr. <b>NATERRA & NATDUO in MT.</b> Targets are zero.";
+        document.getElementById('partyTableHint').innerHTML = "Quantities in Kg/Ltr. <b>NATERRA & NATDUO in MT.</b> Targets are zero. Click column headers to sort.";
         document.getElementById('partyTableHead').innerHTML = `
             <tr>
                 <th>Product Name</th>
-                <th>LY Actual<br>25-26</th>
-                <th>CY 26-27<br>Targets</th>
-                <th>Actual<br>26-27</th>
-                <th>Growth<br>over LY (%)</th>
+                <th class="sortable" data-table="partyProd" data-key="lQ">LY Actual<br>25-26</th>
+                <th class="sortable" data-table="partyProd" data-key="tQ">CY 26-27<br>Targets</th>
+                <th class="sortable" data-table="partyProd" data-key="cQ">Actual<br>26-27</th>
+                <th class="sortable" data-table="partyProd" data-key="goly">Growth<br>over LY (%)</th>
             </tr>`;
 
         let pData = partyStats[sParty] ? partyStats[sParty].prod : {};
-        let tot_cQ = 0, tot_lQ = 0;
+        let pRows3 = [];
         PRODUCTS.forEach(prod => {
             let pQ = pData[prod] || {cQ: 0, lQ: 0};
             if (pQ.cQ === 0 && pQ.lQ === 0) return;
-            tot_cQ += pQ.cQ;
-            tot_lQ += pQ.lQ;
-            let isMT = (prod === 'NATERRA' || prod === 'NATDUO');
-            
             let goly = pQ.lQ === 0 ? (pQ.cQ > 0 ? 100 : 0) : ((pQ.cQ - pQ.lQ) / Math.abs(pQ.lQ)) * 100;
-            let golyStr = pQ.lQ === 0 && pQ.cQ > 0 ? 'N/A' : (goly > 0 ? '+' : '') + goly.toFixed(1) + '%';
-            
+            pRows3.push({ name: prod, cQ: pQ.cQ, lQ: pQ.lQ, tQ: 0, goly: goly });
+        });
+        if (sortState.table === 'partyProd' && sortState.key) {
+            pRows3 = applySort(pRows3, sortState.key, sortState.dir);
+        }
+        let tot_cQ = 0, tot_lQ = 0;
+        pRows3.forEach(r => {
+            tot_cQ += r.cQ;
+            tot_lQ += r.lQ;
+            let isMT = (r.name === 'NATERRA' || r.name === 'NATDUO');
+            let golyStr = r.lQ === 0 && r.cQ > 0 ? 'N/A' : (r.goly > 0 ? '+' : '') + r.goly.toFixed(1) + '%';
             p3HTML += `<tr>
-                <td><b>${prod}</b>${isMT ? ' <span style="font-size:10px;color:#64748b">(MT)</span>' : ''}</td>
-                <td>${qf(pQ.lQ, isMT)}</td>
+                <td><b>${r.name}</b>${isMT ? ' <span style="font-size:10px;color:#64748b">(MT)</span>' : ''}</td>
+                <td>${qf(r.lQ, isMT)}</td>
                 <td><span class="zero">0</span></td>
-                <td>${qf(pQ.cQ, isMT)}</td>
-                <td class="${goly>=0?'pos-growth':'neg-growth'}">${golyStr}</td>
+                <td>${qf(r.cQ, isMT)}</td>
+                <td class="${r.goly>=0?'pos-growth':'neg-growth'}">${golyStr}</td>
             </tr>`;
         });
-        
         let totGoly = tot_lQ === 0 ? (tot_cQ > 0 ? 100 : 0) : ((tot_cQ - tot_lQ) / Math.abs(tot_lQ)) * 100;
         let totGolyStr = tot_lQ === 0 && tot_cQ > 0 ? 'N/A' : (totGoly > 0 ? '+' : '') + totGoly.toFixed(1) + '%';
-        
         p3HTML += `<tr class="total-row"><td>Total Qty (Kg/Ltr)</td><td>${qf(tot_lQ, false)}</td><td>0</td><td>${qf(tot_cQ, false)}</td><td class="${totGoly>=0?'pos-growth':'neg-growth'}">${totGolyStr}</td></tr>`;
     }
     
     document.getElementById('partyTableBody').innerHTML = p3HTML;
+    updateSortUI();
 }
 
 function loadLiveGoogleSheet() {
@@ -684,6 +752,7 @@ function resetFilters() {
   document.getElementById('monthHdr').textContent = "All Months (FY)";
   document.getElementById('fTerritory').value = 'ALL';
   document.getElementById('fParty').value = 'ALL';
+  sortState = { table: null, key: null, dir: 'asc' };
   calculateDashboard();
 }
 
