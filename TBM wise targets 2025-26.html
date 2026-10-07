@@ -274,7 +274,7 @@ html,body{width:100%;max-width:100%;overflow-x:hidden}
 <body>
 <div class="header">
   <h1>Punjab Target Dashboard — FY 2026-27</h1>
-  <p>Territory-wise and product-wise target analysis • NDP & NRV value in ₹ Crore</p>
+  <p>Territory-wise and product-wise target analysis • NDP value in ₹ Crore</p>
 </div>
 <div class="wrap">
   <div class="filters">
@@ -312,12 +312,12 @@ html,body{width:100%;max-width:100%;overflow-x:hidden}
   <div class="tiles">
     <div class="tile"><div class="icon">📦</div><div class="label">Total Volume</div><div class="value" id="tileVolume">0</div><div class="sub">Target volume for selected filters</div></div>
     <div class="tile"><div class="icon">💰</div><div class="label">Total Target — NDP</div><div class="value" id="tileNDP">₹0.00 Cr</div><div class="sub">NDP value</div></div>
-    <div class="tile"><div class="icon">📈</div><div class="label">Total Target — NRV</div><div class="value" id="tileNRV">₹0.00 Cr</div><div class="sub">NRV value</div></div>
+    <div class="tile"><div class="icon">📈</div><div class="label">Total Target — NDP</div><div class="value" id="tileNRV">₹0.00 Cr</div><div class="sub">NDP value</div></div>
   </div>
 
   <div class="panel">
-    <h2>Monthly NRV Value</h2>
-    <div class="hint" id="chartHint">NRV value in ₹ Crore</div>
+    <h2>Monthly NDP Value</h2>
+    <div class="hint" id="chartHint">NDP value in ₹ Crore</div>
     <div class="chartbox"><canvas id="nrvChart"></canvas></div>
   </div>
 
@@ -406,32 +406,31 @@ function ndpFor(r,period){
   const vol=volumeFor(r,period);
   return vol * r.ndp / 1e7;
 }
-function nrvFor(r,period){
-  if(period==='FULL') return r.totalNRV;
-  const months=String(period).split(',').filter(Boolean);
-  return months.reduce((sum,m)=>sum+(r.monthlyNRV[m]||0),0);
+function ndpFor(r,period){
+  const vol=volumeFor(r,period);
+  return vol * r.ndp / 1e7;
 }
 function updateTiles(){
   const rs=selectedRecords();
-  let vol=0,ndp=0,nrv=0;
-  rs.forEach(r=>{vol+=volumeFor(r,periodValue());ndp+=ndpFor(r,periodValue());nrv+=nrvFor(r,periodValue())});
+  let vol=0,ndp=0;
+  rs.forEach(r=>{vol+=volumeFor(r,periodValue());ndp+=ndpFor(r,periodValue())});
   document.getElementById('tileVolume').textContent=num(vol);
   document.getElementById('tileNDP').textContent=money(ndp);
-  document.getElementById('tileNRV').textContent=money(nrv);
+  document.getElementById('tileNDP').textContent=money(ndp);
 }
 
 let chart;
 function updateChart(){
   const rs=selectedRecords();
   const chartMonths=getPeriodMonths();
-  const vals=chartMonths.map(m=>rs.reduce((a,r)=>a+(r.monthlyNRV[m]||0),0));
+  const vals=chartMonths.map(m=>rs.reduce((a,r)=>a+ndpFor(r,m),0));
   const ctx=document.getElementById('nrvChart');
   if(chart) chart.destroy();
-  chart=new Chart(ctx,{type:'bar',data:{labels:chartMonths,datasets:[{label:'NRV Value (₹ Cr)',data:vals,borderWidth:1}]},
+  chart=new Chart(ctx,{type:'bar',data:{labels:chartMonths,datasets:[{label:'NDP Value (₹ Cr)',data:vals,borderWidth:1}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' ₹'+Number(c.raw||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})+' Cr'}}},
     scales:{y:{beginAtZero:true,title:{display:true,text:'₹ Crore'}},x:{title:{display:true,text:'Selected Month(s)'}}}}});
   document.getElementById('chartHint').textContent=
-    'Monthly NRV value in ₹ Crore • '+(territorySel.value==='ALL'?'All Territories':territorySel.value)+' • '+(productSel.value==='ALL'?'All Products':productSel.value)+' • '+(periodIsFull()?'Full Year':getSelectedMonths().join(', '));
+    'Monthly NDP value in ₹ Crore • '+(territorySel.value==='ALL'?'All Territories':territorySel.value)+' • '+(productSel.value==='ALL'?'All Products':productSel.value)+' • '+(periodIsFull()?'Full Year':getSelectedMonths().join(', '));
 }
 
 function selectedTerritoriesForTable(){
@@ -458,15 +457,15 @@ function buildTerritoryMatrix(){
   const prods=productListForTable();
 
   // Territory columns contain QUANTITY only.
-  // The last column contains the product's total NRV value in ₹ Crore.
+  // The last column contains the product's total NDP value in ₹ Crore.
   let h='<thead><tr><th>Product</th>';
   terrs.forEach(t=>{
-    const territoryNRV=prods.reduce((sum,p)=>{
-      return sum+rowsFor(t,p).reduce((x,r)=>x+nrvFor(r,period),0);
+    const territoryNDP=prods.reduce((sum,p)=>{
+      return sum+rowsFor(t,p).reduce((x,r)=>x+ndpFor(r,period),0);
     },0);
-    h+='<th><div>'+t+'</div><div style="font-size:10px;font-weight:600;opacity:.9">NRV ₹'+territoryNRV.toFixed(2)+' Cr</div></th>';
+    h+='<th><div>'+t+'</div><div style="font-size:10px;font-weight:600;opacity:.9">NDP ₹'+territoryNDP.toFixed(2)+' Cr</div></th>';
   });
-  h+='<th><div>Product Value on NRV</div><div style="font-size:10px;font-weight:600;opacity:.9">₹ Crore</div></th></tr></thead><tbody>';
+  h+='<th><div>Product Value on NDP</div><div style="font-size:10px;font-weight:600;opacity:.9">₹ Crore</div></th></tr></thead><tbody>';
 
   prods.forEach(p=>{
     h+='<tr><td>'+p+'</td>';
@@ -475,31 +474,25 @@ function buildTerritoryMatrix(){
       h+='<td>'+num(qty)+'</td>';
     });
 
-    const productNRV=terrs.reduce((sum,t)=>{
-      return sum+rowsFor(t,p).reduce((x,r)=>x+nrvFor(r,period),0);
+    const productNDP=terrs.reduce((sum,t)=>{
+      return sum+rowsFor(t,p).reduce((x,r)=>x+ndpFor(r,period),0);
     },0);
-    h+='<td><b>'+money(productNRV)+'</b></td></tr>';
+    h+='<td><b>'+money(productNDP)+'</b></td></tr>';
   });
 
-  h+='</tbody><tfoot><tr class="total-row"><td>Total Qty / NRV</td>';
+  h+='</tbody><tfoot><tr class="total-row"><td>Total Qty / NDP</td>';
   terrs.forEach(t=>{
     const qty=prods.reduce((sum,p)=>sum+totalVolumeForRegionProduct(t,p,period),0);
     h+='<td>'+num(qty)+'</td>';
   });
 
-  const grandNRV=prods.reduce((sum,p)=>{
-    return sum+terrs.reduce((x,t)=>x+rowsFor(t,p).reduce((z,r)=>z+nrvFor(r,period),0),0);
+  const grandNDP=prods.reduce((sum,p)=>{
+    return sum+terrs.reduce((x,t)=>x+rowsFor(t,p).reduce((z,r)=>z+ndpFor(r,period),0),0);
   },0);
-  h+='<td>'+money(grandNRV)+'</td></tr></tfoot>';
+  h+='<td>'+money(grandNDP)+'</td></tr></tfoot>';
 
   table.innerHTML=h;
-  // With one selected territory, only 3 columns are needed, so keep the table
-  // inside the viewport. With all territories, retain horizontal scrolling.
   table.dataset.compact = terrs.length===1 ? "1" : "0";
-
-  const ptxt=productSel.value==='ALL'?'All Products':productSel.value;
-  const ttxt=territorySel.value==='ALL'?'Punjab Total + All Territories':territorySel.value;
-  const pertxt=period==='FULL'?'Annual':period;
 }
 
 function buildMonthTable(){
@@ -509,13 +502,13 @@ function buildMonthTable(){
   const region=territorySel.value==='ALL'?'Punjab':territorySel.value;
   const monthCols=getPeriodMonths();
 
-  // Body remains QTY. Only one NRV figure (₹ Cr) is shown under each month heading.
+  // Body remains QTY. NDP value (₹ Cr) is shown under each month heading.
   let h='<thead><tr><th>Product</th>';
   monthCols.forEach(m=>{
-    const monthNRV=prods.reduce((sum,p)=>{
-      return sum+rowsFor(region,p).reduce((x,r)=>x+(r.monthlyNRV[m]||0),0);
+    const monthNDP=prods.reduce((sum,p)=>{
+      return sum+rowsFor(region,p).reduce((x,r)=>x+ndpFor(r,m),0);
     },0);
-    h+='<th><div>'+m+'</div><div style="font-size:10px;font-weight:600;opacity:.9">NRV ₹'+monthNRV.toFixed(2)+' Cr</div></th>';
+    h+='<th><div>'+m+'</div><div style="font-size:10px;font-weight:600;opacity:.9">NDP ₹'+monthNDP.toFixed(2)+' Cr</div></th>';
   });
   h+='<th>Total Vol</th></tr></thead><tbody>';
 
@@ -551,9 +544,6 @@ function buildMonthTable(){
 
   h+='<td>'+num(grand)+'</td></tr></tfoot>';
   table.innerHTML=h;
-
-  const regionText=region==='Punjab'?'Punjab State':region;
-  const periodText=periodIsFull()?'All Months':period;
 }
 
 function update(){
