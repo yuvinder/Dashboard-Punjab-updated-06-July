@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -161,7 +162,6 @@ tbody tr:hover td{background:#eaf3ff!important}
   background:linear-gradient(135deg,#b91c1c,#ef4444)!important;
 }
 
-
 html,body{width:100%;max-width:100%;overflow-x:hidden}
 @media(max-width:800px){
   .header{padding:16px 13px}
@@ -195,8 +195,40 @@ html,body{width:100%;max-width:100%;overflow-x:hidden}
   table{min-width:720px}
 }
 
+.period-filter{overflow:visible!important;z-index:20}
+.month-picker{position:relative;width:100%}
+.month-picker-btn{
+  width:100%;min-height:43px;padding:11px 12px;border:1px solid #ffffff55;border-radius:10px;
+  background:#ffffff1f;color:#fff;font-size:14px;font-weight:700;outline:none;
+  display:flex;align-items:center;justify-content:space-between;cursor:pointer;
+}
+.picker-arrow{font-size:16px;margin-left:8px}
+.month-menu{
+  display:none;position:absolute;left:0;right:0;top:calc(100% + 7px);z-index:1000;
+  background:#fff;color:#17233c;border:1px solid #dbe4f0;border-radius:12px;
+  box-shadow:0 14px 30px #17233c35;padding:8px;max-height:330px;overflow:auto;
+}
+.month-menu.open{display:block}
+.month-menu-head{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:5px 6px 8px;border-bottom:1px solid #e5eaf1;margin-bottom:5px;
+  font-size:12px;font-weight:800;
+}
+.month-menu-head button{
+  border:0;background:#eef4ff;color:#2563eb;border-radius:7px;padding:5px 8px;
+  font-size:11px;font-weight:800;cursor:pointer;
+}
+.month-option{
+  display:flex;align-items:center;gap:9px;padding:8px 7px;border-radius:8px;
+  font-size:13px;font-weight:700;cursor:pointer;
+}
+.month-option:hover{background:#f1f5f9}
+.month-option input{width:16px;height:16px;accent-color:#2563eb}
+@media(max-width:800px){
+  .month-picker-btn{min-height:45px;font-size:15px}
+  .month-menu{max-height:300px}
+}
 </style>
-
 
 <style id="table2-compact-fix">
 /* Keep both dashboard tables' Product column compact */
@@ -247,7 +279,33 @@ html,body{width:100%;max-width:100%;overflow-x:hidden}
 <div class="wrap">
   <div class="filters">
     <div class="filter"><label>PRODUCT</label><select id="product"></select></div>
-    <div class="filter"><label>PERIOD</label><select id="period"></select></div>
+    <div class="filter period-filter">
+  <label>PERIOD</label>
+  <div class="month-picker" id="monthPicker">
+    <button type="button" class="month-picker-btn" id="monthPickerBtn">
+      <span id="periodLabel">Full Year</span><span class="picker-arrow">▾</span>
+    </button>
+    <div class="month-menu" id="monthMenu">
+      <div class="month-menu-head">
+        <span>Select Month(s)</span>
+        <button type="button" id="clearMonths">Clear</button>
+      </div>
+      <label class="month-option"><input type="checkbox" value="Apr"> <span>Apr</span></label>
+      <label class="month-option"><input type="checkbox" value="May"> <span>May</span></label>
+      <label class="month-option"><input type="checkbox" value="Jun"> <span>Jun</span></label>
+      <label class="month-option"><input type="checkbox" value="Jul"> <span>Jul</span></label>
+      <label class="month-option"><input type="checkbox" value="Aug"> <span>Aug</span></label>
+      <label class="month-option"><input type="checkbox" value="Sep"> <span>Sep</span></label>
+      <label class="month-option"><input type="checkbox" value="Oct"> <span>Oct</span></label>
+      <label class="month-option"><input type="checkbox" value="Nov"> <span>Nov</span></label>
+      <label class="month-option"><input type="checkbox" value="Dec"> <span>Dec</span></label>
+      <label class="month-option"><input type="checkbox" value="Jan"> <span>Jan</span></label>
+      <label class="month-option"><input type="checkbox" value="Feb"> <span>Feb</span></label>
+      <label class="month-option"><input type="checkbox" value="Mar"> <span>Mar</span></label>
+    </div>
+  </div>
+  <select id="period" style="display:none"><option value="FULL">Full Year</option></select>
+</div>
     <div class="filter"><label>TERRITORY</label><select id="territory"></select></div>
   </div>
 
@@ -287,6 +345,9 @@ const PRODUCTS = ["ASTOR", "ATMOS", "BOSNATE", "CYANAT", "DEXARON", "DI-FORCE", 
 const productSel=document.getElementById('product');
 const periodSel=document.getElementById('period');
 const territorySel=document.getElementById('territory');
+const monthPickerBtn=document.getElementById('monthPickerBtn');
+const monthMenu=document.getElementById('monthMenu');
+const periodLabel=document.getElementById('periodLabel');
 const money=x=> '₹'+Number(x||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})+' Cr';
 const num=x=> Number(x||0).toLocaleString('en-IN',{maximumFractionDigits:2});
 
@@ -294,9 +355,43 @@ function option(sel,text,value){let o=document.createElement('option');o.textCon
 option(productSel,'All Products','ALL');
 PRODUCTS.forEach(p=>option(productSel,p,p));
 option(periodSel,'Full Year','FULL');
-MONTHS.forEach(m=>option(periodSel,m,m));
 option(territorySel,'All Territories','ALL');
 TERRITORIES.forEach(t=>option(territorySel,t,t));
+
+function getSelectedMonths(){
+  const checked=[...monthMenu.querySelectorAll('input[type="checkbox"]:checked')].map(x=>x.value);
+  return checked;
+}
+function getPeriodMonths(){
+  const selected=getSelectedMonths();
+  return selected.length ? selected : MONTHS;
+}
+function periodIsFull(){
+  return getSelectedMonths().length===0;
+}
+function periodValue(){
+  return periodIsFull() ? 'FULL' : getSelectedMonths().join(',');
+}
+function updatePeriodUI(){
+  const selected=getSelectedMonths();
+  periodSel.value=selected.length ? selected.join(',') : 'FULL';
+  periodLabel.textContent=selected.length ? selected.join(', ') : 'Full Year';
+}
+monthPickerBtn.addEventListener('click',e=>{
+  e.stopPropagation();
+  monthMenu.classList.toggle('open');
+});
+monthMenu.addEventListener('click',e=>e.stopPropagation());
+document.addEventListener('click',()=>monthMenu.classList.remove('open'));
+monthMenu.querySelectorAll('input[type="checkbox"]').forEach(cb=>{
+  cb.addEventListener('change',()=>{ updatePeriodUI(); update(); });
+});
+document.getElementById('clearMonths').addEventListener('click',()=>{
+  monthMenu.querySelectorAll('input[type="checkbox"]').forEach(cb=>cb.checked=false);
+  updatePeriodUI();
+  update();
+});
+updatePeriodUI();
 
 function selectedRecords(){
   const p=productSel.value,t=territorySel.value,period=periodSel.value;
@@ -304,7 +399,8 @@ function selectedRecords(){
 }
 function volumeFor(r,period){
   if(period==='FULL') return Object.values(r.months).reduce((a,b)=>a+b,0);
-  return r.months[period]||0;
+  const months=String(period).split(',').filter(Boolean);
+  return months.reduce((sum,m)=>sum+(r.months[m]||0),0);
 }
 function ndpFor(r,period){
   const vol=volumeFor(r,period);
@@ -312,12 +408,13 @@ function ndpFor(r,period){
 }
 function nrvFor(r,period){
   if(period==='FULL') return r.totalNRV;
-  return r.monthlyNRV[period]||0;
+  const months=String(period).split(',').filter(Boolean);
+  return months.reduce((sum,m)=>sum+(r.monthlyNRV[m]||0),0);
 }
 function updateTiles(){
   const rs=selectedRecords();
   let vol=0,ndp=0,nrv=0;
-  rs.forEach(r=>{vol+=volumeFor(r,periodSel.value);ndp+=ndpFor(r,periodSel.value);nrv+=nrvFor(r,periodSel.value)});
+  rs.forEach(r=>{vol+=volumeFor(r,periodValue());ndp+=ndpFor(r,periodValue());nrv+=nrvFor(r,periodValue())});
   document.getElementById('tileVolume').textContent=num(vol);
   document.getElementById('tileNDP').textContent=money(ndp);
   document.getElementById('tileNRV').textContent=money(nrv);
@@ -326,14 +423,15 @@ function updateTiles(){
 let chart;
 function updateChart(){
   const rs=selectedRecords();
-  const vals=MONTHS.map(m=>rs.reduce((a,r)=>a+(r.monthlyNRV[m]||0),0));
+  const chartMonths=getPeriodMonths();
+  const vals=chartMonths.map(m=>rs.reduce((a,r)=>a+(r.monthlyNRV[m]||0),0));
   const ctx=document.getElementById('nrvChart');
   if(chart) chart.destroy();
-  chart=new Chart(ctx,{type:'bar',data:{labels:MONTHS,datasets:[{label:'NRV Value (₹ Cr)',data:vals,borderWidth:1}]},
+  chart=new Chart(ctx,{type:'bar',data:{labels:chartMonths,datasets:[{label:'NRV Value (₹ Cr)',data:vals,borderWidth:1}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' ₹'+Number(c.raw||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})+' Cr'}}},
-    scales:{y:{beginAtZero:true,title:{display:true,text:'₹ Crore'}},x:{title:{display:true,text:'Month'}}}}});
+    scales:{y:{beginAtZero:true,title:{display:true,text:'₹ Crore'}},x:{title:{display:true,text:'Selected Month(s)'}}}}});
   document.getElementById('chartHint').textContent=
-    'Monthly NRV value in ₹ Crore • '+(territorySel.value==='ALL'?'All Territories':territorySel.value)+' • '+(productSel.value==='ALL'?'All Products':productSel.value);
+    'Monthly NRV value in ₹ Crore • '+(territorySel.value==='ALL'?'All Territories':territorySel.value)+' • '+(productSel.value==='ALL'?'All Products':productSel.value)+' • '+(periodIsFull()?'Full Year':getSelectedMonths().join(', '));
 }
 
 function selectedTerritoriesForTable(){
@@ -355,7 +453,7 @@ function totalVolumeForRegionProduct(region, product, period){
 
 function buildTerritoryMatrix(){
   const table=document.getElementById('nrvTable');
-  const period=periodSel.value;
+  const period=periodValue();
   const terrs=selectedTerritoriesForTable();
   const prods=productListForTable();
 
@@ -406,10 +504,10 @@ function buildTerritoryMatrix(){
 
 function buildMonthTable(){
   const table=document.getElementById('targetTable');
-  const period=periodSel.value;
+  const period=periodValue();
   const prods=productListForTable();
   const region=territorySel.value==='ALL'?'Punjab':territorySel.value;
-  const monthCols=period==='FULL' ? MONTHS : [period];
+  const monthCols=getPeriodMonths();
 
   // Body remains QTY. Only one NRV figure (₹ Cr) is shown under each month heading.
   let h='<thead><tr><th>Product</th>';
@@ -430,7 +528,7 @@ function buildMonthTable(){
       h+='<td>'+num(qty)+'</td>';
     });
 
-    const total=period==='FULL'
+    const total=periodIsFull()
       ? source.reduce((sum,r)=>sum+Object.values(r.months).reduce((x,y)=>x+y,0),0)
       : source.reduce((sum,r)=>sum+(r.months[period]||0),0);
 
@@ -447,7 +545,7 @@ function buildMonthTable(){
 
   const grand=prods.reduce((sum,p)=>{
     return sum+rowsFor(region,p).reduce((x,r)=>{
-      return x+(period==='FULL'?Object.values(r.months).reduce((a,b)=>a+b,0):(r.months[period]||0));
+      return x+(periodIsFull()?Object.values(r.months).reduce((a,b)=>a+b,0):(r.months[period]||0));
     },0);
   },0);
 
@@ -455,7 +553,7 @@ function buildMonthTable(){
   table.innerHTML=h;
 
   const regionText=region==='Punjab'?'Punjab State':region;
-  const periodText=period==='FULL'?'All Months':period;
+  const periodText=periodIsFull()?'All Months':period;
 }
 
 function update(){
@@ -464,7 +562,7 @@ function update(){
   buildTerritoryMatrix();
   buildMonthTable();
 }
-[productSel,periodSel,territorySel].forEach(s=>s.addEventListener('change',update));
+[productSel,territorySel].forEach(s=>s.addEventListener('change',update));
 update();
 </script>
 
