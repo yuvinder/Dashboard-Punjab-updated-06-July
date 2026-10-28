@@ -208,6 +208,31 @@ table th:nth-child(4), table td:nth-child(4){width:20%}
 .return-added .return-percent{font-weight:900;color:#B42318}
 @media(max-width:700px){.return-added .return-kpis{grid-template-columns:1fr}.return-added .return-kpi-value{font-size:18px}.return-added .return-sort select{min-width:0;flex:1}}
 
+
+/* Mobile fit override: keep every dashboard table within the screen width. */
+@media (max-width:600px){
+  html,body,.wrap,.dashboard,.main,.panel,.scroll,.table-wrap,.table-container{max-width:100%;min-width:0;box-sizing:border-box;}
+  body,.wrap,.main{overflow-x:hidden;}
+  .panel{padding-left:8px!important;padding-right:8px!important;}
+  .scroll,.table-wrap,.table-container{overflow-x:hidden!important;}
+  .panel table,.return-added table,.product-territory-panel table{width:100%!important;min-width:0!important;max-width:100%!important;table-layout:fixed!important;border-collapse:collapse;}
+  .panel table th,.panel table td,
+  .return-added table th,.return-added table td,
+  .product-territory-panel table th,.product-territory-panel table td{
+    min-width:0!important;max-width:none!important;padding:5px 3px!important;font-size:10px!important;line-height:1.25!important;
+    white-space:normal!important;overflow-wrap:anywhere!important;word-break:break-word!important;box-sizing:border-box;
+  }
+  .product-territory-panel table th:first-child,.product-territory-panel table td:first-child{position:static!important;width:auto!important;}
+  .return-added .th-sort{gap:2px!important;white-space:normal!important;max-width:100%;}
+  .return-added .th-sort .tri{font-size:8px!important;flex-shrink:0;}
+  .return-added .return-kpis{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:5px!important;}
+  .return-added .return-kpi{padding:7px 5px!important;min-width:0;}
+  .return-added .return-kpi-label{font-size:9px!important;line-height:1.2;}
+  .return-added .return-kpi-value{font-size:13px!important;overflow-wrap:anywhere;}
+  .return-added .return-sort select{min-width:0!important;max-width:100%;}
+  /* Allow long product/party names to wrap instead of widening the page. */
+  .panel table td:first-child,.panel table th:first-child{overflow-wrap:anywhere!important;}
+}
 </style>
 </head>
 <body>
