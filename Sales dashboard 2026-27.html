@@ -188,6 +188,26 @@ table th:nth-child(4), table td:nth-child(4){width:20%}
   .product-territory-panel table td:first-child{width:28%;font-size:11px}
 }
 
+
+/* Add-on styles only: sales return tables */
+.return-added .return-sort{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:4px 0 10px}
+.return-added .return-sort label{font-size:12px;font-weight:800;color:var(--navy)}
+.return-added .return-sort select{width:auto;min-width:180px;height:32px;font-size:12px}
+.return-added .return-kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-bottom:10px}
+.return-added .return-kpi{border:1px solid var(--line);border-radius:6px;background:#fff;padding:10px}
+.return-added .return-kpi-label{font-size:11px;font-weight:800;color:var(--muted)}
+.return-added .return-kpi-value{font-size:20px;font-weight:900;color:var(--navy);margin-top:5px}
+.return-added .scroll{overflow:auto}
+.return-added table{min-width:560px}
+.return-added table thead th{background:#DC2626;color:#fff;border-bottom:1px solid #FCA5A5}
+.return-added table thead th:first-child{text-align:left}
+.return-added .th-sort{display:inline-flex;align-items:center;gap:5px;border:0;background:transparent;color:inherit;font:inherit;font-weight:inherit;padding:0;cursor:pointer;white-space:nowrap}
+.return-added .th-sort .tri{font-size:10px;opacity:.75;line-height:1}
+.return-added .th-sort[aria-sort="ascending"] .tri,.return-added .th-sort[aria-sort="descending"] .tri{opacity:1;color:#fff}
+.return-added .th-sort:focus-visible{outline:2px solid #fff;outline-offset:2px;border-radius:2px}
+.return-added .return-percent{font-weight:900;color:#B42318}
+@media(max-width:700px){.return-added .return-kpis{grid-template-columns:1fr}.return-added .return-kpi-value{font-size:18px}.return-added .return-sort select{min-width:0;flex:1}}
+
 </style>
 </head>
 <body>
@@ -303,6 +323,33 @@ table th:nth-child(4), table td:nth-child(4){width:20%}
           </table>
         </div>
         <div class="unit-note">All products are shown in Kg/Ltr. NATDUO and NATERRA are shown in MT.</div>
+      </div>
+
+      <!-- Added panels only: existing dashboard panels and filters remain unchanged. -->
+      <div class="panel return-added">
+        <div class="section-head">Party-wise Sale vs Return NDP (Lakhs)</div>
+        <div class="return-kpis">
+          <div class="return-kpi"><div class="return-kpi-label">Total Sale NDP</div><div class="return-kpi-value" id="returnSaleNdp">₹0.00</div></div>
+          <div class="return-kpi"><div class="return-kpi-label">Total Return NDP</div><div class="return-kpi-value" id="returnValueNdp">₹0.00</div></div>
+          <div class="return-kpi"><div class="return-kpi-label">Overall Return %</div><div class="return-kpi-value" id="returnOverallPercent">0.00%</div></div>
+        </div>
+        <div class="return-sort"><label for="returnSort">Sort:</label>
+          <select id="returnSort" aria-label="Sort party-wise sale versus return table">
+            <option value="party-asc">Party Name: A–Z</option>
+            <option value="party-desc">Party Name: Z–A</option>
+            <option value="pct-desc">Return %: Highest to Lowest</option>
+            <option value="pct-asc">Return %: Lowest to Highest</option>
+          </select>
+        </div>
+        <div class="scroll"><table><thead><tr><th><button class="th-sort" type="button" data-sort-table="partyReturnNdpBody" data-sort-col="0">Payer Name <span class="tri">▲▼</span></button></th><th><button class="th-sort" type="button" data-sort-table="partyReturnNdpBody" data-sort-col="1">Sale NDP (L) <span class="tri">▲▼</span></button></th><th><button class="th-sort" type="button" data-sort-table="partyReturnNdpBody" data-sort-col="2">Return NDP (L) <span class="tri">▲▼</span></button></th><th><button class="th-sort" type="button" data-sort-table="partyReturnNdpBody" data-sort-col="3">Return % <span class="tri">▲▼</span></button></th></tr></thead>
+          <tbody id="partyReturnNdpBody"><tr><td colspan="4">Waiting for data…</td></tr></tbody></table></div>
+      </div>
+
+      <div class="panel return-added">
+        <div class="section-head">Sales Return Details</div>
+        <div class="scroll"><table><thead><tr><th><button class="th-sort" type="button" data-sort-table="salesReturnDetailsBody" data-sort-col="0">Payer Name <span class="tri">▲▼</span></button></th><th><button class="th-sort" type="button" data-sort-table="salesReturnDetailsBody" data-sort-col="1">Product <span class="tri">▲▼</span></button></th><th><button class="th-sort" type="button" data-sort-table="salesReturnDetailsBody" data-sort-col="2">Return Qty (Kg/Ltrs) <span class="tri">▲▼</span></button></th><th><button class="th-sort" type="button" data-sort-table="salesReturnDetailsBody" data-sort-col="3">Return Date <span class="tri">▲▼</span></button></th></tr></thead>
+          <tbody id="salesReturnDetailsBody"><tr><td colspan="4">Waiting for data…</td></tr></tbody></table></div>
+        <div id="salesReturnCount" class="status">Return rows are identified by negative quantities in KG/LTRS.</div>
       </div>
     </main>
   </div>
@@ -684,7 +731,90 @@ function render(){
     $("territoryChart").innerHTML="";
     $("territoryChart").appendChild(wrap);
   }
+  renderReturnTables(f);
 }
+
+
+/* Added functionality only: interpret negative KG/LTRS rows as sales returns. */
+let __returnFilteredRows=[];
+function renderReturnTables(filteredRows){
+  const rows=Array.isArray(filteredRows)?filteredRows:__returnFilteredRows;
+  __returnFilteredRows=rows;
+  const byParty=Object.create(null);
+  const returnRows=[];
+  let totalSaleNdp=0,totalReturnNdp=0;
+  rows.forEach(r=>{
+    const party=String(r.payer||"(Blank)");
+    const rate=(RATES[norm(r.strength)]||[0,0])[1];
+    if(!byParty[party])byParty[party]={sale:0,ret:0};
+    if(Number(r.qty)>0){
+      const value=Number(r.qty)*rate;
+      byParty[party].sale+=value;
+      totalSaleNdp+=value;
+    }else if(Number(r.qty)<0){
+      const qty=Math.abs(Number(r.qty));
+      const value=qty*rate;
+      byParty[party].ret+=value;
+      totalReturnNdp+=value;
+      returnRows.push({...r,returnQty:qty,returnNdp:value});
+    }
+  });
+  const safeMoney=x=>"₹"+(x/100000).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});
+  $("returnSaleNdp").textContent=safeMoney(totalSaleNdp);
+  $("returnValueNdp").textContent=safeMoney(totalReturnNdp);
+  $("returnOverallPercent").textContent=(totalSaleNdp?totalReturnNdp/totalSaleNdp*100:0).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2})+"%";
+  const partyRows=Object.entries(byParty).map(([party,v])=>({party,sale:v.sale,ret:v.ret,pct:v.sale?v.ret/v.sale*100:0}));
+  const sort=$("returnSort")?$("returnSort").value:"party-asc";
+  partyRows.sort((a,b)=>sort==="party-desc"?b.party.localeCompare(a.party):sort==="pct-desc"?b.pct-a.pct:sort==="pct-asc"?a.pct-b.pct:a.party.localeCompare(b.party));
+  $("partyReturnNdpBody").innerHTML=partyRows.map(r=>`<tr><td title="${esc(r.party)}">${esc(r.party)}</td><td>${safeMoney(r.sale)}</td><td>${safeMoney(r.ret)}</td><td class="return-percent">${r.pct.toFixed(2)}%</td></tr>`).join("")||'<tr><td colspan="4">No matching data</td></tr>';
+  returnRows.sort((a,b)=>String(a.payer||"").localeCompare(String(b.payer||""))||String(b.invoiceDate||"").localeCompare(String(a.invoiceDate||"")));
+  $("salesReturnDetailsBody").innerHTML=returnRows.map(r=>`<tr><td>${esc(r.payer||"(Blank)")}</td><td>${esc(r.product||r.strength||"(Blank)")}</td><td>${Number(r.returnQty).toLocaleString("en-IN",{maximumFractionDigits:3})}</td><td>${esc(r.invoiceDate||"—")}</td></tr>`).join("")||'<tr><td colspan="4">No return rows in the current filter selection</td></tr>';
+  $("salesReturnCount").textContent="Return records found: "+returnRows.length.toLocaleString("en-IN")+". Negative KG/LTRS quantities are shown as positive return quantities.";
+}
+
+if($("returnSort")) $("returnSort").addEventListener("change",()=>renderReturnTables(__returnFilteredRows));
+
+
+// Small triangle sorting on each column of the two added tables only.
+(function enableReturnHeaderSorting(){
+  const states=Object.create(null);
+  function valueForSort(row,col){
+    const cell=row.cells[col];
+    let t=(cell?cell.textContent:" ").trim();
+    // Currency, percentage and quantity columns sort numerically.
+    if(/[₹%]/.test(t) || /^-?[\d,]+(?:\.\d+)?$/.test(t)){
+      const n=parseFloat(t.replace(/[^0-9.\-]/g,""));
+      if(Number.isFinite(n)) return {type:"number",value:n};
+    }
+    // Dates such as 19-Oct-2026 sort chronologically.
+    const d=date(t);
+    if(d && /\d/.test(t) && /[A-Za-z]|[\/.-]/.test(t)) return {type:"number",value:d.getTime()};
+    return {type:"text",value:t.toLocaleLowerCase()};
+  }
+  document.addEventListener("click",function(ev){
+    const btn=ev.target.closest(".return-added .th-sort");
+    if(!btn) return;
+    const body=$(btn.dataset.sortTable), col=Number(btn.dataset.sortCol);
+    if(!body) return;
+    const key=btn.dataset.sortTable+":"+col;
+    const dir=states[key]==="asc"?"desc":"asc";
+    states[key]=dir;
+    const rows=Array.from(body.querySelectorAll("tr")).filter(tr=>tr.cells.length>1);
+    rows.sort((a,b)=>{
+      const av=valueForSort(a,col),bv=valueForSort(b,col);
+      let cmp=av.type==="number"&&bv.type==="number"?av.value-bv.value:String(av.value).localeCompare(String(bv.value),undefined,{numeric:true,sensitivity:"base"});
+      return dir==="asc"?cmp:-cmp;
+    });
+    rows.forEach(r=>body.appendChild(r));
+    document.querySelectorAll('.return-added .th-sort[data-sort-table="'+body.id+'"]').forEach(b=>{
+      b.setAttribute("aria-sort",b===btn?(dir==="asc"?"ascending":"descending"):"none");
+      const tri=b.querySelector(".tri");
+      if(tri) tri.textContent=b===btn?(dir==="asc"?"▲":"▼"):"▲▼";
+    });
+  });
+})();
+
+
 
 function resetFilters(){
   Object.keys(multiSelections).forEach(k=>multiSelections[k].clear());
